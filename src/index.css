@@ -1,0 +1,48 @@
+.nav-link-active {
+  padding: 10px 20px;
+  margin: 5px 0px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  margin-right: -20px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #2b3513;
+  text-decoration: none;
+}
+
+.nav-link-active svg {
+  margin-right: 20px;
+}
+
+.nav-link-active:hover {
+  background-color: #fff;
+  color: #2b3513;
+  transition: all 0.5s;
+}
+
+.nav-link-inactive {
+  padding: 10px 20px;
+  margin: 5px 0px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  margin-right: -20px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-link-inactive svg {
+  margin-right: 20px;
+}
+
+.nav-link-inactive:hover {
+  background-color: #fff;
+  color: #2b3513;
+  transition: all 0.5s;
+}
