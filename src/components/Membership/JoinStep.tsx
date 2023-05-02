@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Button from "../Button/Button";
-import OffCanvas from "../OffCanvas/OffCanvas";
 import { useMediaQuery } from "react-responsive";
-import WhyjoinTable from "../Tables/Membership/WhyjoinTable";
-import WhyJoinCreate from "../Modals/WhyJoin/WhyJoinCreate";
+import OffCanvas from "../OffCanvas/OffCanvas";
+import Button from "../Button/Button";
+import JoinStepCreate from "../Modals/JoinStep/JoinStepCreate";
+import JoinStepTable from "../Tables/Membership/JoinStepTable";
 
-const WhyJoin = () => {
+const JoinStep = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
 
@@ -17,7 +17,7 @@ const WhyJoin = () => {
         setIsOpen={setIsOpen}
         isOpen={isOpen}
       >
-        <WhyJoinCreate closefn={() => setIsOpen(!isOpen)} />
+        <JoinStepCreate closefn={() => setIsOpen(!isOpen)} />
       </OffCanvas>
 
       <div
@@ -32,9 +32,9 @@ const WhyJoin = () => {
           Create New
         </Button>
       </div>
-      <WhyjoinTable />
+      <JoinStepTable />
     </>
   );
 };
 
-export default WhyJoin;
+export default JoinStep;

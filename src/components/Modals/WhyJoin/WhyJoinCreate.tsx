@@ -72,6 +72,7 @@ const WhyJoinCreate: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     <>
       <ModalsContainer>
         <Form onSubmit={handleSubmit(onSubmitHandler)}>
+          <h2>Create Why Join Item</h2>
           <FormError>{errors?.header?.message}</FormError>
           <FormInput>
             <label>

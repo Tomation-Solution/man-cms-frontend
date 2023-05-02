@@ -113,6 +113,7 @@ const EditTrainingsModal: React.FC<{
           progressClassName: "toastProgress",
         });
         reset();
+        queryClient.invalidateQueries(`trainings-${trainingsId}`);
         queryClient.invalidateQueries("all-trainings");
         closefn();
       },

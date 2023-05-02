@@ -118,6 +118,7 @@ const EditNewsModal: React.FC<{ newsId: number; closefn: () => void }> = ({
         progressClassName: "toastProgress",
         icon: false,
       });
+      queryClient.invalidateQueries(`news-${newsId}`);
       queryClient.invalidateQueries("all-news");
       closefn();
     },

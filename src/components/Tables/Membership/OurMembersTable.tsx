@@ -1,18 +1,17 @@
-import React from "react";
-import { TableReject, TableView } from "../Tables.styles";
-import { Hooks } from "react-table";
-import Tables from "../Tables";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
-import { whyJoinGetAll } from "../../../axios/api-calls";
-import Loading from "../../Loading/Loading";
-import { FormError } from "../../../globals/styles/forms.styles";
-import OffCanvas from "../../OffCanvas/OffCanvas";
-import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import WhyJoinEdit from "../../Modals/WhyJoin/WhyJoinEdit";
-import WhyJoinDelete from "../../Modals/WhyJoin/WhyJoinDelete";
+import { Hooks } from "react-table";
+import { ourMembersGetAll } from "../../../axios/api-calls";
+import { FormError } from "../../../globals/styles/forms.styles";
+import Loading from "../../Loading/Loading";
+import OffCanvas from "../../OffCanvas/OffCanvas";
+import Tables from "../Tables";
+import { TableView, TableReject } from "../Tables.styles";
+import OurMembersEdit from "../../Modals/OurMembers/OurMembersEdit";
+import OurMembersDelete from "../../Modals/OurMembers/OurMembersDelete";
 
-const WhyjoinTable = () => {
+const OurMembersTable = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [id, setId] = useState(0);
@@ -27,8 +26,8 @@ const WhyjoinTable = () => {
   };
 
   const { isLoading, isError, data, isFetching } = useQuery(
-    "all-why-join",
-    whyJoinGetAll,
+    "all-members",
+    ourMembersGetAll,
     {
       select: (data) => data.data,
       refetchOnWindowFocus: false,
@@ -41,18 +40,22 @@ const WhyjoinTable = () => {
       accessor: "id",
     },
     {
-      Header: "Type",
-      accessor: "type",
-    },
-    {
-      Header: "Header",
-      accessor: "header",
+      Header: "Name",
+      accessor: "name",
     },
   ];
 
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
+      {
+        id: "website",
+        Header: "Website Url",
+        Cell: ({ row }) => (
+          //@ts-ignore
+          <a href={`${row.original["website"]}`}>{row.original["website"]}</a>
+        ),
+      },
       {
         id: "Click to Edit",
         Header: "Click to Edit",
@@ -92,7 +95,7 @@ const WhyjoinTable = () => {
         setIsOpen={setIsOpen}
         isOpen={isOpen}
       >
-        <WhyJoinEdit closefn={closeSlider} whyId={id} />
+        <OurMembersEdit closefn={closeSlider} memId={id} />
       </OffCanvas>
       <OffCanvas
         size={isMobileScreen ? 100 : 50}
@@ -100,8 +103,7 @@ const WhyjoinTable = () => {
         setIsOpen={setIsDeleteOpen}
         isOpen={isDeleteOpen}
       >
-        {/* <DeleteNewsModal newsId={delId} closefn={closeDeleteSlider} /> */}
-        <WhyJoinDelete closefn={closeDeleteSlider} whyId={delId} />
+        <OurMembersDelete closefn={closeDeleteSlider} whyId={delId} />
       </OffCanvas>
 
       {isFetching || isLoading ? (
@@ -119,4 +121,4 @@ const WhyjoinTable = () => {
   );
 };
 
-export default WhyjoinTable;
+export default OurMembersTable;

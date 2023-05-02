@@ -93,6 +93,7 @@ const EditOffice: React.FC<{ closefn: () => void; id: number }> = ({
           icon: false,
           progressClassName: "toastProgress",
         });
+        queryClient.invalidateQueries(`operate-office-${id}`);
         queryClient.invalidateQueries("all-operate-office");
         closefn();
       },
