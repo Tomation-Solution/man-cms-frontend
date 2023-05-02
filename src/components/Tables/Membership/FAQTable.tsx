@@ -1,18 +1,17 @@
-import React from "react";
-import { TableReject, TableView } from "../Tables.styles";
-import { Hooks } from "react-table";
-import Tables from "../Tables";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
-import { whyJoinGetAll } from "../../../axios/api-calls";
-import Loading from "../../Loading/Loading";
-import { FormError } from "../../../globals/styles/forms.styles";
-import OffCanvas from "../../OffCanvas/OffCanvas";
-import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import WhyJoinEdit from "../../Modals/WhyJoin/WhyJoinEdit";
-import WhyJoinDelete from "../../Modals/WhyJoin/WhyJoinDelete";
+import { Hooks } from "react-table";
+import { faqGetAll } from "../../../axios/api-calls";
+import { FormError } from "../../../globals/styles/forms.styles";
+import Loading from "../../Loading/Loading";
+import OffCanvas from "../../OffCanvas/OffCanvas";
+import Tables from "../Tables";
+import { TableView, TableReject } from "../Tables.styles";
+import FAQSEdit from "../../Modals/FAQS/FAQSEdit";
+import FAQSDelete from "../../Modals/FAQS/FAQSDelete";
 
-const WhyjoinTable = () => {
+const FAQTable = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [id, setId] = useState(0);
@@ -27,8 +26,8 @@ const WhyjoinTable = () => {
   };
 
   const { isLoading, isError, data, isFetching } = useQuery(
-    "all-why-join",
-    whyJoinGetAll,
+    "all-faqs",
+    faqGetAll,
     {
       select: (data) => data.data,
       refetchOnWindowFocus: false,
@@ -39,10 +38,6 @@ const WhyjoinTable = () => {
     {
       Header: "S/N",
       accessor: "id",
-    },
-    {
-      Header: "Type",
-      accessor: "type",
     },
     {
       Header: "Header",
@@ -92,7 +87,7 @@ const WhyjoinTable = () => {
         setIsOpen={setIsOpen}
         isOpen={isOpen}
       >
-        <WhyJoinEdit closefn={closeSlider} whyId={id} />
+        <FAQSEdit closefn={closeSlider} faqId={id} />
       </OffCanvas>
       <OffCanvas
         size={isMobileScreen ? 100 : 50}
@@ -100,8 +95,7 @@ const WhyjoinTable = () => {
         setIsOpen={setIsDeleteOpen}
         isOpen={isDeleteOpen}
       >
-        {/* <DeleteNewsModal newsId={delId} closefn={closeDeleteSlider} /> */}
-        <WhyJoinDelete closefn={closeDeleteSlider} whyId={delId} />
+        <FAQSDelete closefn={closeDeleteSlider} joinId={delId} />
       </OffCanvas>
 
       {isFetching || isLoading ? (
@@ -119,4 +113,4 @@ const WhyjoinTable = () => {
   );
 };
 
-export default WhyjoinTable;
+export default FAQTable;

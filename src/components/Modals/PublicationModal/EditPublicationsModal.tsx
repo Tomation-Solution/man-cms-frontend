@@ -135,6 +135,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
           progressClassName: "toastProgress",
           icon: false,
         });
+        queryClient.invalidateQueries(`publication-${pubid}`);
         queryClient.invalidateQueries("all-publication");
         close();
       },

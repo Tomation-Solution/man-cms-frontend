@@ -113,6 +113,7 @@ const EditEventModal: React.FC<{
           progressClassName: "toastProgress",
         });
         reset();
+        queryClient.invalidateQueries(`event-${eventsId}`);
         queryClient.invalidateQueries("all-events");
         closefn();
       },

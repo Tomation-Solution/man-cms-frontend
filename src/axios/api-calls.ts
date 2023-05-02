@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = "https://web-production-9688.up.railway.app/api";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -542,7 +542,7 @@ export const whyJoinRetrieve = async (id: any) => {
 export const whyJoinUpdate = async (payload: any) => {
   const { id, data } = payload;
   try {
-    const res = await privateRequest.put(`/membership/why-join${id}`, data);
+    const res = await privateRequest.put(`/membership/why-join/${id}`, data);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -551,7 +551,148 @@ export const whyJoinUpdate = async (payload: any) => {
 
 export const whyJoinDelete = async (id: any) => {
   try {
-    const res = await privateRequest.delete(`/membership/why-join${id}`);
+    const res = await privateRequest.delete(`/membership/why-join/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//JOIN STEP
+export const joinStepCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/membership/join-step`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const joinStepGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/join-step`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const joinStepRetrieve = async (id: any) => {
+  try {
+    const res = await privateRequest.get(`/membership/join-step/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const joinStepUpdate = async (payload: any) => {
+  const { id, data } = payload;
+  try {
+    const res = await privateRequest.put(`/membership/join-step/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const joinStepDelete = async (id: any) => {
+  try {
+    const res = await privateRequest.delete(`/membership/join-step/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//FAQ
+export const faqCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/membership/faq`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const faqGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/faq`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const faqRetrieve = async (id: any) => {
+  try {
+    const res = await privateRequest.get(`/membership/faq/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const faqUpdate = async (payload: any) => {
+  const { id, data } = payload;
+  try {
+    const res = await privateRequest.put(`/membership/faq/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const faqDelete = async (id: any) => {
+  try {
+    const res = await privateRequest.delete(`/membership/faq/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//OUR MEMBERS
+export const ourMembersCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/membership/our-members`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const ourMembersGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/our-members`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const ourMembersRetrieve = async (id: any) => {
+  try {
+    const res = await privateRequest.get(`/membership/our-members/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const ourMembersUpdate = async (payload: any) => {
+  const { id, data } = payload;
+  try {
+    const res = await privateRequest.put(`/membership/our-members/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const ourMembersDelete = async (id: any) => {
+  try {
+    const res = await privateRequest.delete(`/membership/our-members/${id}`);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);

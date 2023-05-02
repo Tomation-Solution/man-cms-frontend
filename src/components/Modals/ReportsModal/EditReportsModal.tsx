@@ -118,6 +118,7 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
         progressClassName: "toastProgress",
         icon: false,
       });
+      queryClient.invalidateQueries(`report-${reportId}`);
       queryClient.invalidateQueries("all-reports");
       closefn();
     },

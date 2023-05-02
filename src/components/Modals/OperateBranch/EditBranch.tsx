@@ -13,7 +13,6 @@ import type { Asserts } from "yup";
 import { CustomModalButton } from "../../../globals/styles/CustomFormComponents";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
-  operateBranchCreate,
   operateBranchRetrieve,
   operateBranchUpdate,
 } from "../../../axios/api-calls";
@@ -99,6 +98,7 @@ const EditBranch: React.FC<{ closefn: () => void; id: number }> = ({
           icon: false,
           progressClassName: "toastProgress",
         });
+        queryClient.invalidateQueries(`operate-branch-${id}`);
         queryClient.invalidateQueries("all-operate-branch");
         closefn();
       },
