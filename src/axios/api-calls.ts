@@ -698,3 +698,22 @@ export const ourMembersDelete = async (id: any) => {
     throw new AxiosError(e);
   }
 };
+
+//GALLERY
+export const galleryGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/gallery/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/gallery/`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
