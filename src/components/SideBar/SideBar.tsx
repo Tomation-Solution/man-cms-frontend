@@ -99,7 +99,7 @@ const SideBar: FC<Props> = ({ show }) => {
             Reports
           </CustomSideBarNavLinks>
 
-          <CustomSideBarNavLinks where="/">
+          <CustomSideBarNavLinks where="/gallery">
             <AiFillSetting />
             Gallery
           </CustomSideBarNavLinks>
