@@ -2,8 +2,8 @@ import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 
-// const BASE_URL = "https://web-production-9688.up.railway.app/api";
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = "https://web-production-9688.up.railway.app/api";
+// const BASE_URL = "http://127.0.0.1:8000/api";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
