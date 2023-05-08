@@ -20,9 +20,8 @@ import { datefromatter } from "../../../utils/DateFormatter";
 type InputDataType = {
   image: string;
   name: string;
-  is_special: boolean | string;
+  training_type: boolean | string;
   group_type: string;
-  payment_type: string;
   location: string;
   start_date: Date | string;
   end_date: Date | string;
@@ -33,9 +32,8 @@ type InputDataType = {
 const schema = yup.object({
   image: yup.mixed().required(),
   name: yup.string().required(),
-  is_special: yup.string().required(),
+  training_type: yup.string().required(),
   group_type: yup.string().required(),
-  payment_type: yup.string().required(),
   location: yup.string().required(),
   start_date: yup.date().required(),
   end_date: yup.date().required(),
@@ -55,9 +53,8 @@ const CreateTrainings: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     defaultValues: {
       image: "",
       name: "",
-      is_special: "",
+      training_type: "",
       group_type: "",
-      payment_type: "",
       location: "",
       start_date: "",
       end_date: "",
@@ -154,7 +151,7 @@ const CreateTrainings: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors?.is_paid?.message}</FormError>
             <FormSelect>
               <label>
-                Is Paid Training
+                Is this a paid training
                 <br />
                 <small>If true a valid price must be provided</small>
                 <br />
@@ -187,17 +184,6 @@ const CreateTrainings: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 <textarea {...register("location", { required: true })} />
               </label>
             </FormInput>
-            <FormError>{errors?.payment_type?.message}</FormError>
-            <FormInput>
-              <label>
-                Payment Type e.g(in-person / online / both)
-                <br />
-                <input
-                  type="text"
-                  {...register("payment_type", { required: true })}
-                />
-              </label>
-            </FormInput>
             <FormError>{errors?.group_type?.message}</FormError>
             <FormInput>
               <label>
@@ -209,21 +195,17 @@ const CreateTrainings: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 />
               </label>
             </FormInput>
-            <FormError>{errors?.is_special?.message}</FormError>
-            <FormSelect>
+            <FormError>{errors?.training_type?.message}</FormError>
+            <FormInput>
               <label>
-                Is Special Training
+                Type of Training
                 <br />
-                <select
-                  defaultValue={""}
-                  {...register("is_special", { required: true })}
-                >
-                  <option disabled>select an option</option>
-                  <option value={"true"}>Yes</option>
-                  <option value={"false"}>No</option>
-                </select>
+                <input
+                  type="text"
+                  {...register("training_type", { required: true })}
+                />
               </label>
-            </FormSelect>
+            </FormInput>
             <FormError>
               {errors?.start_date?.message ? "invalid start date" : null}
             </FormError>

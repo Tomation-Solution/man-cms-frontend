@@ -9,11 +9,18 @@ import { useQuery } from "react-query";
 import { galleryGetAll } from "../../axios/api-calls";
 import Loading from "../Loading/Loading";
 import { FormError } from "../../globals/styles/forms.styles";
+import { datefromatter } from "../../utils/DateFormatter";
+import GalleryDelete from "../Modals/GalleryModals/GalleryDelete";
+import GalleryRename from "../Modals/GalleryModals/GalleryRename";
 
 const Gallery = () => {
   const [showModal, setShowModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
+  const [galleryId, setGalleryId] = useState(0);
+  const [galleryName, setGalleryName] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
 
   const { isLoading, isFetching, isError, data } = useQuery(
     "all-gallery",
@@ -23,7 +30,6 @@ const Gallery = () => {
       select: (data) => data.data,
     }
   );
-  console.log(data);
   return (
     <>
       {isLoading || isFetching ? (
@@ -31,8 +37,26 @@ const Gallery = () => {
       ) : !isError ? (
         <>
           {showModal && (
-            <GalleryModal closefn={() => setShowModal(!showModal)} />
+            <GalleryModal
+              galleryid={galleryId}
+              closefn={() => setShowModal(!showModal)}
+            />
           )}
+          {showDeleteModal && (
+            <GalleryDelete
+              galleryId={galleryId}
+              galleryName={galleryName}
+              closefn={() => setShowDeleteModal(!showDeleteModal)}
+            />
+          )}
+          {showRenameModal && (
+            <GalleryRename
+              galleryId={galleryId}
+              galleryName={galleryName}
+              closefn={() => setShowRenameModal(!showRenameModal)}
+            />
+          )}
+
           <OffCanvas
             size={isMobileScreen ? 100 : 50}
             btnClick={() => null}
@@ -58,14 +82,41 @@ const Gallery = () => {
             <div className="gallery-items">
               {data.map((item: any, index: number) => (
                 <div className="gallery-item" key={index}>
-                  <p>Image Folder</p>
-                  <small>Created on: 2023-03-10</small>
+                  <p>{item.name}</p>
+                  <small>
+                    Created on: {datefromatter(new Date(item.created_at))}
+                  </small>
 
                   <div className="gallery-modal-btn">
-                    <Button isSmall onClick={() => setShowModal(!showModal)}>
+                    <Button
+                      isSmall
+                      onClick={() => {
+                        setGalleryId(item.id);
+                        setGalleryName(item.name);
+                        setShowRenameModal(!showRenameModal);
+                      }}
+                    >
+                      Rename
+                    </Button>
+                    <Button
+                      isSmall
+                      onClick={() => {
+                        setGalleryId(item.id);
+                        setShowModal(!showModal);
+                      }}
+                    >
                       View
                     </Button>
-                    <Button isSmall>Delete</Button>
+                    <Button
+                      isSmall
+                      onClick={() => {
+                        setGalleryId(item.id);
+                        setGalleryName(item.name);
+                        setShowDeleteModal(!showDeleteModal);
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
               ))}

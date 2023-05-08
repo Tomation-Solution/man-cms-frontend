@@ -14,21 +14,11 @@ import {
 import { ModalsContainer } from "../Modals.styles";
 import Button from "../../Button/Button";
 import { convertImageToBase64String } from "../../../utils/ImageToBase64";
-
-const acceptedExtensions = [".jpeg", ".jpg", ".png", ".gif"];
-
-function validateFileExtension(file: any) {
-  if (typeof file === "string") {
-    if (file.startsWith("data:image")) return true;
-  }
-  try {
-    const fileName = file[0].name;
-    const extension = "." + fileName.split(".").pop().toLowerCase();
-    return acceptedExtensions.includes(extension);
-  } catch (e) {
-    return false;
-  }
-}
+import { useMutation, useQueryClient } from "react-query";
+import { galleryCreate } from "../../../axios/api-calls";
+import { toast } from "react-toastify";
+import Loading from "../../Loading/Loading";
+import { validateFileExtension } from "../../../utils/extensionValidator";
 
 const schema = yup.object().shape({
   name: yup.string().required(),
@@ -58,9 +48,12 @@ const schema = yup.object().shape({
 
 interface InputData extends yup.InferType<typeof schema> {}
 
-const GalleryCreateModal: React.FC<{ closefn: () => void }> = () => {
+const GalleryCreateModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
+  const queryClient = useQueryClient();
+
   const {
     register,
+    reset,
     control,
     handleSubmit,
     formState: { errors },
@@ -82,74 +75,111 @@ const GalleryCreateModal: React.FC<{ closefn: () => void }> = () => {
     name: "images",
   });
 
-  const onSubmitHandler = async (data: InputData) => {
-    const submitdata = { ...data };
+  const { isLoading, mutate } = useMutation(galleryCreate, {
+    onMutate: () => {
+      toast.info("gallery creating", {
+        icon: false,
+        progressClassName: "toastProgress",
+      });
+    },
+    onSuccess: () => {
+      toast.success("gallery created", {
+        icon: false,
+        progressClassName: "toastProgress",
+      });
+      reset();
+      queryClient.invalidateQueries("all-gallery");
+      closefn();
+    },
+    onError: () => {
+      toast.error("gallery not created", {
+        icon: false,
+        progressClassName: "toastProgress",
+      });
+    },
+  });
 
-    submitdata.images.forEach(async (item) => {
+  const onSubmitHandler = async (data: InputData) => {
+    const { images, ...payload } = data;
+
+    const newImages = images.map(async (item) => {
       const base64String = await convertImageToBase64String(item.image);
-      item.image = base64String as string;
+      return {
+        caption: item.caption,
+        image: base64String,
+      };
     });
 
-    console.log(data);
+    const final = await Promise.all(newImages);
+    mutate({ ...payload, images: final });
   };
 
   return (
     <>
-      <ModalsContainer>
-        <Form onSubmit={handleSubmit(onSubmitHandler)}>
-          <h2>Create Gallery</h2>
-          <FormError>{errors?.name?.message}</FormError>
-          <FormInput>
-            <label>
-              Name
-              <br />
-              <input type="text" {...register("name")} />
-            </label>
-          </FormInput>
-
-          <FormError>{errors?.images?.message}</FormError>
-          {fields.map((fields, index) => (
-            <section key={fields.id}>
-              <FormError>{errors?.images?.[index]?.caption?.message}</FormError>
-              <FormInput>
-                <label>
-                  Caption
-                  <br />
-                  <input type="text" {...register(`images.${index}.caption`)} />
-                </label>
-              </FormInput>
-              <FormError>{errors?.images?.[index]?.image?.message}</FormError>
-              <FormInput>
-                <label>
-                  Image
-                  <br />
-                  <input
-                    type="file"
-                    accept=".jpeg,.jpg,.png,.gif"
-                    {...register(`images.${index}.image`)}
-                  />
-                </label>
-              </FormInput>
-              <div>
-                <Button styleType={"whiteBg"} onClick={() => remove(index)}>
-                  DELETE
-                </Button>
+      {isLoading ? (
+        <Loading light loading />
+      ) : (
+        <ModalsContainer>
+          <Form onSubmit={handleSubmit(onSubmitHandler)}>
+            <h2>Create Gallery</h2>
+            <FormError>{errors?.name?.message}</FormError>
+            <FormInput>
+              <label>
+                Name
                 <br />
-              </div>
-            </section>
-          ))}
-          <AddMoreButton
-            justify="center"
-            click={() => append({ caption: "", image: "" })}
-          >
-            Add More Images
-          </AddMoreButton>
+                <input type="text" {...register("name")} />
+              </label>
+            </FormInput>
 
-          <div>
-            <CustomModalButton>CREATE</CustomModalButton>
-          </div>
-        </Form>
-      </ModalsContainer>
+            <FormError>{errors?.images?.message}</FormError>
+            {fields.map((fields, index) => (
+              <section key={fields.id}>
+                <FormError>
+                  {errors?.images?.[index]?.caption?.message}
+                </FormError>
+                <FormInput>
+                  <label>
+                    Caption
+                    <br />
+                    <input
+                      type="text"
+                      {...register(`images.${index}.caption`)}
+                    />
+                  </label>
+                </FormInput>
+                <FormError>{errors?.images?.[index]?.image?.message}</FormError>
+                <FormInput>
+                  <label>
+                    Image
+                    <br />
+                    <input
+                      type="file"
+                      accept=".jpeg,.jpg,.png,.gif"
+                      {...register(`images.${index}.image`)}
+                    />
+                  </label>
+                </FormInput>
+                <div>
+                  <Button styleType={"whiteBg"} onClick={() => remove(index)}>
+                    DELETE
+                  </Button>
+                  <br />
+                </div>
+              </section>
+            ))}
+            <AddMoreButton
+              justify="center"
+              click={() => append({ caption: "", image: "" })}
+            >
+              Add More Images
+            </AddMoreButton>
+
+            <div>
+              <CustomModalButton>CREATE</CustomModalButton>
+            </div>
+          </Form>
+        </ModalsContainer>
+      )}
     </>
   );
 };

@@ -124,6 +124,16 @@ const SideBar: FC<Props> = ({ show }) => {
             Membership
           </CustomSideBarNavLinks>
 
+          <CustomSideBarNavLinks where="/service-request">
+            <MdRoundaboutLeft />
+            Request For Service
+          </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/newsletter-sub">
+            <MdRoundaboutLeft />
+            NewsLetter Subscriptions
+          </CustomSideBarNavLinks>
+
           <SideBtn onClick={deleteUserFn}>
             <BiLogOut />
             Logout

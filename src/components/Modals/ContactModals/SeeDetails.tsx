@@ -8,6 +8,10 @@ const SeeDetails: React.FC<{ data: DataType }> = ({ data }) => {
     <ContactContainer>
       <h1>{data.name}</h1>
       <p>
+        <span className="darkend">Date Sent: </span>
+        {datefromatter(new Date(data.created_at))}
+      </p>
+      <p>
         <span className="darkend">Email: </span>
         {data.email}
       </p>
@@ -22,10 +26,6 @@ const SeeDetails: React.FC<{ data: DataType }> = ({ data }) => {
       <p>
         <span className="darkend">Message: </span>
         {data.message}
-      </p>
-      <p>
-        <span className="darkend">Date Sent: </span>
-        {datefromatter(new Date(data.created_at))}
       </p>
     </ContactContainer>
   );

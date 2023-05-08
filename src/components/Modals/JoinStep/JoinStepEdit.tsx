@@ -216,7 +216,7 @@ const JoinStepEdit: React.FC<{ joinId: number; closefn: () => void }> = ({
             </AddMoreButton>
 
             <div>
-              <CustomModalButton isDisabled={isLoading}>Edit</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

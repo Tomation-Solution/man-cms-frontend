@@ -20,9 +20,8 @@ import { datefromatter } from "../../../utils/DateFormatter";
 type InputDataType = {
   image: string;
   name: string;
-  is_special: boolean | string;
+  is_agm: boolean | string;
   group_type: string;
-  payment_type: string;
   location: string;
   start_date: Date | string;
   end_date: Date | string;
@@ -33,9 +32,8 @@ type InputDataType = {
 const schema = yup.object({
   image: yup.mixed().required(),
   name: yup.string().required(),
-  is_special: yup.string().required(),
+  is_agm: yup.string().required(),
   group_type: yup.string().required(),
-  payment_type: yup.string().required(),
   location: yup.string().required(),
   start_date: yup.date().required(),
   end_date: yup.date().required(),
@@ -55,9 +53,8 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     defaultValues: {
       image: "",
       name: "",
-      is_special: "",
+      is_agm: "",
       group_type: "",
-      payment_type: "",
       location: "",
       start_date: "",
       end_date: "",
@@ -150,7 +147,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors?.is_paid?.message}</FormError>
             <FormSelect>
               <label>
-                Is Paid Event
+                Is this a paid event
                 <br />
                 <small>If true a valid price must be provided</small>
                 <br />
@@ -183,17 +180,6 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 <textarea {...register("location", { required: true })} />
               </label>
             </FormInput>
-            <FormError>{errors?.payment_type?.message}</FormError>
-            <FormInput>
-              <label>
-                Payment Type e.g(in-person / online / both)
-                <br />
-                <input
-                  type="text"
-                  {...register("payment_type", { required: true })}
-                />
-              </label>
-            </FormInput>
             <FormError>{errors?.group_type?.message}</FormError>
             <FormInput>
               <label>
@@ -205,14 +191,14 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 />
               </label>
             </FormInput>
-            <FormError>{errors?.is_special?.message}</FormError>
+            <FormError>{errors?.is_agm?.message}</FormError>
             <FormSelect>
               <label>
-                Is Special Event
+                Is this event an Annual General Meeting
                 <br />
                 <select
                   defaultValue={""}
-                  {...register("is_special", { required: true })}
+                  {...register("is_agm", { required: true })}
                 >
                   <option disabled>select an option</option>
                   <option value={"true"}>Yes</option>
