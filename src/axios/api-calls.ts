@@ -2,7 +2,8 @@ import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 
-const BASE_URL = "https://web-production-9688.up.railway.app/api";
+// const BASE_URL = "https://web-production-9688.up.railway.app/api";
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -80,6 +81,43 @@ export const publicationUpdate = async (data: {
 export const publicationDelete = async (id: number) => {
   try {
     const res = await privateRequest.delete(`/publications/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const publicationTypesGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/publications/type`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const publicationTypesRename = async (payload: any) => {
+  const { id, ...data } = payload;
+  try {
+    const res = await privateRequest.patch(`/publications/type/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const publicationTypesDelete = async (id: any) => {
+  try {
+    const res = await privateRequest.delete(`/publications/type/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const publicationTypesCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/publications/type`, payload);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -693,6 +731,110 @@ export const ourMembersUpdate = async (payload: any) => {
 export const ourMembersDelete = async (id: any) => {
   try {
     const res = await privateRequest.delete(`/membership/our-members/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//GALLERY
+export const galleryGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/gallery/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryCreate = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/gallery/`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryRetrieve = async (id: number) => {
+  try {
+    const res = await privateRequest.get(`/gallery/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryDelete = async (id: number) => {
+  try {
+    const res = await privateRequest.delete(`/gallery/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryItemDelete = async (id: number) => {
+  try {
+    const res = await privateRequest.delete(`/gallery/gallery-item/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryItemAdd = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/gallery/gallery-item/add`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryItemRetrieve = async (id: number) => {
+  try {
+    const res = await privateRequest.get(`/gallery/gallery-item/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryItemUpdate = async (payload: any) => {
+  const { id, ...data } = payload;
+  try {
+    const res = await privateRequest.patch(`/gallery/gallery-item/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const galleryRename = async (payload: any) => {
+  const { id, ...data } = payload;
+  try {
+    const res = await privateRequest.post(`/gallery/rename/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//SERVICE
+export const serviceRequestGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/services/request-service`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//NEWS LETTER SUBSCRIPTIONS
+export const newLetterGetAll = async () => {
+  try {
+    const res = await privateRequest.get(`/services/newsletter-subscription`);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);

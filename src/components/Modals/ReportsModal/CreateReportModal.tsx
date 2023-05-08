@@ -18,6 +18,7 @@ import { reportsCreate } from "../../../axios/api-calls";
 import { toast } from "react-toastify";
 import Loading from "../../Loading/Loading";
 import Button from "../../Button/Button";
+import { validateFileExtension } from "../../../utils/extensionValidator";
 
 type detailsObj = {
   header: string;
@@ -35,7 +36,19 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.string().url().required(),
+  link: yup.mixed().test({
+    message: "Please provide a supported file type",
+    test: (file, context) => {
+      if (!file) {
+        return false;
+      }
+      const isValid = validateFileExtension(file, false);
+      if (!isValid) {
+        return isValid;
+      }
+      return isValid;
+    },
+  }),
   image: yup.mixed().required(),
   details: yup
     .array(
@@ -109,10 +122,12 @@ const CreateReportModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
 
   const onSubmitHandler = (data: formInputData) => {
     console.log(data);
-    let { image, details, ...payload } = data;
+    let { image, details, link, ...payload } = data;
     image = image[0];
+    link = link[0];
     const FormDataHandler = new FormData();
     FormDataHandler.append("image", image);
+    FormDataHandler.append("link", link);
     FormDataHandler.append("details", JSON.stringify(details));
     Object.keys(payload)?.forEach((key) =>
       //@ts-ignore
@@ -162,9 +177,14 @@ const CreateReportModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors?.link?.message}</FormError>
             <FormInput>
               <label>
-                Read More Link*
+                Upload File*
                 <br />
-                <input type="text" {...register("link", { required: true })} />
+                <input
+                  type={"file"}
+                  accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
+                  style={{ backgroundColor: "#fff" }}
+                  {...register("link", { required: true })}
+                />
               </label>
             </FormInput>
 

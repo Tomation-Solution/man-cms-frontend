@@ -9,6 +9,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   publicationRetrieve,
+  publicationTypesGetAll,
   publicationUpdate,
 } from "../../../axios/api-calls";
 
@@ -23,6 +24,7 @@ import {
   SelectImage,
 } from "../../../globals/styles/CustomFormComponents";
 import { toast } from "react-toastify";
+import { validateFileExtension } from "../../../utils/extensionValidator";
 
 type detailsObj = {
   header: string;
@@ -32,7 +34,7 @@ type detailsObj = {
 type formInputData = {
   name: string;
   title: string;
-  link: string;
+  link: any;
   is_paid: string;
   price: string;
   type: string;
@@ -43,7 +45,6 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.string().url().required(),
   image: yup.mixed().required(),
   is_paid: yup.string().required(),
   type: yup.string().required(),
@@ -121,6 +122,16 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
     },
   });
 
+  const {
+    isLoading: getLoading,
+    isFetching: getFetching,
+    isError: getError,
+    data: getData,
+  } = useQuery("all-publication-types", publicationTypesGetAll, {
+    select: (data) => data.data,
+    refetchOnWindowFocus: false,
+  });
+
   const { mutate, isLoading: editLoading } = useMutation(
     (data: any) => publicationUpdate(data),
     {
@@ -151,10 +162,14 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
   const onSubmitHandler = (data: formInputData) => {
     if (data.is_paid === "true") {
       const FormDataHandler = new FormData();
-      let { image, details, ...payload } = data;
+      let { image, details, link, ...payload } = data;
       if (typeof data.image !== "string" && data.image instanceof FileList) {
         image = image[0];
         FormDataHandler.append("image", image);
+      }
+      if (typeof data.link !== "string" && data.link instanceof FileList) {
+        link = link[0];
+        FormDataHandler.append("link", link);
       }
 
       Object.keys(payload)?.forEach((key) =>
@@ -166,10 +181,14 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
       mutate({ pubid, FormDataHandler });
     } else {
       const FormDataHandler = new FormData();
-      let { image, details, price, ...payload } = data;
+      let { image, details, price, link, ...payload } = data;
       if (typeof data.image !== "string" && data.image instanceof FileList) {
         image = image[0];
         FormDataHandler.append("image", image);
+      }
+      if (typeof data.link !== "string" && data.link instanceof FileList) {
+        link = link[0];
+        FormDataHandler.append("link", link);
       }
 
       Object.keys(payload)?.forEach((key) =>
@@ -182,14 +201,24 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
     }
   };
 
-  const previousImage = getValues("image");
+  const previousImage = data?.image;
+  const previousFileLink = data?.link;
 
   return (
     <>
       <ModalsContainer>
-        {isLoading || isFetching || editLoading ? (
-          <Loading light loading={isLoading || isFetching || editLoading} />
-        ) : !isError ? (
+        {isLoading || isFetching || editLoading || getLoading || getFetching ? (
+          <Loading
+            light
+            loading={
+              isLoading ||
+              isFetching ||
+              editLoading ||
+              getLoading ||
+              getFetching
+            }
+          />
+        ) : !isError || getError ? (
           <>
             <Form onSubmit={handleSubmit(onSubmitHandler)}>
               <h2>Edit a Publication</h2>
@@ -225,7 +254,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
               <FormError>{errors?.is_paid?.message}</FormError>
               <FormSelect>
                 <label>
-                  Is Paid Publication*
+                  Is this a paid publication*
                   <br />
                   <small>if true a valid price must be provided</small>
                   <br />
@@ -235,7 +264,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                   >
                     <option disabled>select an option</option>
                     <option value="true">True</option>
-                    <option value="false">No</option>
+                    <option value="false">False</option>
                   </select>
                 </label>
               </FormSelect>
@@ -264,9 +293,11 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                     {...register("type", { required: true })}
                   >
                     <option disabled>select an option</option>
-                    <option value={"OTHERS"}>OTHERS</option>
-                    <option value={"MAGAZINE"}>MAGAZINE</option>
-                    <option value={"MCCI"}>MCCI</option>
+                    {getData.map((item: { name: string; id: number }) => (
+                      <option value={item.id} key={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </FormSelect>
@@ -334,13 +365,23 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                 Add More or Show All
               </AddMoreButton>
 
+              <div>
+                <a
+                  href={previousFileLink}
+                  target="_blank"
+                  style={{ color: "#fff" }}
+                >
+                  Current File Link (click to view)
+                </a>
+              </div>
               <FormError>{errors?.link?.message}</FormError>
               <FormInput>
                 <label>
-                  Read More Link*
+                  Upload File*
                   <br />
                   <input
-                    type={"text"}
+                    type={"file"}
+                    accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                     style={{ backgroundColor: "#fff" }}
                     {...register("link", { required: true })}
                   />
@@ -348,7 +389,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
               </FormInput>
               <div>
                 <CustomModalButton isDisabled={isLoading}>
-                  EDIT
+                  SAVE
                 </CustomModalButton>
               </div>
             </Form>

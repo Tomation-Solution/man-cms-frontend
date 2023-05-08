@@ -28,7 +28,7 @@ type detailsObj = {
 type formInputData = {
   name: string;
   title: string;
-  link: string;
+  link: any;
   image: any;
   details: detailsObj[];
 };
@@ -36,7 +36,6 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.string().url().required(),
   image: yup.mixed().required(),
   details: yup
     .array(
@@ -132,10 +131,14 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
 
   const onSubmitHandler = (data: formInputData) => {
     const FormDataHandler = new FormData();
-    let { image, details, ...payload } = data;
+    let { image, details, link, ...payload } = data;
     if (typeof data.image !== "string" && data.image instanceof FileList) {
       image = image[0];
       FormDataHandler.append("image", image);
+    }
+    if (typeof data.link !== "string" && data.link instanceof FileList) {
+      link = link[0];
+      FormDataHandler.append("link", link);
     }
     FormDataHandler.append("details", JSON.stringify(details));
 
@@ -147,12 +150,13 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
     mutate({ reportId, FormDataHandler });
   };
 
-  const previousImage = getValues("image");
+  const previousImage = data?.image;
+  const previousFileLink = data?.link;
   return (
     <>
       <ModalsContainer>
         {isLoading || isFetching || editLoading ? (
-          <Loading loading={isLoading || isFetching || editLoading} />
+          <Loading light loading={isLoading || isFetching || editLoading} />
         ) : !isError ? (
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <h2>Edit a Report</h2>
@@ -186,12 +190,26 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
                 <input type="text" {...register("title", { required: true })} />
               </label>
             </FormInput>
+            <div>
+              <a
+                href={previousFileLink}
+                target="_blank"
+                style={{ color: "#fff" }}
+              >
+                Current File Link (click to view)
+              </a>
+            </div>
             <FormError>{errors?.link?.message}</FormError>
             <FormInput>
               <label>
-                Read More Link*
+                Upload File*
                 <br />
-                <input type="text" {...register("link", { required: true })} />
+                <input
+                  type={"file"}
+                  accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
+                  style={{ backgroundColor: "#fff" }}
+                  {...register("link", { required: true })}
+                />
               </label>
             </FormInput>
 
@@ -247,7 +265,7 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
             </AddMoreButton>
 
             <div>
-              <CustomModalButton isDisabled={isLoading}>EDIT</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

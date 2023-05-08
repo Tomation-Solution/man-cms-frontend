@@ -177,7 +177,7 @@ const EditOffice: React.FC<{ closefn: () => void; id: number }> = ({
               </label>
             </FormInput>
             <div>
-              <CustomModalButton isDisabled={isLoading}>EDIT</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

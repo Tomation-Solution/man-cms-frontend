@@ -116,7 +116,7 @@ const OurMembersEdit: React.FC<{ closefn: () => void; memId: number }> = ({
             </FormInput>
 
             <div>
-              <CustomModalButton isDisabled={isLoading}>Edit</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

@@ -15,10 +15,14 @@ import { ModalsContainer } from "../Modals.styles";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation, useQueryClient } from "react-query";
-import { publicationCreate } from "../../../axios/api-calls";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  publicationCreate,
+  publicationTypesGetAll,
+} from "../../../axios/api-calls";
 import { toast } from "react-toastify";
 import Loading from "../../Loading/Loading";
+import { validateFileExtension } from "../../../utils/extensionValidator";
 
 type detailsObj = {
   header: string;
@@ -39,7 +43,19 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.string().url().required(),
+  link: yup.mixed().test({
+    message: "Please provide a supported file type",
+    test: (file, context) => {
+      if (!file) {
+        return false;
+      }
+      const isValid = validateFileExtension(file, false);
+      if (!isValid) {
+        return isValid;
+      }
+      return isValid;
+    },
+  }),
   image: yup.mixed().required(),
   is_paid: yup.string().required(),
   type: yup.string().required(),
@@ -80,6 +96,16 @@ const CreatePublicationsModal = () => {
     },
   });
 
+  const {
+    isLoading: getLoading,
+    isFetching,
+    isError,
+    data,
+  } = useQuery("all-publication-types", publicationTypesGetAll, {
+    select: (data) => data.data,
+    refetchOnWindowFocus: false,
+  });
+
   const { mutate, isLoading } = useMutation(
     (data: any) => publicationCreate(data),
     {
@@ -116,7 +142,7 @@ const CreatePublicationsModal = () => {
 
   const onSubmitHandler = (data: formInputData) => {
     if (data.is_paid == "true") {
-      let { image, details, ...payload } = data;
+      let { image, details, link, ...payload } = data;
       image = image[0];
 
       const FormDataHandler = new FormData();
@@ -125,11 +151,12 @@ const CreatePublicationsModal = () => {
         FormDataHandler.append(key, payload[key])
       );
       FormDataHandler.append("image", image);
+      FormDataHandler.append("link", link[0]);
       FormDataHandler.append("details", JSON.stringify(details));
 
       mutate(FormDataHandler);
     } else {
-      let { image, details, price, ...payload } = data;
+      let { image, details, price, link, ...payload } = data;
       image = image[0];
 
       const FormDataHandler = new FormData();
@@ -138,6 +165,7 @@ const CreatePublicationsModal = () => {
         FormDataHandler.append(key, payload[key])
       );
       FormDataHandler.append("image", image);
+      FormDataHandler.append("link", link[0]);
       FormDataHandler.append("details", JSON.stringify(details));
 
       mutate(FormDataHandler);
@@ -146,9 +174,9 @@ const CreatePublicationsModal = () => {
   return (
     <>
       <ModalsContainer>
-        {isLoading ? (
-          <Loading light loading={isLoading} />
-        ) : (
+        {isLoading || getLoading || isFetching ? (
+          <Loading light loading={isLoading || getLoading || isFetching} />
+        ) : !isError ? (
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <h2>Create a Publication</h2>
             <br />
@@ -183,7 +211,7 @@ const CreatePublicationsModal = () => {
             <FormError>{errors?.is_paid?.message}</FormError>
             <FormSelect>
               <label>
-                Is Paid Publication*
+                Is this a paid publication*
                 <br />
                 <small>if true a valid price must be provided</small>
                 <br />
@@ -193,7 +221,7 @@ const CreatePublicationsModal = () => {
                 >
                   <option disabled>select an option</option>
                   <option value="true">True</option>
-                  <option value="false">No</option>
+                  <option value="false">False</option>
                 </select>
               </label>
             </FormSelect>
@@ -222,9 +250,11 @@ const CreatePublicationsModal = () => {
                   {...register("type", { required: true })}
                 >
                   <option disabled>select an option</option>
-                  <option value={"OTHERS"}>OTHERS</option>
-                  <option value={"MAGAZINE"}>MAGAZINE</option>
-                  <option value={"MCCI"}>MCCI</option>
+                  {data.map((item: { name: string; id: number }) => (
+                    <option value={item.id} key={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
                 </select>
               </label>
             </FormSelect>
@@ -295,10 +325,11 @@ const CreatePublicationsModal = () => {
             <FormError>{errors?.link?.message}</FormError>
             <FormInput>
               <label>
-                Read More Link*
+                Upload File*
                 <br />
                 <input
-                  type={"text"}
+                  type={"file"}
+                  accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                   style={{ backgroundColor: "#fff" }}
                   {...register("link", { required: true })}
                 />
@@ -310,6 +341,8 @@ const CreatePublicationsModal = () => {
               </CustomModalButton>
             </div>
           </Form>
+        ) : (
+          <FormError>Can't Fetch Publication Data</FormError>
         )}
       </ModalsContainer>
     </>

@@ -99,7 +99,7 @@ const SideBar: FC<Props> = ({ show }) => {
             Reports
           </CustomSideBarNavLinks>
 
-          <CustomSideBarNavLinks where="/">
+          <CustomSideBarNavLinks where="/gallery">
             <AiFillSetting />
             Gallery
           </CustomSideBarNavLinks>
@@ -122,6 +122,16 @@ const SideBar: FC<Props> = ({ show }) => {
           <CustomSideBarNavLinks where="/membership">
             <MdRoundaboutLeft />
             Membership
+          </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/service-request">
+            <MdRoundaboutLeft />
+            Request For Service
+          </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/newsletter-sub">
+            <MdRoundaboutLeft />
+            NewsLetter Subscriptions
           </CustomSideBarNavLinks>
 
           <SideBtn onClick={deleteUserFn}>

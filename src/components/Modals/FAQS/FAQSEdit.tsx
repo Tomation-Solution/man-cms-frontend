@@ -151,7 +151,7 @@ const FAQSEdit: React.FC<{ closefn: () => void; faqId: number }> = ({
             </AddMoreButton>
 
             <div>
-              <CustomModalButton isDisabled={isLoading}>EDIT</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

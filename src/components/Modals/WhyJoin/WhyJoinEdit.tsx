@@ -136,7 +136,7 @@ const WhyJoinEdit: React.FC<{ closefn: () => void; whyId: number }> = ({
             </FormSelect>
 
             <div>
-              <CustomModalButton isDisabled={isLoading}>EDIT</CustomModalButton>
+              <CustomModalButton isDisabled={isLoading}>SAVE</CustomModalButton>
             </div>
           </Form>
         ) : (

@@ -19,6 +19,9 @@ import ProspectiveMembersFormTwo from "./components/ProspectiveMembers/Prospecti
 import ApprovalMessage from "./components/ProspectiveMembers/ApprovalMessage";
 import CertificateIssuing from "./components/ProspectiveMembers/CertificateIssuing/CertificateIssuing";
 import CertificateAppointment from "./components/ProspectiveMembers/CertificateIssuing/CertificateAppointment";
+import GalleryPage from "./pages/GalleryPage";
+import ServiceRequestPages from "./pages/ServiceRequestPages";
+import NewsLetterPage from "./pages/NewsLetterPage";
 
 function App() {
   return (
@@ -44,6 +47,9 @@ function App() {
             <Route path="/trainings" element={<TrainingsPage />} />
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/membership" element={<MembershipPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/service-request" element={<ServiceRequestPages />} />
+            <Route path="/newsletter-sub" element={<NewsLetterPage />} />
             <Route
               path="/prospective-members"
               element={<ProspectiveMembers />}

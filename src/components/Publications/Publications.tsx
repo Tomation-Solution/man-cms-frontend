@@ -2,15 +2,22 @@ import React, { useState } from "react";
 import Button from "../Button/Button";
 import CreatePublicationsModal from "../Modals/PublicationModal/CreatePublicationsModal";
 import OffCanvas from "../OffCanvas/OffCanvas";
-import SearchBanner from "../SearchBanner/SearchBanner";
 import PublicationTables from "../Tables/PublicationTables/PublicationTables";
 import { useMediaQuery } from "react-responsive";
+import { PublicationsHeadBanner } from "./Publications.styles";
+import EditPublicationTypes from "../Modals/PublicationModal/EditPublicationTypes";
 
 const Publications = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showEditPublication, setShowEditPublication] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
   return (
     <>
+      {showEditPublication && (
+        <EditPublicationTypes
+          closefn={() => setShowEditPublication(!showEditPublication)}
+        />
+      )}
       <OffCanvas
         size={isMobileScreen ? 100 : 50}
         btnClick={() => null}
@@ -19,20 +26,16 @@ const Publications = () => {
       >
         <CreatePublicationsModal />
       </OffCanvas>
-      {/* <PublicationsContainer>
-        <SearchBanner />
-      </PublicationsContainer> */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Button styleType={"sec"} onClick={() => setIsOpen(!isOpen)}>
-          Create New
+
+      <PublicationsHeadBanner>
+        <Button onClick={() => setShowEditPublication(!showEditPublication)}>
+          Publication types
         </Button>
-      </div>
+        <Button styleType={"sec"} onClick={() => setIsOpen(!isOpen)}>
+          Create new publication
+        </Button>
+      </PublicationsHeadBanner>
+
       <PublicationTables />
     </>
   );

@@ -3,10 +3,11 @@ import { BackDropCon } from "./BackDrop.styles";
 
 type Props = {
   children: ReactNode;
+  overlay?: boolean;
 };
 
-const BackDrop: FC<Props> = ({ children }) => {
-  return <BackDropCon>{children}</BackDropCon>;
+const BackDrop: FC<Props> = ({ children, overlay = false }) => {
+  return <BackDropCon isOverlay={overlay}>{children}</BackDropCon>;
 };
 
 export default BackDrop;

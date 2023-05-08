@@ -5,7 +5,7 @@ import { Laptop, mobile, tablet } from "../../responsive";
 export const Header = styled.div`
   h1 {
     font-weight: 500;
-    color: ${seqLightBlue};
+    color: ${seqBlue100};
     margin-bottom: 0.3em;
   }
   h3 {

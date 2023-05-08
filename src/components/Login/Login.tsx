@@ -90,7 +90,7 @@ const Login = () => {
       <Loading loading={isLoading} />
       <LoginContainer>
         <FormContainer>
-          <h2 style={{ textAlign: "center" }}>User Registration</h2>
+          <h2 style={{ textAlign: "center" }}>Login</h2>
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <FormInput>
               <FormError>{errors?.email?.message}</FormError>
