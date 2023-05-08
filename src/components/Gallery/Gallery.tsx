@@ -30,7 +30,6 @@ const Gallery = () => {
       select: (data) => data.data,
     }
   );
-
   return (
     <>
       {isLoading || isFetching ? (
