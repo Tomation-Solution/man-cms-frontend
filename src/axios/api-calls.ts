@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
+import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -840,3 +841,51 @@ export const newLetterGetAll = async () => {
     throw new AxiosError(e);
   }
 };
+
+
+
+// service 
+type ServiceResponseType ={
+  "id": number,
+  "image": any,
+  "name": string,
+  "description": null|string,
+  "type": "CORE"|'MRC'|'MPDCL'|'OTHERS',
+  "created_at":string,
+  "updated_at": string,
+  "writer": number
+}
+export const createService =async(data:ServicePageCreationType):Promise<ServiceResponseType>=>{
+  const form = new FormData()
+  form.append('name',data.name)
+  form.append('type',data.type)
+  form.append('description',data.description)
+  form.append('image',data.image[0])
+
+  const res = await privateRequest.post('/services/all-services',form)
+  return res.data
+} 
+
+export const getServices = async ():Promise<ServiceResponseType[]>=>{
+
+  const res = await privateRequest.get('/services/all-services',)
+  return res.data.data
+}
+
+export const deleteServiceApi = async (id:number):Promise<any>=>{
+  const res = await privateRequest.delete(`/services/all-services/${id}`,)
+  return res.data
+}
+
+
+export const updateServiceApi =async({data,id}:{data:ServicePageCreationType,id:number}):Promise<ServiceResponseType>=>{
+  const form = new FormData()
+  form.append('name',data.name)
+  form.append('type',data.type)
+  form.append('description',data.description)
+  if(typeof data.image!=='string'){
+    form.append('image',data.image[0])
+  }
+  const res = await privateRequest.put(`/services/all-services/${id}`,form)
+  return res.data
+} 

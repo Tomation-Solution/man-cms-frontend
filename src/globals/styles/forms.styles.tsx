@@ -189,9 +189,9 @@ export const FormLink = styled.div`
 `;
 
 export const FormError = styled.div`
-  color: red;
+  color:crimson;
   font-weight: 500;
-  margin-top: 0.5em;
+  margin-top: 0.1em;
 `;
 
 export const FormSuccess = styled.div`
