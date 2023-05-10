@@ -889,3 +889,35 @@ export const updateServiceApi =async({data,id}:{data:ServicePageCreationType,id:
   const res = await privateRequest.put(`/services/all-services/${id}`,form)
   return res.data
 } 
+
+
+
+// mrc service
+type createMrcApiProp ={
+  name:string;
+  description:string;
+  small_text:string;
+  items:string[];
+  id?:number;
+}
+export const createMrcApi =async (data:createMrcApiProp)=>{
+  const res = await privateRequest.post(`/structure/mrc-service`,data)
+  return res.data
+}
+
+
+export const getMrcApi = async ():Promise<createMrcApiProp[]>=>{
+  const res = await privateRequest.get(`/structure/mrc-service`,)
+  return res.data.data
+}
+
+
+export const deleteMrcApi = async (id:number):Promise<any>=>{
+  const res = await privateRequest.delete(`/structure/mrc-service/${id}`,)
+  return res.data.data
+}
+
+export const updateMrcApi = async (data:createMrcApiProp):Promise<any>=>{
+  const res = await privateRequest.put(`/structure/mrc-service/${data.id}`,data)
+  return res.data
+}
