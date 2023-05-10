@@ -23,6 +23,7 @@ import GalleryPage from "./pages/GalleryPage";
 import ServiceRequestPages from "./pages/ServiceRequestPages";
 import NewsLetterPage from "./pages/NewsLetterPage";
 import ServicePage from "./pages/ServicePage/ServicePage";
+import StructurePage from "./pages/Structure/StructurePage";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
             <Route path="/service-request" element={<ServiceRequestPages />} />
             <Route path="/newsletter-sub" element={<NewsLetterPage />} />
             <Route path="/service" element={<ServicePage />} />
+            <Route path="/structure" element={<StructurePage />} />
             
             <Route
               path="/prospective-members"

@@ -127,6 +127,10 @@ const SideBar: FC<Props> = ({ show }) => {
             <MdRoundaboutLeft />
             Service Management
           </CustomSideBarNavLinks>
+          <CustomSideBarNavLinks where="/structure">
+            <MdRoundaboutLeft />
+            Structure Management
+          </CustomSideBarNavLinks>
           <CustomSideBarNavLinks where="/service-request">
             <MdRoundaboutLeft />
             Request For Service
@@ -136,7 +140,6 @@ const SideBar: FC<Props> = ({ show }) => {
             <MdRoundaboutLeft />
             NewsLetter Subscriptions
           </CustomSideBarNavLinks>
-
           <SideBtn onClick={deleteUserFn}>
             <BiLogOut />
             Logout
