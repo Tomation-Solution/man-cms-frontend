@@ -22,6 +22,7 @@ import CertificateAppointment from "./components/ProspectiveMembers/CertificateI
 import GalleryPage from "./pages/GalleryPage";
 import ServiceRequestPages from "./pages/ServiceRequestPages";
 import NewsLetterPage from "./pages/NewsLetterPage";
+import ServicePage from "./pages/ServicePage/ServicePage";
 
 function App() {
   return (
@@ -50,6 +51,8 @@ function App() {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/service-request" element={<ServiceRequestPages />} />
             <Route path="/newsletter-sub" element={<NewsLetterPage />} />
+            <Route path="/service" element={<ServicePage />} />
+            
             <Route
               path="/prospective-members"
               element={<ProspectiveMembers />}

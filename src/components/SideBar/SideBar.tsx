@@ -123,7 +123,10 @@ const SideBar: FC<Props> = ({ show }) => {
             <MdRoundaboutLeft />
             Membership
           </CustomSideBarNavLinks>
-
+          <CustomSideBarNavLinks where="/service">
+            <MdRoundaboutLeft />
+            Service Management
+          </CustomSideBarNavLinks>
           <CustomSideBarNavLinks where="/service-request">
             <MdRoundaboutLeft />
             Request For Service
