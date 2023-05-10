@@ -871,3 +871,21 @@ export const getServices = async ():Promise<ServiceResponseType[]>=>{
   const res = await privateRequest.get('/services/all-services',)
   return res.data.data
 }
+
+export const deleteServiceApi = async (id:number):Promise<any>=>{
+  const res = await privateRequest.delete(`/services/all-services/${id}`,)
+  return res.data
+}
+
+
+export const updateServiceApi =async({data,id}:{data:ServicePageCreationType,id:number}):Promise<ServiceResponseType>=>{
+  const form = new FormData()
+  form.append('name',data.name)
+  form.append('type',data.type)
+  form.append('description',data.description)
+  if(typeof data.image!=='string'){
+    form.append('image',data.image[0])
+  }
+  const res = await privateRequest.put(`/services/all-services/${id}`,form)
+  return res.data
+} 
