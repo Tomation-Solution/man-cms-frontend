@@ -186,6 +186,7 @@ export const MrcUpdateModal = ({ mrc }: { mrc: FormType }) => {
         //@ts-ignore
         setValue(
           "items",
+          // @ts-ignore
           mrc.items.map((d) => {
             if (d) {
               return { value: d };
