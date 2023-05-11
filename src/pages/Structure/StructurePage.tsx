@@ -43,7 +43,7 @@ const StructurePage = ()=>{
           }}
           onClick={() => setOptions("mrc")}
         >
-            MRC
+            MRC Services
           {/* Sectoral Group Page */}
         </span>
 
@@ -59,9 +59,9 @@ const StructurePage = ()=>{
             alignItems: "center",
             justifyContent: "center",
           }}
-          onClick={() => setOptions("Public")}
+          onClick={() => setOptions("MRC page content")}
         >
-          Public
+          MRC page content
         </span>
 
         <span
@@ -88,6 +88,7 @@ const StructurePage = ()=>{
 
       </div>
       {options === "mrc" ? <MrcTab /> : null}
+      {options === "MRC page content" ? <h1>hello world</h1>: null}
         </div>
     )
 }
