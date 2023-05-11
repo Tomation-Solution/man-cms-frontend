@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
+import { MPDCLType } from "../components/Modals/MPDCLModal";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -953,4 +954,52 @@ export const updateMrcApi = async (data: createMrcApiProp): Promise<any> => {
     data
   );
   return res.data;
+};
+
+
+//get MPDCL
+type MpdclType ={
+  "id": number,
+  "type": string,
+  "header": string,
+  "description":string,
+  "image": string|null 
+}
+export const getMpdclApi = async ():Promise<MpdclType[]>=>{
+  const resp = await privateRequest.get('/structure/mpdcl-service')
+  return resp.data.data
+}
+
+
+export const createMpdclApi = async ({data}:{
+  data:MPDCLType }):Promise<MPDCLType>=>{
+  const form = new FormData()
+  form.append('type',data.type)
+  form.append('header',data.header)
+  form.append('description',data.description)
+  if(data.image){
+    form.append('image',data.image[0])
+  }
+  const resp  = await privateRequest.post('/structure/mpdcl-service',form)
+
+  return resp.data 
+}
+export const updateMpdclApi = async ({data}:{
+  data:MPDCLType }):Promise<MPDCLType>=>{
+  const form = new FormData()
+  form.append('type',data.type)
+  form.append('header',data.header)
+  form.append('description',data.description)
+  if(typeof data.image!=='string'){
+    form.append('image',data.image[0])
+  }
+  const resp  = await privateRequest.put(`/structure/mpdcl-service/${data.id}`,form)
+
+  return resp.data 
+}
+
+
+export const deleteMpdclApi = async (id: number): Promise<any> => {
+  const res = await privateRequest.delete(`/structure/mpdcl-service/${id}`);
+  return res.data.data;
 };
