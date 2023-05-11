@@ -24,6 +24,7 @@ import ServiceRequestPages from "./pages/ServiceRequestPages";
 import NewsLetterPage from "./pages/NewsLetterPage";
 import ServicePage from "./pages/ServicePage/ServicePage";
 import StructurePage from "./pages/Structure/StructurePage";
+import PaymentsPage from "./pages/PaymentsPage";
 
 function App() {
   return (
@@ -54,7 +55,11 @@ function App() {
             <Route path="/newsletter-sub" element={<NewsLetterPage />} />
             <Route path="/service" element={<ServicePage />} />
             <Route path="/structure" element={<StructurePage />} />
-            
+            <Route
+              path="/payments-and-registrations"
+              element={<PaymentsPage />}
+            />
+
             <Route
               path="/prospective-members"
               element={<ProspectiveMembers />}
