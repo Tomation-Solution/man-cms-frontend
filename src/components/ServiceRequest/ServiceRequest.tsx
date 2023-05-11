@@ -33,7 +33,6 @@ const ServiceRequest = () => {
           <FormError>Can't Fetch Service Requirements</FormError>
         )}
       </ContactMainContainer>
-      ;
     </>
   );
 };

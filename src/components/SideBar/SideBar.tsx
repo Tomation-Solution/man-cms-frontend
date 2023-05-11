@@ -11,6 +11,7 @@ import {
   MdEmojiEvents,
   MdRoundaboutLeft,
   MdOnDeviceTraining,
+  MdPayments,
 } from "react-icons/md";
 import { AiFillSetting } from "react-icons/ai";
 import { TbReportSearch } from "react-icons/tb";
@@ -69,11 +70,6 @@ const SideBar: FC<Props> = ({ show }) => {
         </SideLogo>
 
         <SideBtnCon>
-          {/* <SideBtn>
-          <MdDashboard />
-          DashBoard
-        </SideBtn> */}
-
           <CustomSideBarNavLinks where="/publications">
             <MdGroups2 />
             Publications
@@ -127,10 +123,17 @@ const SideBar: FC<Props> = ({ show }) => {
             <MdRoundaboutLeft />
             Service Management
           </CustomSideBarNavLinks>
+
           <CustomSideBarNavLinks where="/structure">
             <MdRoundaboutLeft />
             Structure Management
           </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/payments-and-registrations">
+            <MdPayments />
+            Payments & Registrations
+          </CustomSideBarNavLinks>
+
           <CustomSideBarNavLinks where="/service-request">
             <MdRoundaboutLeft />
             Request For Service

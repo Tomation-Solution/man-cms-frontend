@@ -822,7 +822,7 @@ export const galleryRename = async (payload: any) => {
   }
 };
 
-//SERVICE
+//SERVICE REQUEST
 export const serviceRequestGetAll = async () => {
   try {
     const res = await privateRequest.get(`/services/request-service`);
@@ -842,82 +842,115 @@ export const newLetterGetAll = async () => {
   }
 };
 
-
-
-// service 
-type ServiceResponseType ={
-  "id": number,
-  "image": any,
-  "name": string,
-  "description": null|string,
-  "type": "CORE"|'MRC'|'MPDCL'|'OTHERS',
-  "created_at":string,
-  "updated_at": string,
-  "writer": number
-}
-export const createService =async(data:ServicePageCreationType):Promise<ServiceResponseType>=>{
-  const form = new FormData()
-  form.append('name',data.name)
-  form.append('type',data.type)
-  form.append('description',data.description)
-  form.append('image',data.image[0])
-
-  const res = await privateRequest.post('/services/all-services',form)
-  return res.data
-} 
-
-export const getServices = async ():Promise<ServiceResponseType[]>=>{
-
-  const res = await privateRequest.get('/services/all-services',)
-  return res.data.data
-}
-
-export const deleteServiceApi = async (id:number):Promise<any>=>{
-  const res = await privateRequest.delete(`/services/all-services/${id}`,)
-  return res.data
-}
-
-
-export const updateServiceApi =async({data,id}:{data:ServicePageCreationType,id:number}):Promise<ServiceResponseType>=>{
-  const form = new FormData()
-  form.append('name',data.name)
-  form.append('type',data.type)
-  form.append('description',data.description)
-  if(typeof data.image!=='string'){
-    form.append('image',data.image[0])
+//PAYMENTS
+export const publicationPayments = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/publications`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
   }
-  const res = await privateRequest.put(`/services/all-services/${id}`,form)
-  return res.data
-} 
+};
 
+export const eventTrainingPaymentRegistration = async () => {
+  try {
+    const res = await privateRequest.get(
+      `/payments/event-training-registration`
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
 
+export const agmPaymentRegistration = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/agm-registration`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+// service
+type ServiceResponseType = {
+  id: number;
+  image: any;
+  name: string;
+  description: null | string;
+  type: "CORE" | "MRC" | "MPDCL" | "OTHERS";
+  created_at: string;
+  updated_at: string;
+  writer: number;
+};
+export const createService = async (
+  data: ServicePageCreationType
+): Promise<ServiceResponseType> => {
+  const form = new FormData();
+  form.append("name", data.name);
+  form.append("type", data.type);
+  form.append("description", data.description);
+  form.append("image", data.image[0]);
+
+  const res = await privateRequest.post("/services/all-services", form);
+  return res.data;
+};
+
+export const getServices = async (): Promise<ServiceResponseType[]> => {
+  const res = await privateRequest.get("/services/all-services");
+  return res.data.data;
+};
+
+export const deleteServiceApi = async (id: number): Promise<any> => {
+  const res = await privateRequest.delete(`/services/all-services/${id}`);
+  return res.data;
+};
+
+export const updateServiceApi = async ({
+  data,
+  id,
+}: {
+  data: ServicePageCreationType;
+  id: number;
+}): Promise<ServiceResponseType> => {
+  const form = new FormData();
+  form.append("name", data.name);
+  form.append("type", data.type);
+  form.append("description", data.description);
+  if (typeof data.image !== "string") {
+    form.append("image", data.image[0]);
+  }
+  const res = await privateRequest.put(`/services/all-services/${id}`, form);
+  return res.data;
+};
 
 // mrc service
-type createMrcApiProp ={
-  name:string;
-  description:string;
-  small_text:string;
-  items:string[];
-  id?:number;
-}
-export const createMrcApi =async (data:createMrcApiProp)=>{
-  const res = await privateRequest.post(`/structure/mrc-service`,data)
-  return res.data
-}
+type createMrcApiProp = {
+  name: string;
+  description: string;
+  small_text: string;
+  items: string[];
+  id?: number;
+};
+export const createMrcApi = async (data: createMrcApiProp) => {
+  const res = await privateRequest.post(`/structure/mrc-service`, data);
+  return res.data;
+};
 
+export const getMrcApi = async (): Promise<createMrcApiProp[]> => {
+  const res = await privateRequest.get(`/structure/mrc-service`);
+  return res.data.data;
+};
 
-export const getMrcApi = async ():Promise<createMrcApiProp[]>=>{
-  const res = await privateRequest.get(`/structure/mrc-service`,)
-  return res.data.data
-}
+export const deleteMrcApi = async (id: number): Promise<any> => {
+  const res = await privateRequest.delete(`/structure/mrc-service/${id}`);
+  return res.data.data;
+};
 
-
-export const deleteMrcApi = async (id:number):Promise<any>=>{
-  const res = await privateRequest.delete(`/structure/mrc-service/${id}`,)
-  return res.data.data
-}
-
-export const updateMrcApi = async (data:createMrcApiProp):Promise<any>=>{
-  const res = await privateRequest.put(`/structure/mrc-service/${data.id}`,data)
-  return res.data
-}
+export const updateMrcApi = async (data: createMrcApiProp): Promise<any> => {
+  const res = await privateRequest.put(
+    `/structure/mrc-service/${data.id}`,
+    data
+  );
+  return res.data;
+};
