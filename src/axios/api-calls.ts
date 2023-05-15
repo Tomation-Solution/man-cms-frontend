@@ -3,7 +3,8 @@ import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
-import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType } from "../pages/Structure/StructurePage";
+import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType,  } from "../pages/Structure/StructurePage";
+import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1058,10 +1059,44 @@ export const updateMrcPageApi = async (data:MrcPageContentTabschemaType) =>{
   const newData = {
     'objectives_card':data.objectives_card,
     'who_we_are':data.who_we_are?.map(d=>d.value),
-    'objectives':data.who_we_are?.map(d=>d.value),
+    'objectives':data.objectives?.map(d=>d.value),
   }
-  console.log({newData,data})
 
   const resp = await privateRequest.put('structure/mrc',newData)
   return resp.data
+}
+
+type getSectoralGroupApiResponseType = {
+  "id"?: number,
+  "image": any,
+  "header": string
+}
+export const getSectoralGroupApi = async ():Promise<getSectoralGroupApiResponseType[]>=>{
+    const resp = await privateRequest.get('structure/sectoral-group',)
+    return resp.data.data
+}
+export const deleteSectoralGroupApi = async (id:number)=>{
+  const resp = await privateRequest.delete(`structure/sectoral-group/${id}`,)
+  return resp.data
+}
+export const createUpdateSectoralGroupApi=async (data: SectoralGroupTabSchemaType)=>{
+  let resp:any;
+  let submit = new FormData()
+  submit.append('header',data.header)
+  if(typeof data.image!=='string'){
+    if(data.image){
+      submit.append('image',data.image[0])
+    }
+  }
+  console.log({submit})
+  if(data.id === undefined){
+
+     resp = await privateRequest.post('structure/sectoral-group',submit)
+    return resp.data
+  }
+  // submit.append('id',data.id.toString())
+  
+   resp = await privateRequest.put(`structure/sectoral-group/${data.id}`,submit)
+  return resp.data
+
 }
