@@ -3,6 +3,7 @@ import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
+import { MPDCLPageContentSchemaFormType } from "../pages/Structure/StructurePage";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1003,3 +1004,39 @@ export const deleteMpdclApi = async (id: number): Promise<any> => {
   const res = await privateRequest.delete(`/structure/mpdcl-service/${id}`);
   return res.data.data;
 };
+
+
+
+//MPDCLPageContent
+type MPDCLPageContent={
+  renewable_items:{
+    header:string,description:string
+  }[],
+  who_we_are:string[],
+  our_objectives_header:string,
+  renewable_image:string,
+  renewable_desc:string[];
+  our_objectives_items:string[];
+}
+export const getMPDCLPageContentApi =async ():Promise<MPDCLPageContent>=>{
+  const resp = await privateRequest.get(`/structure/mpdcl`);
+  return resp.data.data;
+}
+
+export const updateMPDCLPageContentApi= async (data:MPDCLPageContentSchemaFormType):Promise<any>=>{
+  const form = new FormData()
+  form.append('renewable_items',JSON.stringify(data.renewable_items))
+  if(data.who_we_are){
+    form.append('who_we_are',JSON.stringify(data.who_we_are.map(d=>d.value)))
+  }
+  if(data.our_objectives_header){
+    form.append('our_objectives_header',data.our_objectives_header)
+  }
+  form.append('our_objectives_items',JSON.stringify(data.our_objectives_items?.map(d=>d.value)))
+  form.append('renewable_desc',JSON.stringify(data.renewable_desc?.map(d=>d.value)))
+ if(typeof data.renewable_image !='string'){
+   form.append('renewable_image',data.renewable_image[0])
+  }
+  const resp = await privateRequest.put(`/structure/mpdcl`,form);
+  return resp.data;
+}
