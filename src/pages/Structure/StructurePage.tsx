@@ -7,7 +7,7 @@ import Button from "../../components/Button/Button";
 import {  MrcModal, MrcUpdateModal } from "../../components/Modals/MrcModal";
 import Tables from "../../components/Tables/Tables";
 import { Hooks } from "react-table";
-import { deleteMpdclApi, deleteMrcApi, getMPDCLPageContentApi, getMpdclApi, getMrcApi, getMrcPage, updateMPDCLPageContentApi, updateMrcPageApi } from "../../axios/api-calls";
+import { createUpdateSectoralGroupApi, deleteMpdclApi, deleteMrcApi, deleteSectoralGroupApi, getMPDCLPageContentApi, getMpdclApi, getMrcApi, getMrcPage, getSectoralGroupApi, updateMPDCLPageContentApi, updateMrcPageApi } from "../../axios/api-calls";
 import Loading from "../../components/Loading/Loading";
 import { TableReject, TableView } from "../../components/Tables/Tables.styles";
 import InputWithLabel from "../../components/InputWithLabel/InputWithLabel";
@@ -17,6 +17,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import BoxWithHeading from "../../components/BoxWithHeading";
 import { AddMoreButton } from "../../globals/styles/CustomFormComponents";
+import CreateSectoralGroupModal, { SectoralGroupTabSchemaType, UpdateGroupModal } from "../../components/Modals/SectoralGroupModal";
 
 
 
@@ -91,7 +92,7 @@ const StructurePage = ()=>{
         <span
           style={{
             fontWeight: "500",
-            color: `${options === "Public" ? "#4FDE9D" : "#2b3513"}`,
+            color: `${options === "MRCpagecontent" ? "#4FDE9D" : "#2b3513"}`,
             cursor: "pointer",
             borderRight: "1px solid #2b3513",
             flex: "0 0 160px",
@@ -100,12 +101,28 @@ const StructurePage = ()=>{
             alignItems: "center",
             justifyContent: "center",
           }}
-          onClick={() => setOptions("MRC page content")}
+          onClick={() => setOptions("MRCpagecontent")}
         >
           MRC page content
         </span>
 
-      
+        <span
+          style={{
+            fontWeight: "500",
+            color: `${options === "SectoralGroup" ? "#4FDE9D" : "#2b3513"}`,
+            cursor: "pointer",
+            borderRight: "1px solid #2b3513",
+            flex: "0 0 160px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setOptions("SectoralGroup")}
+        >
+          Sectoral Group
+        </span>
+        
         <br />
         <br />
 
@@ -119,7 +136,8 @@ const StructurePage = ()=>{
       {options==='MPDCLPageContent'?<MPDCLPageContent/>:null}
 
       {options === "mrc" ? <MrcTab /> : null}
-      {options === "MRC page content" ? <MrcPageContentTab />: null}
+      {options === "SectoralGroup" ?<SectoralGroupTab/>: null}
+      {options === "MRCpagecontent" ? <MrcPageContentTab />: null}
         </div>
     )
 }
@@ -314,11 +332,20 @@ const MrcPageContentTab = ()=>{
         }
       }
     })
-    const {mutate,isLoading:editing} = useMutation(updateMrcPageApi)
+    const {mutate,isLoading:editing} = useMutation(updateMrcPageApi,{
+      'onSuccess':(data)=>{
+      queryClient.invalidateQueries("mrc-page");
+        toast.success("Update Success", {
+          progressClassName: "toastProgress",
+          icon: false,
+        });
+      }
+    })
     // 
 
     const onSubmitHandler = (data: MrcPageContentTabschemaType)=>{
       console.log({'SUbmittedData':data})
+      
       mutate(data)
     } 
 
@@ -845,6 +872,133 @@ return (
         Update
       </Button>
     </form>
+    </div>
+  )
+}
+
+const SectoralGroupTab =  ()=>{
+  const isMobileScreen = useMediaQuery({ maxWidth: 600 });
+  const queryClient = useQueryClient();
+  const [isOpen,setIsOpen] = useState(false)
+  const [isUpdateOpen,setIsUpdateOpen] = useState(false)
+  const [currentData,setCurrentData] = useState<SectoralGroupTabSchemaType>()
+  const {isLoading,data} = useQuery('get-sectoral',getSectoralGroupApi,{
+    // 'onSuccess':(data)=>{
+     
+    // }
+    refetchOnWindowFocus:false
+  })
+  const {isLoading:deleting,mutate:deleteSectoralGroup} = useMutation(deleteSectoralGroupApi,{
+      'onSuccess':(data)=>{
+      queryClient.invalidateQueries("get-sectoral");
+      }
+  })
+
+  // createUpdateSectoralGroupApi
+
+
+  const columns = [
+    {
+      Header:'Header',
+      accessor:'header',
+
+    },
+  ]
+  const tableHooks = (hooks: Hooks) =>{
+    hooks.visibleColumns.push((columns)=>[
+      {
+        id:'s/n',
+        Header:'S/N',
+        Cell: (tableProps:any)=>{
+          return <>
+          {tableProps.row.index+1}
+          </>
+      }
+      },
+    ...columns,
+    {
+      id:'images',
+      Header: "Image",
+      Cell: (tableProp:any)=>(
+        <>
+        <img style={{'width':'50px','height':'50px'}} src={tableProp.row.original.image} />
+        </>
+      )
+    },
+    {
+      id: "Click to Edit",
+      Header: "Click to Edit",
+      Cell: ({ row }:any) => (
+        <TableView
+          onClick={() => {
+            setIsUpdateOpen(true);
+            setCurrentData(row.original)
+          }}
+        >
+          Edit
+        </TableView>
+      ),
+    },
+    {
+      id: "Click to Delete",
+      Header: "Click to Delete",
+      Cell: ({ row }:any) => (
+        <TableReject
+          onClick={() => {
+            if(row.original?.id){
+              deleteSectoralGroup(row.original.id)
+
+            }
+          }}
+        >
+          Delete
+        </TableReject>
+      ),
+    },
+    ])
+  }
+  return (
+
+    <div>
+
+
+<OffCanvas
+    size={isMobileScreen ? 100 : 50}
+    btnClick={() => null}
+    setIsOpen={setIsOpen}
+    isOpen={isOpen}
+  >
+    <CreateSectoralGroupModal/>
+  </OffCanvas>
+
+  <OffCanvas
+    size={isMobileScreen ? 100 : 50}
+    btnClick={() => null}
+    setIsOpen={setIsUpdateOpen}
+    isOpen={isUpdateOpen}
+  >
+    <UpdateGroupModal
+    data={currentData}
+    />
+  </OffCanvas>
+
+
+    {/* <p>jdjd</p> */}
+  <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
+          Create Sectoral Group
+        </Button>
+        <Loading loading={isLoading||deleting} />
+
+       <Tables
+        tableColumn={columns}
+        tableData={
+          data?data:[]
+          
+        }
+        customHooks={[
+          tableHooks
+        ]}
+        />
     </div>
   )
 }
