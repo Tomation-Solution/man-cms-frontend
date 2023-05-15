@@ -7,7 +7,7 @@ import Button from "../../components/Button/Button";
 import {  MrcModal, MrcUpdateModal } from "../../components/Modals/MrcModal";
 import Tables from "../../components/Tables/Tables";
 import { Hooks } from "react-table";
-import { deleteMpdclApi, deleteMrcApi, getMPDCLPageContentApi, getMpdclApi, getMrcApi, updateMPDCLPageContentApi } from "../../axios/api-calls";
+import { deleteMpdclApi, deleteMrcApi, getMPDCLPageContentApi, getMpdclApi, getMrcApi, getMrcPage, updateMPDCLPageContentApi, updateMrcPageApi } from "../../axios/api-calls";
 import Loading from "../../components/Loading/Loading";
 import { TableReject, TableView } from "../../components/Tables/Tables.styles";
 import InputWithLabel from "../../components/InputWithLabel/InputWithLabel";
@@ -273,64 +273,177 @@ const MrcPageContentTabschema = yup.object({
   })),
   
 })
+export type MrcPageContentTabschemaType = yup.InferType<typeof MrcPageContentTabschema>
 const MrcPageContentTab = ()=>{
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
-  const [currentData,setCurrentData] =useState<any>()
+
+  const [currentData,setCurrentData] =useState<any>()  
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<MrcPageContentTabschemaType>({
+    resolver: yupResolver(MrcPageContentTabschema),});
+
+    const { fields:objectivesCardField, append, remove } = useFieldArray({
+      name:'objectives_card',
+      control,
+    })
+
+    const { fields:whoWeAreFields, append:whoWeAreappend, remove:whoWeAreRemove } = useFieldArray({
+      name:'who_we_are',
+      control,
+    })
+    const { fields:objectivesFields, append:objectivesAppend, remove:objectivesRemove } = useFieldArray({
+      name:'objectives',
+      control,
+    })
+
+    const {isLoading} = useQuery('mrc-page',getMrcPage,{
+      refetchOnWindowFocus:false,
+      'onSuccess':(data)=>{
+        if(data){
+          console.log(data)
+            setValue('objectives_card',data.objectives_card)
+            setValue('who_we_are',data.who_we_are.map((d,index)=>({'value':d})))
+            setValue('objectives',data.objectives.map((d,index)=>({'value':d})))
+        }
+      }
+    })
+    const {mutate,isLoading:editing} = useMutation(updateMrcPageApi)
+    // 
+
+    const onSubmitHandler = (data: MrcPageContentTabschemaType)=>{
+      console.log({'SUbmittedData':data})
+      mutate(data)
+    } 
+
   return (
     <div>
 {/* <Loading loading={isLoading||deleting} /> */}
        
+    <Loading loading={isLoading||editing} />
             <h2>MRC page content</h2>
-       <br />
-       <br />
 
        {/* Objectives */}
-       <form action="">
+       <form 
+        onSubmit={handleSubmit(onSubmitHandler)}
+       >
        {/* objectives_ca */}
-
-       <h2><small>Objectives Card</small></h2>
-       <div
-       style={{'paddingLeft':'20px ','paddingTop':'1rem'}}
-       >
-       <InputWithLabel
-      //  register={}
-      label="Card header"
-       />
+    <BoxWithHeading
+    heading="Objectives Card"
+    >
        <br />
-       <InputWithLabel
-      //  register={}
-      label="Description"
-       />
-              <br />
-     
-       </div>
-
-       <h2><small>Who We Are</small></h2>
-       <div
-       style={{'paddingLeft':'20px ','paddingTop':'1rem'}}
-       >
-       <InputWithLabel
-      //  register={}
-      label="text"
-       />
-       <br />
-      
-       </div>
-
-       <h2><small>Objectives</small></h2>
-       <div
-       style={{'paddingLeft':'20px ','paddingTop':'1rem'}}
-       >
-       <InputWithLabel
-      //  register={}
-      label="Objective"
-       />
-       <br />
-      
-       </div>
+    {
+      objectivesCardField.map((d,index)=>(
+        <>
+          <InputWithLabel
+          //  register={}
+          label="Card header"
+          register={register(`objectives_card.${index}.header`)}
+          />
+          <InputWithLabel
+          //  register={}
+          label="Description"
+          register={register(`objectives_card.${index}.description`)}
+          />
+          <Button
+              styleType={"whiteBg"}
+              onClick={() => {
+                remove(index)
+              }}
+              >
+              DELETE
+              </Button>
         <br />
+        </>
+      ))
+    }
+          <AddMoreButton
+              justify="center"
+              click={() => {
+                append({'description':'','header':'heading'})
+              }}
+            >
+              Add More
+      </AddMoreButton>
+
+    </BoxWithHeading>
+            
+          <BoxWithHeading
+          heading="Who We Are"
+          >
+            {
+              whoWeAreFields.map((d,index)=>(
+              <>
+              <InputWithLabel
+               register={register(`who_we_are.${index}.value`)}
+              
+              label="text"
+              key={index}
+              />
+                  <Button
+              styleType={"whiteBg"}
+              onClick={() => {
+                whoWeAreRemove(index)
+              }}
+              >
+              DELETE
+              </Button>
+              <br />
+                </>
+              ))
+            }
+           
+
+          </BoxWithHeading>
+          <AddMoreButton
+              justify="center"
+              click={() => {
+                whoWeAreappend({'value':'.'})
+              }}
+            >
+              Add More
+      </AddMoreButton>
+
+
+      <BoxWithHeading
+      heading="Objectives"
+      >
+        {
+          objectivesFields.map((d,index)=>(
+          <>
+              <InputWithLabel
+            //  register={}
+            label="Objective"
+            register={register(`objectives.${index}.value`)}
+            />
+                      <Button
+              styleType={"whiteBg"}
+              onClick={() => {
+                objectivesRemove(index)
+              }}
+              >
+              DELETE
+              </Button>
+            <br /> 
+            </>
+          ))
+        }
+          <AddMoreButton
+              justify="center"
+              click={() => {
+                objectivesAppend({'value':'.'})
+              }}
+            >
+              Add More
+      </AddMoreButton>
+      <br />
+      </BoxWithHeading>
         <Button style={{'width':'100%'}} styleType="pry">EDIT</Button>
        </form>
     </div>

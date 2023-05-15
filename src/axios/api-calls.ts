@@ -3,7 +3,7 @@ import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
-import { MPDCLPageContentSchemaFormType } from "../pages/Structure/StructurePage";
+import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType } from "../pages/Structure/StructurePage";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1039,4 +1039,29 @@ export const updateMPDCLPageContentApi= async (data:MPDCLPageContentSchemaFormTy
   }
   const resp = await privateRequest.put(`/structure/mpdcl`,form);
   return resp.data;
+}
+
+type MrcPageResponse = {
+  objectives_card:{
+    header:string;
+    description:string;
+  }[],
+  who_we_are:string[];
+  objectives:string[];  
+}
+export const getMrcPage = async ():Promise<MrcPageResponse>=>{
+  const resp = await privateRequest.get(`structure/mrc`)
+  return resp.data.data
+}
+
+export const updateMrcPageApi = async (data:MrcPageContentTabschemaType) =>{
+  const newData = {
+    'objectives_card':data.objectives_card,
+    'who_we_are':data.who_we_are?.map(d=>d.value),
+    'objectives':data.who_we_are?.map(d=>d.value),
+  }
+  console.log({newData,data})
+
+  const resp = await privateRequest.put('structure/mrc',newData)
+  return resp.data
 }
