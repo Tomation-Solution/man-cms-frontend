@@ -7,6 +7,7 @@ import HowWeOperate from "../components/AboutUs/HowWeOperate";
 import Office from "../components/AboutUs/Office";
 import Branch from "../components/AboutUs/Branch";
 import Contacts from "../components/AboutUs/Contacts";
+import OurExcutive from "../components/AboutUs/OurExcutive";
 
 const AboutUsPage = () => {
   const [options, setOptions] = useState("history");
@@ -152,6 +153,24 @@ const AboutUsPage = () => {
         >
           Contacts
         </span>
+
+        <span
+          style={{
+            fontWeight: "500",
+            color: `${options === "Executives" ? "#4FDE9D" : "#2b3513"}`,
+            cursor: "pointer",
+            borderRight: "1px solid #2b3513",
+            width: "200px",
+            flex: "0 0 160px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setOptions("Executives")}
+        >
+          Executives
+        </span>
       </div>
 
       {options === "history" ? <History /> : null}
@@ -162,6 +181,7 @@ const AboutUsPage = () => {
       {options === "operate-office" ? <Office /> : null}
       {options === "operate-branch" ? <Branch /> : null}
       {options === "contacts" ? <Contacts /> : null}
+      {options === "Executives" ?<OurExcutive/> : null}
     </>
   );
 };

@@ -1100,3 +1100,69 @@ export const createUpdateSectoralGroupApi=async (data: SectoralGroupTabSchemaTyp
   return resp.data
 
 }
+
+
+
+// Manage Executive
+type ExecutiveType ={
+  "id"?: number,
+  "image"?: string,
+  "name": string,
+  "title": string,
+  "extra_title1"?: string,
+  "extra_title2"?: string,
+  "type": string,
+  "created_at"?: string,
+  "updated_at"?: string
+}
+export const getExecutiveApi = async ():Promise<ExecutiveType[]>=>{
+  const resp = await  privateRequest.get('aboutus/our-executives',)
+  return resp.data.data
+}
+
+export const createExecutiveApi = async (data:ExecutiveType):Promise<any>=>{
+  const form = new FormData()
+  form.append('name',data.name)
+  form.append('title',data.title)
+  form.append('type',data.type)
+  if(data.extra_title1){
+    form.append('extra_title1',data.extra_title1)
+  }
+  if(data.extra_title2){
+    form.append('extra_title2',data.extra_title2)
+  }
+  if(data.image){
+    form.append('image',data.image[0])
+  }
+  form.append('type',data.type)
+  const resp = await  privateRequest.post('aboutus/our-executives',form)
+  return resp.data
+}
+
+
+export const updateExecutiveApi = async (data:ExecutiveType):Promise<any>=>{
+  const form = new FormData()
+  form.append('name',data.name)
+  form.append('title',data.title)
+  form.append('type',data.type)
+  if(data.extra_title1){
+    form.append('extra_title1',data.extra_title1)
+  }
+  if(data.extra_title2){
+    form.append('extra_title2',data.extra_title2)
+  }
+  if(typeof data.image !=='string'){
+    if(data.image){
+      form.append('image',data.image[0])
+    }
+  }
+  form.append('type',data.type)
+  const resp = await  privateRequest.put(`aboutus/our-executives/${data.id}`,form)
+  return resp.data
+}
+
+
+export const deleteExecutiveApi = async(id:number)=>{
+  const resp = await  privateRequest.delete(`aboutus/our-executives/${id}`,)
+  return resp.data
+}
