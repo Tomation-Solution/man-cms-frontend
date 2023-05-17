@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
-import privateRequest from "./axios-utils";
+import privateRequest, { rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
 import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType,  } from "../pages/Structure/StructurePage";
@@ -1164,5 +1164,97 @@ export const updateExecutiveApi = async (data:ExecutiveType):Promise<any>=>{
 
 export const deleteExecutiveApi = async(id:number)=>{
   const resp = await  privateRequest.delete(`aboutus/our-executives/${id}`,)
+  return resp.data
+}
+
+
+
+export type ProspectiveMembertype = {
+  "id": 8,
+  "form_one": [
+      {
+          "cac_registration_number":string,
+          "prospective_member": number,
+          "name_of_company": string,
+          "tax_identification_number":string,
+          "corporate_office_addresse": string,
+          "office_bus_stop": string,
+          "office_city": string,
+          "office_lga": string,
+          "office_state": string,
+          "postal_addresse": string,
+          "telephone": string,
+          "email_addresse":string,
+          "website": string,
+          "factoru_details":string,
+          "legal_status_of_company":string,
+          "number_of_female_expatriates": number,
+          "number_of_male_expatriates": number,
+          "number_of_male_permanent_staff": number,
+          "number_of_female_permanent_staff": number,
+          "local_share_capital": string,
+          "foreign_share_capital": string,
+          "ownership_structure_equity_local":string,
+          "ownership_structure_equity_foregin": string,
+          "total_value_of_land_asset": string,
+          "total_value_of_building_asset": string,
+          "total_value_of_other_asset": string,
+          "installed_capacity": string,
+          "current_sales_turnover": string,
+          "projected_sales_turnover":string,
+          "are_your_product_exported": string,
+          "company_contact_infomation": string,
+          "designation": string,
+          "name_of_md_or_ceo_of_company": string,
+          "selectdate_of_registration": string,
+          "upload_signature": string,
+          // "all_roduct_manufactured": "[{'product_manufactured':'whothey breat','certificates':'certifacet of thoe'}]",
+          // "all_raw_materials_used": "[{'major_raw_materials':'j frhufr','major_raw_materials':'hello people'}]",
+          "all_roduct_manufactured":string,
+          "all_raw_materials_used": string,
+      }
+  ],
+  "form_two": [
+      {
+          "corporate_affairs_commision":string|null,
+          "letter_of_breakdown_of_payment_and_docs_attached": string|null,
+          "first_year_of_buisness_plan": string|null,
+          "second_year_of_buisness_plan": string|null,
+          "photocopy_of_your_reciept_issued_on_purchase_of_applicant_form":string|null,
+          "prospective_member": number
+      }
+  ],
+  "name_of_company": string,
+  "telephone_number": string,
+  "cac_registration_number": string,
+  "email": string,
+  "website": string,
+  "corporate_office_addresse":string,
+  "has_paid": boolean,
+  "paystack": string,
+  "amount": string,
+  "subcription_amount":string,
+  "subcription_paystack": string,
+  "admin": string,
+  "has_paid_subcription":boolean,
+  "application_status": string,
+  "user": number
+}
+// admin prospective member
+export const getprospectiveMemberSubmission = async ():Promise<ProspectiveMembertype[]>=>{
+  const resp = await  rel8Request.get(`prospectivemember/admin_manage_prospective_member/get_submissions/`,)
+  return resp.data.data
+}
+
+export const getprospectiveMemberSubmissionDetail = async (id:number):Promise<ProspectiveMembertype>=>{
+  const resp = await  rel8Request.get(`prospectivemember/admin_manage_prospective_member/get_submissions/?id=${id}`,)
+  return resp.data.data
+}
+
+
+export const updateRemarkOrStatus = async(
+  data:{id:string,status?:string,remark?:string}
+)=>{
+  const resp = await  rel8Request.post(`prospectivemember/admin_manage_prospective_member/update_prospective_status/`,data)
   return resp.data
 }

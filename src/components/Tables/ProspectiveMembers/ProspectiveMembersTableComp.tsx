@@ -5,6 +5,9 @@ import { IndeterminateCheckbox } from "../Checkbox";
 import { TableView } from "../Tables.styles";
 import { Hooks } from "react-table";
 import { Link } from "react-router-dom";
+import { getprospectiveMemberSubmission } from "../../../axios/api-calls";
+import { useQuery } from "react-query";
+import { datefromatter } from "../../../utils/DateFormatter";
 
 export const ProspectiveMembersTableApproved = () => {
   //   const { isLoading, isError, data, isFetching } = useQuery(
@@ -84,44 +87,59 @@ export const ProspectiveMembersTableApproved = () => {
 };
 
 export const ProspectiveMembersTablePending = () => {
-  //   const { isLoading, isError, data, isFetching } = useQuery(
-  //     "all-approved-applications",
-  //     {
-  //       select: (data) => data.data,
-  //       refetchOnWindowFocus: false,
-  //     }
-  //   );
+    const { isLoading, isError, data, isFetching } = useQuery(
+      "all-approved-applications",
+      getprospectiveMemberSubmission,
+      {
+        // select: (data) => data.data,
+        refetchOnWindowFocus: false,
+      }
+    );
 
   const columns = [
     {
       Header: "Company Name",
-      accessor: "company_name",
+      accessor: "name_of_company",
     },
     {
       Header: "CAC Number",
-      accessor: "cac_number",
+      accessor: "cac_registration_number",
     },
-    {
-      Header: "Application Date",
-      accessor: "application_date",
-    },
-    {
-      Header: "Status",
-      accessor: "status",
-    },
+   
+   
   ];
-
+  console.log({data})
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
       {
+        Header: "Application Date",
+        accessor: "created_at",
+        Cell: ({ row }:any) => (
+          <>
+            {" "}
+            {row.original.created_at?datefromatter(new Date(row.original.created_at as string)):''}
+          </>
+        ),
+      },
+      {
+        Header: "Status",
+        id:'Status',
+        accessor: "status",
+        Cell: ({ row }:any) => (
+          <>
+          pending
+          </>
+        ),
+      },
+      {
         id: "Click to Edit",
         Header: "Click to Edit",
-        Cell: ({ row }) => (
+        Cell: ({ row }:any) => (
           <TableView>
             {" "}
             <Link
-              to={"/prospective-members/form-one"}
+              to={"/prospective-members/details/"+row.original.id}
               style={{
                 textDecoration: "none",
                 color: "#2b3513",
@@ -171,8 +189,9 @@ export const ProspectiveMembersTablePending = () => {
       ) : !isError ? ( */}
       <ProspectiveMembersTable
         tableColumn={columns}
-        tableData={pendingApplication}
-        customHooks={[tableHooks, selectionHook]}
+        tableData={data?data:[]}
+        // tableData={pendingApplication}
+        customHooks={[tableHooks,]}
       />
       {/* ) : (
         <FormError>Cant Fetch Approved Application</FormError>

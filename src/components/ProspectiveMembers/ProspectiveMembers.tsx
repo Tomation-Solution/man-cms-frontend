@@ -10,7 +10,7 @@ import {
 } from "../Tables/ProspectiveMembers/ProspectiveMembersTableComp";
 
 const ProspectiveMembers = () => {
-  const [options, setOptions] = useState("approved");
+  const [options, setOptions] = useState<'pending'|'approved'>("pending");
   return (
     <>
       <ApplicationsTabItems>

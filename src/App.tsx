@@ -65,7 +65,7 @@ function App() {
               element={<ProspectiveMembers />}
             />
             <Route
-              path="/prospective-members/form-one"
+              path="/prospective-members/details/:id"
               element={<ProspectiveMembersForm />}
             />
             <Route
