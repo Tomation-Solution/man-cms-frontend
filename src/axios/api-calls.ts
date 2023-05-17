@@ -1241,8 +1241,10 @@ export type ProspectiveMembertype = {
   "user": number
 }
 // admin prospective member
-export const getprospectiveMemberSubmission = async ():Promise<ProspectiveMembertype[]>=>{
-  const resp = await  rel8Request.get(`prospectivemember/admin_manage_prospective_member/get_submissions/`,)
+export const getprospectiveMemberSubmission = async (
+  {application_status='approval_in_progress'}:{application_status?:'approval_in_progress'|'final_approval'}
+):Promise<ProspectiveMembertype[]>=>{
+  const resp = await  rel8Request.get(`prospectivemember/admin_manage_prospective_member/get_submissions/?application_status=${application_status}`,)
   return resp.data.data
 }
 

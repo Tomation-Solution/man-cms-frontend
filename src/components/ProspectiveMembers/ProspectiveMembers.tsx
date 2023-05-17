@@ -26,9 +26,9 @@ const ProspectiveMembers = () => {
         >
           Applications Approved
         </ApplicationsTabItem>
-        <ApplicationFilter>
+        {/* <ApplicationFilter>
           <option>12.03.23 - 20.03.23</option>
-        </ApplicationFilter>
+        </ApplicationFilter> */}
       </ApplicationsTabItems>
 
       {options === "approved" ? <ProspectiveMembersTableApproved /> : null}
