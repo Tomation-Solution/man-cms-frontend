@@ -25,6 +25,7 @@ import NewsLetterPage from "./pages/NewsLetterPage";
 import ServicePage from "./pages/ServicePage/ServicePage";
 import StructurePage from "./pages/Structure/StructurePage";
 import PaymentsPage from "./pages/PaymentsPage";
+import HomePageManagement from "./pages/HomePageManagement";
 
 function App() {
   return (
@@ -64,7 +65,12 @@ function App() {
               path="/prospective-members"
               element={<ProspectiveMembers />}
             />
-            <Route
+                        <Route
+              path="/hompage-management"
+              element={<HomePageManagement />}
+            />
+
+<Route
               path="/prospective-members/details/:id"
               element={<ProspectiveMembersForm />}
             />

@@ -70,6 +70,11 @@ const SideBar: FC<Props> = ({ show }) => {
         </SideLogo>
 
         <SideBtnCon>
+        <CustomSideBarNavLinks where="/hompage-management">
+            <MdGroups2 />
+            Homepage
+          </CustomSideBarNavLinks>
+
           <CustomSideBarNavLinks where="/publications">
             <MdGroups2 />
             Publications
