@@ -6,6 +6,7 @@ import { MPDCLType } from "../components/Modals/MPDCLModal";
 import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType,  } from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
+import { HomePageContentType } from "../pages/HomePageManagement";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1303,5 +1304,61 @@ export const deleteWhyChooseUsApi = async(id:number)=>{
 export const getWhyChooseUsApi = async():Promise<WhyChooseUsType[]>=>{
 
   const resp = await  privateRequest.get(`membership/why-we-are-unique/`,)
+  return resp.data.data
+}
+
+
+
+// home page content
+export type HomePageContentServerResponse = {
+  "id": number,
+  "Logo": string,
+  "slider_welcome_message": string,
+  "slider_vision_message": string,
+  "slider_mission_message":string,
+  "vision_intro":  string[],
+  "mission_intro": string[],
+  "advocacy_intro":  string[],
+  "history_intro":  string[],
+  "why_join_intro": string[],
+  "members_intro": string[],
+  "slider_image1":string|null,
+  "slider_image2":string|null,
+  "slider_image3":string|null
+}
+export const getHomePageContent =async ():Promise<HomePageContentServerResponse>=>{
+  const resp = await  privateRequest.get(`membership/home-main/`,)
+  return resp.data.data
+
+}
+
+export const updateHomePageContent = async(data:HomePageContentType):Promise<HomePageContentServerResponse>=>{
+  const form = new FormData()
+
+  if(typeof data.Logo !=='string'){
+    form.append('Logo',data.Logo[0])
+  }
+  if(typeof data.slider_image1 !=='string'){
+    form.append('slider_image1',data.slider_image1[0])
+  }
+  if(typeof data.slider_image2 !=='string'){
+    form.append('slider_image2',data.slider_image2[0])
+  }
+  if(typeof data.slider_image3 !=='string'){
+    form.append('slider_image2',data.slider_image3[0])
+  }
+  form.append('slider_welcome_message',data.slider_welcome_message)
+  form.append('slider_vision_message',data.slider_vision_message)
+  form.append('slider_mission_message',data.slider_mission_message)
+
+  form.append('vision_intro',JSON.stringify(data.vision_intro?.map((d)=>d.value)))
+  form.append('mission_intro',JSON.stringify(data.mission_intro?.map((d)=>d.value)))
+  form.append('advocacy_intro',JSON.stringify(data.advocacy_intro?.map((d)=>d.value)))
+  form.append('history_intro',JSON.stringify(data.history_intro?.map((d)=>d.value)))
+  form.append('why_join_intro',JSON.stringify(data.why_join_intro?.map((d)=>d.value)))
+  form.append('members_intro',JSON.stringify(data.members_intro?.map((d)=>d.value)))
+
+
+  const resp = await  privateRequest.put(`membership/home-main/`,form)
   return resp.data.data
 }
