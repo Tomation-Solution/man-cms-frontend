@@ -10,7 +10,7 @@ import {
 } from "../Tables/ProspectiveMembers/ProspectiveMembersTableComp";
 
 const ProspectiveMembers = () => {
-  const [options, setOptions] = useState("approved");
+  const [options, setOptions] = useState<'pending'|'approved'>("pending");
   return (
     <>
       <ApplicationsTabItems>
@@ -26,9 +26,9 @@ const ProspectiveMembers = () => {
         >
           Applications Approved
         </ApplicationsTabItem>
-        <ApplicationFilter>
+        {/* <ApplicationFilter>
           <option>12.03.23 - 20.03.23</option>
-        </ApplicationFilter>
+        </ApplicationFilter> */}
       </ApplicationsTabItems>
 
       {options === "approved" ? <ProspectiveMembersTableApproved /> : null}

@@ -5,123 +5,63 @@ import { IndeterminateCheckbox } from "../Checkbox";
 import { TableView } from "../Tables.styles";
 import { Hooks } from "react-table";
 import { Link } from "react-router-dom";
+import { getprospectiveMemberSubmission } from "../../../axios/api-calls";
+import { useQuery } from "react-query";
+import { datefromatter } from "../../../utils/DateFormatter";
+import Loading from "../../Loading/Loading";
 
 export const ProspectiveMembersTableApproved = () => {
-  //   const { isLoading, isError, data, isFetching } = useQuery(
-  //     "all-approved-applications",
-  //     {
-  //       select: (data) => data.data,
-  //       refetchOnWindowFocus: false,
-  //     }
-  //   );
-
-  const columns = [
+  const { isLoading, isError, data, isFetching } = useQuery(
+    "all-approved-applications",
+    ()=>getprospectiveMemberSubmission({'application_status':'final_approval'}),
     {
-      Header: "Company Name",
-      accessor: "company_name",
-    },
-    {
-      Header: "CAC Number",
-      accessor: "cac_number",
-    },
-    {
-      Header: "Application Date",
-      accessor: "application_date",
-    },
-    {
-      Header: "Approval Date",
-      accessor: "approval_date",
-    },
-    {
-      Header: "Status",
-      accessor: "status",
-    },
-  ];
-
-  const selectionHook = (hooks: any) => {
-    hooks.visibleColumns.push((columns: any) => [
-      // Let's make a column for selection
-      {
-        id: "selection",
-        // The header can use the table's getToggleAllRowsSelectedProps method
-        // to render a checkbox
-        Header: ({
-          getToggleAllRowsSelectedProps,
-        }: {
-          getToggleAllRowsSelectedProps: any;
-        }) => (
-          <div>
-            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-          </div>
-        ),
-        // The cell can use the individual row's getToggleRowSelectedProps method
-        // to the render a checkbox
-        Cell: ({ row }: { row: any }) => (
-          <div>
-            <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-          </div>
-        ),
-      },
-      ...columns,
-    ]);
-  };
-
-  return (
-    <>
-      {/* {isFetching || isLoading ? (
-        <Loading loading={isFetching || isLoading} />
-      ) : !isError ? ( */}
-      <ProspectiveMembersTable
-        tableColumn={columns}
-        tableData={approvedApplication}
-        customHooks={[selectionHook]}
-      />
-      {/* ) : (
-        <FormError>Cant Fetch Approved Application</FormError>
-      )} */}
-    </>
+      // select: (data) => data.data,
+      refetchOnWindowFocus: false,
+    }
   );
-};
-
-export const ProspectiveMembersTablePending = () => {
-  //   const { isLoading, isError, data, isFetching } = useQuery(
-  //     "all-approved-applications",
-  //     {
-  //       select: (data) => data.data,
-  //       refetchOnWindowFocus: false,
-  //     }
-  //   );
-
   const columns = [
     {
       Header: "Company Name",
-      accessor: "company_name",
+      accessor: "name_of_company",
     },
     {
       Header: "CAC Number",
-      accessor: "cac_number",
+      accessor: "cac_registration_number",
     },
-    {
-      Header: "Application Date",
-      accessor: "application_date",
-    },
-    {
-      Header: "Status",
-      accessor: "status",
-    },
+   
+   
   ];
-
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
       {
-        id: "Click to Edit",
+        Header: "Application Date",
+        accessor: "created_at",
+        Cell: ({ row }:any) => (
+          <>
+            {" "}
+            {row.original.created_at?datefromatter(new Date(row.original.created_at as string)):''}
+          </>
+        ),
+      },
+      {
+        Header: "Status",
+        id:'Status',
+        accessor: "status",
+        Cell: ({ row }:any) => (
+          <>
+          approved
+          </>
+        ),
+      },
+      {
+        id: "Click to View",
         Header: "Click to Edit",
-        Cell: ({ row }) => (
+        Cell: ({ row }:any) => (
           <TableView>
             {" "}
             <Link
-              to={"/prospective-members/form-one"}
+              to={"/prospective-members/details/"+row.original.id}
               style={{
                 textDecoration: "none",
                 color: "#2b3513",
@@ -166,13 +106,129 @@ export const ProspectiveMembersTablePending = () => {
 
   return (
     <>
+    <Loading loading={ isLoading} />
+      {/* {isFetching || isLoading ? (
+      ) : !isError ? ( */}
+      <ProspectiveMembersTable
+        tableColumn={columns}
+        tableData={data?data:[]}
+        customHooks={[tableHooks]}
+      />
+      {/* ) : (
+        <FormError>Cant Fetch Approved Application</FormError>
+      )} */}
+    </>
+  );
+};
+
+export const ProspectiveMembersTablePending = () => {
+    const { isLoading, isError, data, isFetching } = useQuery(
+      "all-approved-applications",
+      ()=>getprospectiveMemberSubmission({'application_status':'approval_in_progress'}),
+      {
+        // select: (data) => data.data,
+        refetchOnWindowFocus: false,
+      }
+    );
+
+  const columns = [
+    {
+      Header: "Company Name",
+      accessor: "name_of_company",
+    },
+    {
+      Header: "CAC Number",
+      accessor: "cac_registration_number",
+    },
+   
+   
+  ];
+  console.log({data})
+  const tableHooks = (hooks: Hooks) => {
+    hooks.visibleColumns.push((columns) => [
+      ...columns,
+      {
+        Header: "Application Date",
+        accessor: "created_at",
+        Cell: ({ row }:any) => (
+          <>
+            {" "}
+            {row.original.created_at?datefromatter(new Date(row.original.created_at as string)):''}
+          </>
+        ),
+      },
+      {
+        Header: "Status",
+        id:'Status',
+        accessor: "status",
+        Cell: ({ row }:any) => (
+          <>
+          pending
+          </>
+        ),
+      },
+      {
+        id: "Click to Edit",
+        Header: "Click to Edit",
+        Cell: ({ row }:any) => (
+          <TableView>
+            {" "}
+            <Link
+              to={"/prospective-members/details/"+row.original.id}
+              style={{
+                textDecoration: "none",
+                color: "#2b3513",
+                fontWeight: 500,
+              }}
+            >
+              Click to View
+            </Link>
+          </TableView>
+        ),
+      },
+    ]);
+  };
+
+  const selectionHook = (hooks: any) => {
+    hooks.visibleColumns.push((columns: any) => [
+      // Let's make a column for selection
+      {
+        id: "selection",
+        // The header can use the table's getToggleAllRowsSelectedProps method
+        // to render a checkbox
+        Header: ({
+          getToggleAllRowsSelectedProps,
+        }: {
+          getToggleAllRowsSelectedProps: any;
+        }) => (
+          <div>
+            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+          </div>
+        ),
+        // The cell can use the individual row's getToggleRowSelectedProps method
+        // to the render a checkbox
+        Cell: ({ row }: { row: any }) => (
+          <div>
+            <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+          </div>
+        ),
+      },
+      ...columns,
+    ]);
+  };
+
+  return (
+    <>
+    <Loading loading={ isLoading} />
+
       {/* {isFetching || isLoading ? (
         <Loading loading={isFetching || isLoading} />
       ) : !isError ? ( */}
       <ProspectiveMembersTable
         tableColumn={columns}
-        tableData={pendingApplication}
-        customHooks={[tableHooks, selectionHook]}
+        tableData={data?data:[]}
+        // tableData={pendingApplication}
+        customHooks={[tableHooks,]}
       />
       {/* ) : (
         <FormError>Cant Fetch Approved Application</FormError>

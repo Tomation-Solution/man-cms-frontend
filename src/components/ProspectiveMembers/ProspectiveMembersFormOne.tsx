@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+
 import {
   Form,
   FormHalveInput,
@@ -13,10 +15,23 @@ import {
 } from "./ProspectiveMemers.styles";
 import Button from "../Button/Button";
 import { ApproveSvg, DeclineSvg } from "../../assets/svgs";
-import { Link } from "react-router-dom";
+import { Link, json, useParams } from "react-router-dom";
+import { useMutation, useQuery } from "react-query";
+import { getprospectiveMemberSubmissionDetail, updateRemarkOrStatus } from "../../axios/api-calls";
+import Loading from "../Loading/Loading";
 
 const ProspectiveMembersForm = () => {
-  const { register, handleSubmit, control } = useForm({
+  const {id} = useParams()
+  const [remark,setRemark]= useState<string>()
+  const {mutate,isLoading:mutating} = useMutation(updateRemarkOrStatus,{
+    'onSuccess':(data)=>{
+      toast.info(data.message, {
+        progressClassName: "toastProgress",
+        icon: false,
+      });
+    }
+  })
+  const { register, handleSubmit, control,setValue } = useForm({
     defaultValues: {
       name_of_company: "",
       cac_registration_number: "",
@@ -63,6 +78,60 @@ const ProspectiveMembersForm = () => {
     },
   });
 
+
+  const {isLoading,data} =useQuery('prospective-member-detail',()=>getprospectiveMemberSubmissionDetail(id?parseInt(id):-1),{
+    // refetchOnWindowFocus:false,
+    enabled:typeof id==='string'?true:false,
+    'onSuccess':(data)=>{
+      console.log({'Gotten detaisl':data})
+    // if(data.)
+    setValue('name_of_company',data.name_of_company)
+    setValue('cac_registration_number',data.cac_registration_number)
+    if(data.form_one.length==1){
+      console.log({'formone':data.form_one})
+      let formone = data.form_one[0]
+      // let d:any =JSON.parse(formone.all_roduct_manufactured)
+      // console.log({d})
+      //  if(d){
+      //   //  setValue('all_roduct_manufactured',d)
+      //  }
+      setValue('projected_sales_turnover',formone.projected_sales_turnover)
+      setValue('tax_identification_number',formone.tax_identification_number)
+      setValue('corporate_office_addresse',formone.corporate_office_addresse)
+      setValue('office_bus_stop',formone.office_bus_stop)
+      setValue('tax_identification_number',formone.tax_identification_number)
+      setValue('office_city',formone.office_city)
+      setValue('office_lga',formone.office_lga)
+      setValue('office_state',formone.office_state)
+      setValue('postal_addresse',formone.postal_addresse)
+      setValue('telephone',formone.telephone)
+      setValue('email_addresse',formone.email_addresse)
+      setValue('website',formone.website)
+      setValue('factoru_details',formone.factoru_details)
+      setValue('legal_status_of_company',formone.legal_status_of_company)
+      setValue('number_of_female_permanent_staff',formone.number_of_female_permanent_staff.toString())
+      setValue('number_of_male_permanent_staff',formone.number_of_male_permanent_staff.toString())
+      setValue('number_of_female_expatriates',formone.number_of_female_expatriates.toString())
+      setValue('local_share_capital',formone.local_share_capital)
+      setValue('foreign_share_capital',formone.foreign_share_capital)
+      setValue('ownership_structure_equity_local',formone.ownership_structure_equity_local)
+      setValue('ownership_structure_equity_foregin',formone.ownership_structure_equity_foregin)
+      setValue('total_value_of_land_asset',formone.total_value_of_land_asset)
+      setValue('total_value_of_building_asset',formone.total_value_of_building_asset)
+      setValue('installed_capacity',formone.installed_capacity)
+      setValue('current_sales_turnover',formone.current_sales_turnover)
+      setValue('are_your_product_exported',formone.are_your_product_exported)
+      setValue('company_contact_infomation',formone.company_contact_infomation)
+      setValue('designation',formone.designation)
+      setValue('name_of_md_or_ceo_of_company',formone.name_of_md_or_ceo_of_company)
+      setValue('selectdate_of_registration',formone.selectdate_of_registration)
+      setValue('designation',formone.designation)
+      setRemark(data.admin)
+    }
+
+    }
+  })
+
   const { fields: productfields } = useFieldArray({
     control,
     name: "all_roduct_manufactured",
@@ -76,8 +145,11 @@ const ProspectiveMembersForm = () => {
     console.log(data);
   };
 
+  console.log({'some things':id})
+
   return (
     <ProspectiveMembersFormContainer>
+      <Loading loading={isLoading||mutating} />
       <Form onSubmit={handleSubmit(onHandleSubmit)}>
         <FormHalveInput>
           <FormInput>
@@ -86,7 +158,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("name_of_company", { required: true })}
+                {...register("name_of_company", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -97,7 +169,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("cac_registration_number", { required: true })}
+                {...register("cac_registration_number", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -110,7 +182,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("tax_identification_number", { required: true })}
+                {...register("tax_identification_number", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -120,7 +192,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("corporate_office_addresse", { required: true })}
+                {...register("corporate_office_addresse", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -133,7 +205,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("office_bus_stop", { required: true })}
+                {...register("office_bus_stop", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -143,7 +215,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("office_city", { required: true })}
+                {...register("office_city", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -156,7 +228,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("office_lga", { required: true })}
+                {...register("office_lga", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -166,7 +238,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("office_state", { required: true })}
+                {...register("office_state", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -179,7 +251,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("postal_addresse", { required: true })}
+                {...register("postal_addresse", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -189,7 +261,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("telephone", { required: true })}
+                {...register("telephone", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -202,7 +274,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("email_addresse", { required: true })}
+                {...register("email_addresse", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -210,7 +282,7 @@ const ProspectiveMembersForm = () => {
             <label>
               Website Address
               <br />
-              <input type="text" {...register("website", { required: true })} />
+              <input type="text" {...register("website", { required: true,disabled:true })} />
             </label>
           </FormInput>
         </FormHalveInput>
@@ -222,7 +294,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("factoru_details", { required: true })}
+                {...register("factoru_details", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -232,7 +304,7 @@ const ProspectiveMembersForm = () => {
               <br />
               <input
                 type="text"
-                {...register("legal_status_of_company", { required: true })}
+                {...register("legal_status_of_company", { required: true,disabled:true })}
               />
             </label>
           </FormInput>
@@ -248,7 +320,7 @@ const ProspectiveMembersForm = () => {
                   type="text"
                   {...register(
                     `all_roduct_manufactured.${index}.product_manufactured`,
-                    { required: true }
+                    { required: true,disabled:true }
                   )}
                 />
               </label>
@@ -261,7 +333,7 @@ const ProspectiveMembersForm = () => {
                   type="text"
                   {...register(
                     `all_roduct_manufactured.${index}.certificates`,
-                    { required: true }
+                    { required: true,disabled:true }
                   )}
                 />
               </label>
@@ -279,7 +351,7 @@ const ProspectiveMembersForm = () => {
                   type="text"
                   {...register(
                     `all_raw_materials_used.${index}.major_raw_materials`,
-                    { required: true }
+                    { required: true,disabled:true }
                   )}
                 />
               </label>
@@ -292,7 +364,7 @@ const ProspectiveMembersForm = () => {
                   type="text"
                   {...register(
                     `all_raw_materials_used.${index}.major_raw_materials2`,
-                    { required: true }
+                    { required: true,disabled:true }
                   )}
                 />
               </label>
@@ -308,7 +380,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("number_of_male_permanent_staff", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -320,7 +392,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("number_of_female_permanent_staff", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -335,7 +407,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("number_of_male_expatriates", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -347,7 +419,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("number_of_female_expatriates", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -362,7 +434,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("local_share_capital", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -374,7 +446,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("foreign_share_capital", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -389,7 +461,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("ownership_structure_equity_local", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -401,7 +473,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("ownership_structure_equity_foregin", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -416,7 +488,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("total_value_of_land_asset", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -428,7 +500,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("total_value_of_building_asset", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -443,7 +515,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("total_value_of_other_asset", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -455,7 +527,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("installed_capacity", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -470,7 +542,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("current_sales_turnover", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -482,7 +554,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("projected_sales_turnover", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -497,7 +569,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("are_your_product_exported", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -509,14 +581,14 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("company_contact_infomation", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
           </FormInput>
         </FormHalveInput>
 
-        <FormHalveInput>
+        {/* <FormHalveInput>
           <FormInput>
             <label>
               Designation
@@ -524,7 +596,7 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("designation", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -536,22 +608,22 @@ const ProspectiveMembersForm = () => {
               <input
                 type="text"
                 {...register("name_of_md_or_ceo_of_company", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
           </FormInput>
-        </FormHalveInput>
+        </FormHalveInput> */}
 
         <FormHalveInput>
           <FormInput>
             <label>
-              Date of Resignation
+              Designation
               <br />
               <input
                 type="text"
                 {...register("designation", {
-                  required: true,
+                  required: true,disabled:true,
                 })}
               />
             </label>
@@ -562,24 +634,157 @@ const ProspectiveMembersForm = () => {
           </FormInput>
         </FormHalveInput>
 
+<br></br>
+<br></br>
+<ProspectiveMembersFormContainer>
+      {/* <Form onSubmit={handleSubmit(onSubmitHandler)}> */}
+      {/* {
+        data?.form_two.length==1?<>
+      } */}
+        <FormHalveInput>
+          <FormInput>
+            <p>Corporate Affairs Commission (CAC) Forms C02 and C07</p>
+            <br />
+            <Button
+            onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_two[0].corporate_affairs_commision as string
+              ,'_blank')
+            }}
+            >Download Document</Button>
+          </FormInput>
+          <br />
+
+          <FormInput>
+            <p>First Year Of Buisness Plan</p>
+            <br />
+            <Button
+                        onClick={e=>{
+                          e.preventDefault()
+                          window.open(
+                            data?.form_two[0].first_year_of_buisness_plan as string
+                          ,'_blank')
+                        }}
+            
+            >Download Document</Button>
+          </FormInput>
+        </FormHalveInput>
+        <br />
+
+        <FormHalveInput>
+          <FormInput>
+            <p>
+              A Covering Letter on the letter head of your company applying to
+              be registered as a member of MAN, stating the breakdown of
+              payments made and documents attached.
+            </p>
+            <br />
+            <Button
+            onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_two[0].letter_of_breakdown_of_payment_and_docs_attached as string
+              ,'_blank')
+            }}
+            >Download Document</Button>
+          </FormInput>
+          <br />
+
+          <FormInput>
+            <p>
+              Copies of Duly Certified Audited Financial Statement for
+              proceeding two (2) years or Business Plan for new companies
+            </p>
+            <br />
+            <Button
+             onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_two[0].first_year_of_buisness_plan as string
+              ,'_blank')
+            }}
+            >Download Document year 1</Button>
+            <div style={{'padding':'.4rem'}}></div>
+                        <Button
+             onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_two[0].second_year_of_buisness_plan as string
+              ,'_blank')
+            }}
+            >Download Document year 2</Button>
+          </FormInput>
+        </FormHalveInput>
+        <br />
+
+        <FormInput style={{ width: "48%" }}>
+          <p>
+            Photocopy of your receipt issued on purchase of Application Form.
+          </p>
+          <br />
+          <Button
+            
+            onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_two[0].photocopy_of_your_reciept_issued_on_purchase_of_applicant_form as string
+              ,'_blank')
+            }}
+          >Download Document</Button>
+        </FormInput>
+
+     
+      {/* </Form> */}
+    </ProspectiveMembersFormContainer>
+    <br></br>
+<br></br>
         <CustomButtons>
-          <DeclineSvg styling={{ cursor: "pointer" }} />
-          <ApproveSvg styling={{ cursor: "pointer" }} />
+          <DeclineSvg
+          clickfn={()=>{
+            // e.pr
+            if(id){
+              mutate({
+                id,
+                'status':'decline'
+              })
+            }
+          }}
+          styling={{ cursor: "pointer" }} />
+          <ApproveSvg 
+           clickfn={()=>{
+            // e.pr
+            if(id){
+              mutate({
+                id,
+                'status':'final_approval'
+              })
+            }
+          }}
+          styling={{ cursor: "pointer" }} />
         </CustomButtons>
 
         <FormInput>
           <label>
             Remark
             <br />
-            <textarea />
+            <textarea value={remark} onChange={e=>{
+              setRemark(e.target.value)
+            }} />
           </label>
         </FormInput>
 
         <NavigationBtnContainer>
-          <NavigationBtn isFilled={false}>Save & Continue Later</NavigationBtn>
-          <Link to={"/prospective-members/form-two"}>
-            <NavigationBtn isFilled={true}>Next</NavigationBtn>
-          </Link>
+          {/* <NavigationBtn isFilled={false}>Save & Continue Later</NavigationBtn> */}
+            <NavigationBtn 
+            
+            onClick={e=>{
+              e.preventDefault()
+              if(id){
+                mutate({id,remark})
+              }
+            }} 
+            isFilled={true}>Submit Remark</NavigationBtn>
         </NavigationBtnContainer>
       </Form>
     </ProspectiveMembersFormContainer>
