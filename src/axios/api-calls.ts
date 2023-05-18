@@ -5,6 +5,7 @@ import { ServicePageCreationType } from "../components/Modals/ServicePageModals/
 import { MPDCLType } from "../components/Modals/MPDCLModal";
 import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType,  } from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
+import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1259,4 +1260,48 @@ export const updateRemarkOrStatus = async(
 )=>{
   const resp = await  rel8Request.post(`prospectivemember/admin_manage_prospective_member/update_prospective_status/`,data)
   return resp.data
+}
+
+
+
+// whychoose use homepage management
+
+
+export const createWhyChooseUsApi = async({data}:{data:WhyChooseUsType})=>{
+
+  const form = new FormData()
+
+  form.append('heading',data.heading)
+  form.append('description',data.description)
+  form.append('image',data.image[0])
+
+  const resp = await  privateRequest.post(`membership/why-we-are-unique/`,form)
+  return resp.data
+}
+
+export const updateWhyChooseUsApi = async({data}:{data:WhyChooseUsType})=>{
+
+  const form = new FormData()
+
+  form.append('heading',data.heading)
+  form.append('description',data.description)
+  if(typeof data.image !== 'string'){
+    form.append('image',data.image[0])
+  }
+
+  const resp = await  privateRequest.put(`membership/why-we-are-unique/${data.id}/`,form)
+  return resp.data
+}
+
+export const deleteWhyChooseUsApi = async(id:number)=>{
+
+
+  const resp = await  privateRequest.delete(`membership/why-we-are-unique/${id}`,)
+  return resp.data
+}
+
+export const getWhyChooseUsApi = async():Promise<WhyChooseUsType[]>=>{
+
+  const resp = await  privateRequest.get(`membership/why-we-are-unique/`,)
+  return resp.data.data
 }
