@@ -1,34 +1,112 @@
-import React from "react";
-import { useQuery } from "react-query";
-import { agmPaymentRegistration } from "../../axios/api-calls";
+import React, { useState } from "react";
 import { ContactMainContainer } from "../Modals/Modals.styles";
-import Loading from "../Loading/Loading";
-import { FormError } from "../../globals/styles/forms.styles";
-import AGMPaymentItem, { AGMPaymentType } from "./PaymentsItems/AGMPaymentItem";
+import InvitationSection from "./AGMComponents/InvitationSection";
+import MembersSection from "./AGMComponents/MembersSection";
+import ExhibitorsSection from "./AGMComponents/ExhibitorsSection";
+import OthersSection from "./AGMComponents/OthersSection";
+import LuncheonSection from "./AGMComponents/LuncheonBootsSection";
 
 const AGMPayments = () => {
-  const { isLoading, isFetching, isError, data } = useQuery(
-    "all-agm-registrations",
-    agmPaymentRegistration,
-    {
-      select: (data) => data.data,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const [options, setOptions] = useState("invitation");
 
   return (
     <>
       <ContactMainContainer>
-        <Loading loading={isLoading || isFetching} />
-        {!isError && data ? (
-          <>
-            {data.map((item: AGMPaymentType, index: number) => (
-              <AGMPaymentItem data={item} key={index} />
-            ))}
-          </>
-        ) : (
-          <FormError>Can't Fetch AGM Registration Data</FormError>
-        )}
+        <div
+          style={{
+            padding: "10px 5px",
+            display: "flex",
+            gap: "10px",
+            overflowX: "auto",
+          }}
+        >
+          <span
+            style={{
+              fontWeight: "500",
+              color: `${options === "luncheon" ? "#4FDE9D" : "#2b3513"}`,
+              cursor: "pointer",
+              borderRight: "1px solid #2b3513",
+              flex: "0 0 200px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setOptions("luncheon")}
+          >
+            Luncheon Prices & Boots
+          </span>
+          <span
+            style={{
+              fontWeight: "500",
+              color: `${options === "invitation" ? "#4FDE9D" : "#2b3513"}`,
+              cursor: "pointer",
+              borderRight: "1px solid #2b3513",
+              flex: "0 0 200px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setOptions("invitation")}
+          >
+            Invitaions
+          </span>
+          <span
+            style={{
+              fontWeight: "500",
+              color: `${options === "members" ? "#4FDE9D" : "#2b3513"}`,
+              cursor: "pointer",
+              borderRight: "1px solid #2b3513",
+              flex: "0 0 200px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setOptions("members")}
+          >
+            Members Registrations
+          </span>
+          <span
+            style={{
+              fontWeight: "500",
+              color: `${options === "exhibitor" ? "#4FDE9D" : "#2b3513"}`,
+              cursor: "pointer",
+              borderRight: "1px solid #2b3513",
+              flex: "0 0 200px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setOptions("exhibitor")}
+          >
+            Exhibitors Registrations
+          </span>
+          <span
+            style={{
+              fontWeight: "500",
+              color: `${options === "others" ? "#4FDE9D" : "#2b3513"}`,
+              cursor: "pointer",
+              borderRight: "1px solid #2b3513",
+              flex: "0 0 200px",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => setOptions("others")}
+          >
+            Other Registrations Registrations
+          </span>
+        </div>
+
+        {options === "luncheon" ? <LuncheonSection /> : null}
+        {options === "invitation" ? <InvitationSection /> : null}
+        {options === "members" ? <MembersSection /> : null}
+        {options === "exhibitor" ? <ExhibitorsSection /> : null}
+        {options === "others" ? <OthersSection /> : null}
       </ContactMainContainer>
     </>
   );

@@ -332,7 +332,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
 
                   <FormInput>
                     <label>
-                      Paragraph*
+                      Description*
                       <br />
                       <textarea
                         style={{ backgroundColor: "#fff" }}

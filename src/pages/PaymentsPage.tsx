@@ -14,7 +14,6 @@ const PaymentsPage = () => {
           display: "flex",
           gap: "10px",
           overflowX: "auto",
-          // width: "100%",
         }}
       >
         <span
@@ -68,6 +67,8 @@ const PaymentsPage = () => {
           AGM
         </span>
       </div>
+      <hr />
+      <hr />
 
       {options === "publication" ? <PublicationPayments /> : null}
       {options === "event-training" ? <TrainingsEventsPayments /> : null}

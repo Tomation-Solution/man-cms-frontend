@@ -53,8 +53,22 @@ export const ContactContainer = styled.div`
     margin: 5px 0px;
     line-height: 20px;
   }
+  .flexed {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0px;
+  }
 
   span {
     margin: 10px 0px;
   }
+`;
+
+export const ExhibitionBootContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0px;
+  gap: 10px;
 `;

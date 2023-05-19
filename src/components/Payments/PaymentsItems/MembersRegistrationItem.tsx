@@ -3,33 +3,30 @@ import { ContactContainer } from "../../Modals/Modals.styles";
 import { datefromatter } from "../../../utils/DateFormatter";
 import { formatMoney } from "../../../utils/moneyFormatter";
 
-type ParticipantDetailsType = {
+type ParticipantsType = {
   name: string;
-  designation:
-    | "memeber"
-    | "exhibitor"
-    | "exhibitor-participant"
-    | "guest"
-    | "media"
-    | "staff";
   email: string;
   phone_no: string;
 };
 
-export type AGMPaymentType = {
+export type MembersRegistrationItemType = {
   id: number;
   event: number;
+  participant: ParticipantsType[];
   ref: string;
   email: string;
   company_name: string;
   company_address: string;
   is_verified: boolean;
-  participant_details: ParticipantDetailsType[];
+  mail_recevied: boolean;
   amount_to_pay: string;
   created_at: string;
+  updated_at: string;
 };
 
-const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
+const MembersRegistrationItem: React.FC<{
+  data: MembersRegistrationItemType;
+}> = ({ data }) => {
   return (
     <ContactContainer>
       <h1>{data.company_name}</h1>
@@ -40,12 +37,17 @@ const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
       </p>
 
       <p>
+        <span className="darkend"></span>
+        {}
+      </p>
+
+      <p>
         <span className="darkend">AGM event id: </span>
         {data.event}
       </p>
 
       <p>
-        <span className="darkend">Companny email: </span>
+        <span className="darkend">Company email: </span>
         {data.email}
       </p>
 
@@ -65,6 +67,11 @@ const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
       </p>
 
       <p>
+        <span className="darkend">AGM registration status: </span>
+        {data.mail_recevied ? "received" : "not received"}
+      </p>
+
+      <p>
         <span className="darkend">Registration Initialization Date: </span>
         {datefromatter(new Date(data.created_at))}
       </p>
@@ -72,7 +79,7 @@ const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
       <section>
         <br />
         <h3 style={{ textDecoration: "underline" }}>Participants</h3>
-        {data.participant_details.map((item, index) => (
+        {data.participant.map((item, index) => (
           <div key={index} style={{ marginLeft: "20px" }}>
             <h4 style={{ textDecoration: "underline" }}>
               Participant {index + 1}
@@ -88,11 +95,6 @@ const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
             </p>
 
             <p>
-              <span className="darkend">Participant designation: </span>
-              {item.designation}
-            </p>
-
-            <p>
               <span className="darkend">Participant phone number: </span>
               {item.phone_no}
             </p>
@@ -103,4 +105,4 @@ const AGMPaymentItem: React.FC<{ data: AGMPaymentType }> = ({ data }) => {
   );
 };
 
-export default AGMPaymentItem;
+export default MembersRegistrationItem;

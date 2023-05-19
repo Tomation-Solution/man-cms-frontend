@@ -33,6 +33,18 @@ const TrainingsEventsPaymentItem: React.FC<{
         {data.ref}
       </p>
 
+      {data.type === "EVENT" ? (
+        <p>
+          <span className="darkend">Event id: </span>
+          {data.event}
+        </p>
+      ) : (
+        <p>
+          <span className="darkend">Training id: </span>
+          {data.training}
+        </p>
+      )}
+
       <p>
         <span className="darkend">Fullname: </span>
         {data.fullname}

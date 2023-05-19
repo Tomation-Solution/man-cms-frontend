@@ -155,7 +155,7 @@ const EditNewsModal: React.FC<{ newsId: number; closefn: () => void }> = ({
     <>
       <ModalsContainer>
         {isLoading || isFetching || editLoading ? (
-          <Loading loading={isLoading || isFetching || editLoading} />
+          <Loading light loading={isLoading || isFetching || editLoading} />
         ) : !isError ? (
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <h2>Edit a News</h2>
@@ -231,7 +231,7 @@ const EditNewsModal: React.FC<{ newsId: number; closefn: () => void }> = ({
 
                 <FormInput>
                   <label>
-                    Paragraph*
+                    Description*
                     <br />
                     <textarea
                       style={{ backgroundColor: "#fff" }}

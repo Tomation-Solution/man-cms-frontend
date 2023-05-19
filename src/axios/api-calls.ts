@@ -3,7 +3,10 @@ import { User } from "../zustand/store";
 import privateRequest from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
-import { MPDCLPageContentSchemaFormType, MrcPageContentTabschemaType,  } from "../pages/Structure/StructurePage";
+import {
+  MPDCLPageContentSchemaFormType,
+  MrcPageContentTabschemaType,
+} from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
@@ -866,9 +869,135 @@ export const eventTrainingPaymentRegistration = async () => {
   }
 };
 
-export const agmPaymentRegistration = async () => {
+//AGM
+//INVITATIONS
+export const getAllInvitations = async () => {
   try {
-    const res = await privateRequest.get(`/payments/agm-registration`);
+    const res = await privateRequest.get(`/payments/agm-invitation`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const invitationRegistration = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/payments/agm-invitation`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//MEMBERSHIP
+export const agmMembershipRegistration = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/member-agm-registration`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//EXHIBITOR
+export const agmExhibitorRegistration = async () => {
+  try {
+    const res = await privateRequest.get(
+      `/payments/exhibitor-agm-registration`
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//Other Registrations
+export const agmOtherRegistration = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/others-agm-registration`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//LUNCHEON
+export const getAllLuncheonPrices = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/luncheon/public`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateLuncheonPrices = async (payload: any) => {
+  const { id, ...data } = payload;
+  try {
+    const res = await privateRequest.patch(`/payments/luncheon/${id}`, data);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//EXHIBITION BOOTS
+export const getAllExhibitionBoots = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/exhibition-boot`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const createExhibitionBoot = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/payments/exhibition-boot`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const deleteExhibitionBoot = async (id: number) => {
+  try {
+    const res = await privateRequest.delete(`/payments/exhibition-boot/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateExhibitionBoot = async (payload: any) => {
+  const { id, ...data } = payload;
+  try {
+    const res = await privateRequest.patch(
+      `/payments/exhibition-boot/${id}`,
+      data
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//QUICK REGISTRATIONS
+export const makeQuickRegistrations = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(
+      `/payments/quick-agm-registration`,
+      payload
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const getAllQuickRegistrations = async () => {
+  try {
+    const res = await privateRequest.get(`/payments/quick-agm-registration`);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -958,211 +1087,231 @@ export const updateMrcApi = async (data: createMrcApiProp): Promise<any> => {
   return res.data;
 };
 
-
 //get MPDCL
-type MpdclType ={
-  "id": number,
-  "type": string,
-  "header": string,
-  "description":string,
-  "image": string|null 
-}
-export const getMpdclApi = async ():Promise<MpdclType[]>=>{
-  const resp = await privateRequest.get('/structure/mpdcl-service')
-  return resp.data.data
-}
+type MpdclType = {
+  id: number;
+  type: string;
+  header: string;
+  description: string;
+  image: string | null;
+};
+export const getMpdclApi = async (): Promise<MpdclType[]> => {
+  const resp = await privateRequest.get("/structure/mpdcl-service");
+  return resp.data.data;
+};
 
-
-export const createMpdclApi = async ({data}:{
-  data:MPDCLType }):Promise<MPDCLType>=>{
-  const form = new FormData()
-  form.append('type',data.type)
-  form.append('header',data.header)
-  form.append('description',data.description)
-  if(data.image){
-    form.append('image',data.image[0])
+export const createMpdclApi = async ({
+  data,
+}: {
+  data: MPDCLType;
+}): Promise<MPDCLType> => {
+  const form = new FormData();
+  form.append("type", data.type);
+  form.append("header", data.header);
+  form.append("description", data.description);
+  if (data.image) {
+    form.append("image", data.image[0]);
   }
-  const resp  = await privateRequest.post('/structure/mpdcl-service',form)
+  const resp = await privateRequest.post("/structure/mpdcl-service", form);
 
-  return resp.data 
-}
-export const updateMpdclApi = async ({data}:{
-  data:MPDCLType }):Promise<MPDCLType>=>{
-  const form = new FormData()
-  form.append('type',data.type)
-  form.append('header',data.header)
-  form.append('description',data.description)
-  if(typeof data.image!=='string'){
-    form.append('image',data.image[0])
+  return resp.data;
+};
+export const updateMpdclApi = async ({
+  data,
+}: {
+  data: MPDCLType;
+}): Promise<MPDCLType> => {
+  const form = new FormData();
+  form.append("type", data.type);
+  form.append("header", data.header);
+  form.append("description", data.description);
+  if (typeof data.image !== "string") {
+    form.append("image", data.image[0]);
   }
-  const resp  = await privateRequest.put(`/structure/mpdcl-service/${data.id}`,form)
+  const resp = await privateRequest.put(
+    `/structure/mpdcl-service/${data.id}`,
+    form
+  );
 
-  return resp.data 
-}
-
+  return resp.data;
+};
 
 export const deleteMpdclApi = async (id: number): Promise<any> => {
   const res = await privateRequest.delete(`/structure/mpdcl-service/${id}`);
   return res.data.data;
 };
 
-
-
 //MPDCLPageContent
-type MPDCLPageContent={
-  renewable_items:{
-    header:string,description:string
-  }[],
-  who_we_are:string[],
-  our_objectives_header:string,
-  renewable_image:string,
-  renewable_desc:string[];
-  our_objectives_items:string[];
-}
-export const getMPDCLPageContentApi =async ():Promise<MPDCLPageContent>=>{
+type MPDCLPageContent = {
+  renewable_items: {
+    header: string;
+    description: string;
+  }[];
+  who_we_are: string[];
+  our_objectives_header: string;
+  renewable_image: string;
+  renewable_desc: string[];
+  our_objectives_items: string[];
+};
+export const getMPDCLPageContentApi = async (): Promise<MPDCLPageContent> => {
   const resp = await privateRequest.get(`/structure/mpdcl`);
   return resp.data.data;
-}
+};
 
-export const updateMPDCLPageContentApi= async (data:MPDCLPageContentSchemaFormType):Promise<any>=>{
-  const form = new FormData()
-  form.append('renewable_items',JSON.stringify(data.renewable_items))
-  if(data.who_we_are){
-    form.append('who_we_are',JSON.stringify(data.who_we_are.map(d=>d.value)))
+export const updateMPDCLPageContentApi = async (
+  data: MPDCLPageContentSchemaFormType
+): Promise<any> => {
+  const form = new FormData();
+  form.append("renewable_items", JSON.stringify(data.renewable_items));
+  if (data.who_we_are) {
+    form.append(
+      "who_we_are",
+      JSON.stringify(data.who_we_are.map((d) => d.value))
+    );
   }
-  if(data.our_objectives_header){
-    form.append('our_objectives_header',data.our_objectives_header)
+  if (data.our_objectives_header) {
+    form.append("our_objectives_header", data.our_objectives_header);
   }
-  form.append('our_objectives_items',JSON.stringify(data.our_objectives_items?.map(d=>d.value)))
-  form.append('renewable_desc',JSON.stringify(data.renewable_desc?.map(d=>d.value)))
- if(typeof data.renewable_image !='string'){
-   form.append('renewable_image',data.renewable_image[0])
+  form.append(
+    "our_objectives_items",
+    JSON.stringify(data.our_objectives_items?.map((d) => d.value))
+  );
+  form.append(
+    "renewable_desc",
+    JSON.stringify(data.renewable_desc?.map((d) => d.value))
+  );
+  if (typeof data.renewable_image != "string") {
+    form.append("renewable_image", data.renewable_image[0]);
   }
-  const resp = await privateRequest.put(`/structure/mpdcl`,form);
+  const resp = await privateRequest.put(`/structure/mpdcl`, form);
   return resp.data;
-}
+};
 
 type MrcPageResponse = {
-  objectives_card:{
-    header:string;
-    description:string;
-  }[],
-  who_we_are:string[];
-  objectives:string[];  
-}
-export const getMrcPage = async ():Promise<MrcPageResponse>=>{
-  const resp = await privateRequest.get(`structure/mrc`)
-  return resp.data.data
-}
+  objectives_card: {
+    header: string;
+    description: string;
+  }[];
+  who_we_are: string[];
+  objectives: string[];
+};
+export const getMrcPage = async (): Promise<MrcPageResponse> => {
+  const resp = await privateRequest.get(`structure/mrc`);
+  return resp.data.data;
+};
 
-export const updateMrcPageApi = async (data:MrcPageContentTabschemaType) =>{
+export const updateMrcPageApi = async (data: MrcPageContentTabschemaType) => {
   const newData = {
-    'objectives_card':data.objectives_card,
-    'who_we_are':data.who_we_are?.map(d=>d.value),
-    'objectives':data.objectives?.map(d=>d.value),
-  }
+    objectives_card: data.objectives_card,
+    who_we_are: data.who_we_are?.map((d) => d.value),
+    objectives: data.objectives?.map((d) => d.value),
+  };
 
-  const resp = await privateRequest.put('structure/mrc',newData)
-  return resp.data
-}
+  const resp = await privateRequest.put("structure/mrc", newData);
+  return resp.data;
+};
 
 type getSectoralGroupApiResponseType = {
-  "id"?: number,
-  "image": any,
-  "header": string
-}
-export const getSectoralGroupApi = async ():Promise<getSectoralGroupApiResponseType[]>=>{
-    const resp = await privateRequest.get('structure/sectoral-group',)
-    return resp.data.data
-}
-export const deleteSectoralGroupApi = async (id:number)=>{
-  const resp = await privateRequest.delete(`structure/sectoral-group/${id}`,)
-  return resp.data
-}
-export const createUpdateSectoralGroupApi=async (data: SectoralGroupTabSchemaType)=>{
-  let resp:any;
-  let submit = new FormData()
-  submit.append('header',data.header)
-  if(typeof data.image!=='string'){
-    if(data.image){
-      submit.append('image',data.image[0])
+  id?: number;
+  image: any;
+  header: string;
+};
+export const getSectoralGroupApi = async (): Promise<
+  getSectoralGroupApiResponseType[]
+> => {
+  const resp = await privateRequest.get("structure/sectoral-group");
+  return resp.data.data;
+};
+export const deleteSectoralGroupApi = async (id: number) => {
+  const resp = await privateRequest.delete(`structure/sectoral-group/${id}`);
+  return resp.data;
+};
+export const createUpdateSectoralGroupApi = async (
+  data: SectoralGroupTabSchemaType
+) => {
+  let resp: any;
+  let submit = new FormData();
+  submit.append("header", data.header);
+  if (typeof data.image !== "string") {
+    if (data.image) {
+      submit.append("image", data.image[0]);
     }
   }
-  console.log({submit})
-  if(data.id === undefined){
-
-     resp = await privateRequest.post('structure/sectoral-group',submit)
-    return resp.data
+  console.log({ submit });
+  if (data.id === undefined) {
+    resp = await privateRequest.post("structure/sectoral-group", submit);
+    return resp.data;
   }
   // submit.append('id',data.id.toString())
-  
-   resp = await privateRequest.put(`structure/sectoral-group/${data.id}`,submit)
-  return resp.data
 
-}
-
-
+  resp = await privateRequest.put(
+    `structure/sectoral-group/${data.id}`,
+    submit
+  );
+  return resp.data;
+};
 
 // Manage Executive
-type ExecutiveType ={
-  "id"?: number,
-  "image"?: string,
-  "name": string,
-  "title": string,
-  "extra_title1"?: string,
-  "extra_title2"?: string,
-  "type": string,
-  "created_at"?: string,
-  "updated_at"?: string
-}
-export const getExecutiveApi = async ():Promise<ExecutiveType[]>=>{
-  const resp = await  privateRequest.get('aboutus/our-executives',)
-  return resp.data.data
-}
+type ExecutiveType = {
+  id?: number;
+  image?: string;
+  name: string;
+  title: string;
+  extra_title1?: string;
+  extra_title2?: string;
+  type: string;
+  created_at?: string;
+  updated_at?: string;
+};
+export const getExecutiveApi = async (): Promise<ExecutiveType[]> => {
+  const resp = await privateRequest.get("aboutus/our-executives");
+  return resp.data.data;
+};
 
-export const createExecutiveApi = async (data:ExecutiveType):Promise<any>=>{
-  const form = new FormData()
-  form.append('name',data.name)
-  form.append('title',data.title)
-  form.append('type',data.type)
-  if(data.extra_title1){
-    form.append('extra_title1',data.extra_title1)
+export const createExecutiveApi = async (data: ExecutiveType): Promise<any> => {
+  const form = new FormData();
+  form.append("name", data.name);
+  form.append("title", data.title);
+  form.append("type", data.type);
+  if (data.extra_title1) {
+    form.append("extra_title1", data.extra_title1);
   }
-  if(data.extra_title2){
-    form.append('extra_title2',data.extra_title2)
+  if (data.extra_title2) {
+    form.append("extra_title2", data.extra_title2);
   }
-  if(data.image){
-    form.append('image',data.image[0])
+  if (data.image) {
+    form.append("image", data.image[0]);
   }
-  form.append('type',data.type)
-  const resp = await  privateRequest.post('aboutus/our-executives',form)
-  return resp.data
-}
+  form.append("type", data.type);
+  const resp = await privateRequest.post("aboutus/our-executives", form);
+  return resp.data;
+};
 
-
-export const updateExecutiveApi = async (data:ExecutiveType):Promise<any>=>{
-  const form = new FormData()
-  form.append('name',data.name)
-  form.append('title',data.title)
-  form.append('type',data.type)
-  if(data.extra_title1){
-    form.append('extra_title1',data.extra_title1)
+export const updateExecutiveApi = async (data: ExecutiveType): Promise<any> => {
+  const form = new FormData();
+  form.append("name", data.name);
+  form.append("title", data.title);
+  form.append("type", data.type);
+  if (data.extra_title1) {
+    form.append("extra_title1", data.extra_title1);
   }
-  if(data.extra_title2){
-    form.append('extra_title2',data.extra_title2)
+  if (data.extra_title2) {
+    form.append("extra_title2", data.extra_title2);
   }
-  if(typeof data.image !=='string'){
-    if(data.image){
-      form.append('image',data.image[0])
+  if (typeof data.image !== "string") {
+    if (data.image) {
+      form.append("image", data.image[0]);
     }
   }
-  form.append('type',data.type)
-  const resp = await  privateRequest.put(`aboutus/our-executives/${data.id}`,form)
-  return resp.data
-}
+  form.append("type", data.type);
+  const resp = await privateRequest.put(
+    `aboutus/our-executives/${data.id}`,
+    form
+  );
+  return resp.data;
+};
 
-
-export const deleteExecutiveApi = async(id:number)=>{
-  const resp = await  privateRequest.delete(`aboutus/our-executives/${id}`,)
-  return resp.data
-}
+export const deleteExecutiveApi = async (id: number) => {
+  const resp = await privateRequest.delete(`aboutus/our-executives/${id}`);
+  return resp.data;
+};

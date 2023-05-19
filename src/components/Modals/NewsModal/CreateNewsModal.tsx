@@ -203,7 +203,7 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
 
                 <FormInput>
                   <label>
-                    Paragraph*
+                    Description*
                     <br />
                     <textarea
                       style={{ backgroundColor: "#fff" }}
