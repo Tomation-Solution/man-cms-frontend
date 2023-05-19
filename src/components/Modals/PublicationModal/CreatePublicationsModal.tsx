@@ -289,7 +289,7 @@ const CreatePublicationsModal = () => {
 
                 <FormInput>
                   <label>
-                    Paragraph*
+                    Description*
                     <br />
                     <textarea
                       style={{ backgroundColor: "#fff" }}

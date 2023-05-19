@@ -27,22 +27,41 @@ const schema = yup.object().shape({
     .of(
       yup.object({
         caption: yup.string().required("gallery item caption required"),
-        image: yup.mixed().test({
-          message: "Please provide a supported file type",
-          test: (file, context) => {
-            if (!file) {
-              return false;
-            }
-            const isValid = validateFileExtension(file);
-            if (!isValid) {
+        image: yup
+          .mixed()
+          .test({
+            message: "Please provide a supported file type",
+            test: (file, context) => {
+              if (!file) {
+                return false;
+              }
+              const isValid = validateFileExtension(file);
+              if (!isValid) {
+                return isValid;
+              }
               return isValid;
-            }
-            return isValid;
-          },
-        }),
+            },
+          })
+          .test({
+            message: "Image must not exceed 1.5mb",
+            test: (file: any, context) => {
+              if (!file) {
+                return false;
+              }
+              const isValid = file[0].size < 1500000;
+              if (!isValid) {
+                return isValid;
+              }
+              return isValid;
+            },
+          }),
       })
     )
     .min(1, "please provide atleast on gallery item")
+    .max(
+      2,
+      "please no more than two images caption pairs during gallery creation, you can add more later on."
+    )
     .required("images are required for the gallery"),
 });
 
@@ -131,7 +150,6 @@ const GalleryCreateModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
               </label>
             </FormInput>
 
-            <FormError>{errors?.images?.message}</FormError>
             {fields.map((fields, index) => (
               <section key={fields.id}>
                 <FormError>
@@ -167,6 +185,7 @@ const GalleryCreateModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 </div>
               </section>
             ))}
+            <FormError>{errors?.images?.message}</FormError>
             <AddMoreButton
               justify="center"
               click={() => append({ caption: "", image: "" })}

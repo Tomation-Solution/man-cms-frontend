@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import EditEventModal from "../../Modals/EventsModal/EditEventModal";
 import DeleteEventModal from "../../Modals/EventsModal/DeleteEventModal";
+import { formatMoney } from "../../../utils/moneyFormatter";
 
 const EventsTable = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,10 +46,6 @@ const EventsTable = () => {
       accessor: "name",
     },
     {
-      Header: "Price",
-      accessor: "price",
-    },
-    {
       Header: "Start Date",
       accessor: "start_date",
     },
@@ -61,6 +58,13 @@ const EventsTable = () => {
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
+      {
+        id: "Price",
+        Header: "Price",
+        Cell: ({ row }: { row: any }) => (
+          <p>{formatMoney(row.original.price)}</p>
+        ),
+      },
       {
         id: "Click to Edit",
         Header: "Click to Edit",

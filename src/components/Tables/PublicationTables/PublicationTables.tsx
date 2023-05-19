@@ -10,6 +10,8 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import EditPublicationsModal from "../../Modals/PublicationModal/EditPublicationsModal";
 import DeleteModal from "../../Modals/PublicationModal/DeleteModal";
+import numbro from "numbro";
+import { formatMoney } from "../../../utils/moneyFormatter";
 
 const PublicationTables = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,15 +45,18 @@ const PublicationTables = () => {
       Header: "Name",
       accessor: "name",
     },
-    {
-      Header: "Price",
-      accessor: "price",
-    },
   ];
 
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
+      {
+        id: "Price",
+        Header: "Price",
+        Cell: ({ row }: { row: any }) => (
+          <p>{formatMoney(row.original.price)}</p>
+        ),
+      },
       {
         id: "Click to Edit",
         Header: "Click to Edit",

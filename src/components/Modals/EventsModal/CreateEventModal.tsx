@@ -183,7 +183,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors?.group_type?.message}</FormError>
             <FormInput>
               <label>
-                Group Type e.g(members / executives / others)
+                Target Audience e.g(members / executives / others)
                 <br />
                 <input
                   type="text"
@@ -224,7 +224,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             </FormError>
             <FormInput>
               <label>
-                Start Date
+                End Date
                 <br />
                 <input
                   type="date"

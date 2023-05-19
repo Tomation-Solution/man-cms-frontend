@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import EditTrainingsModal from "../../Modals/TrainingsModal/EditTrainingsModal";
 import DeleteTrainingsModal from "../../Modals/TrainingsModal/DeleteTrainingsModal";
+import { formatMoney } from "../../../utils/moneyFormatter";
 
 const TrainingTable = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,10 +46,6 @@ const TrainingTable = () => {
       accessor: "name",
     },
     {
-      Header: "Price",
-      accessor: "price",
-    },
-    {
       Header: "Start Date",
       accessor: "start_date",
     },
@@ -61,6 +58,13 @@ const TrainingTable = () => {
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
+      {
+        id: "Price",
+        Header: "Price",
+        Cell: ({ row }: { row: any }) => (
+          <p>{formatMoney(row.original.price)}</p>
+        ),
+      },
       {
         id: "Click to Edit",
         Header: "Click to Edit",

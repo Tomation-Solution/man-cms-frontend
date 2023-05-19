@@ -231,7 +231,7 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
 
                 <FormInput>
                   <label>
-                    Paragraph*
+                    Description*
                     <br />
                     <textarea
                       style={{ backgroundColor: "#fff" }}
