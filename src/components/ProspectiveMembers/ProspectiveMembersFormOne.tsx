@@ -630,7 +630,14 @@ const ProspectiveMembersForm = () => {
           </FormInput>
           <FormInput>
             Signature
-            <Button>Download</Button>
+            <Button
+            onClick={e=>{
+              e.preventDefault()
+              window.open(
+                data?.form_one[0].upload_signature as string
+              ,'_blank')
+            }}
+            >Download</Button>
           </FormInput>
         </FormHalveInput>
 
