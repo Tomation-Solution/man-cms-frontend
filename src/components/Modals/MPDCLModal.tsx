@@ -66,7 +66,7 @@ const MPDCLModal =()=>{
                 label="Type"
                 options={[
                     {'label':'RENEWABLE ENERGY','option':'RENEWABLE_ENERGY'},
-                    {'label':'ENERGY','option':'RENEWABLE_ENERGY'},
+                    {'label':'POWER FACILITATION ','option':'POWER_FACILITATION'},
                 ]}
             />
             <InputWithLabel 
@@ -152,7 +152,7 @@ export const MPDCLModalUpdate =({previous_data}:{previous_data:MPDCLType})=>{
                   label="Type"
                   options={[
                       {'label':'RENEWABLE ENERGY','option':'RENEWABLE_ENERGY'},
-                      {'label':'ENERGY','option':'RENEWABLE_ENERGY'},
+                      {'label':'POWER FACILITATION ','option':'POWER_FACILITATION'},
                   ]}
               />
               <InputWithLabel 

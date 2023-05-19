@@ -514,11 +514,7 @@ const MPDCL = ()=>{
 
     },
 
-    {
-      Header:'Description',
-      accessor:'description',
-      id:2
-    },
+   
     
  ]
 
@@ -533,6 +529,14 @@ const MPDCL = ()=>{
         </>
     }
     },
+    {
+      Header:'Description',
+      accessor:'description',
+      Cell: (tableProps:any)=>{
+        return <>
+        {tableProps.row.description.slice(0,50)}...
+        </>
+    }},
     ...columns,
     
     {
