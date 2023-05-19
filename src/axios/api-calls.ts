@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { User } from "../zustand/store";
-import privateRequest from "./axios-utils";
+import privateRequest, { rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
 import {
@@ -8,6 +8,8 @@ import {
   MrcPageContentTabschemaType,
 } from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
+import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
+import { HomePageContentType } from "../pages/HomePageManagement";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1314,4 +1316,232 @@ export const updateExecutiveApi = async (data: ExecutiveType): Promise<any> => {
 export const deleteExecutiveApi = async (id: number) => {
   const resp = await privateRequest.delete(`aboutus/our-executives/${id}`);
   return resp.data;
+};
+
+export type ProspectiveMembertype = {
+  id: 8;
+  form_one: [
+    {
+      cac_registration_number: string;
+      prospective_member: number;
+      name_of_company: string;
+      tax_identification_number: string;
+      corporate_office_addresse: string;
+      office_bus_stop: string;
+      office_city: string;
+      office_lga: string;
+      office_state: string;
+      postal_addresse: string;
+      telephone: string;
+      email_addresse: string;
+      website: string;
+      factoru_details: string;
+      legal_status_of_company: string;
+      number_of_female_expatriates: number;
+      number_of_male_expatriates: number;
+      number_of_male_permanent_staff: number;
+      number_of_female_permanent_staff: number;
+      local_share_capital: string;
+      foreign_share_capital: string;
+      ownership_structure_equity_local: string;
+      ownership_structure_equity_foregin: string;
+      total_value_of_land_asset: string;
+      total_value_of_building_asset: string;
+      total_value_of_other_asset: string;
+      installed_capacity: string;
+      current_sales_turnover: string;
+      projected_sales_turnover: string;
+      are_your_product_exported: string;
+      company_contact_infomation: string;
+      designation: string;
+      name_of_md_or_ceo_of_company: string;
+      selectdate_of_registration: string;
+      upload_signature: string;
+      // "all_roduct_manufactured": "[{'product_manufactured':'whothey breat','certificates':'certifacet of thoe'}]",
+      // "all_raw_materials_used": "[{'major_raw_materials':'j frhufr','major_raw_materials':'hello people'}]",
+      all_roduct_manufactured: string;
+      all_raw_materials_used: string;
+    }
+  ];
+  form_two: [
+    {
+      corporate_affairs_commision: string | null;
+      letter_of_breakdown_of_payment_and_docs_attached: string | null;
+      first_year_of_buisness_plan: string | null;
+      second_year_of_buisness_plan: string | null;
+      photocopy_of_your_reciept_issued_on_purchase_of_applicant_form:
+        | string
+        | null;
+      prospective_member: number;
+    }
+  ];
+  name_of_company: string;
+  telephone_number: string;
+  cac_registration_number: string;
+  email: string;
+  website: string;
+  corporate_office_addresse: string;
+  has_paid: boolean;
+  paystack: string;
+  amount: string;
+  subcription_amount: string;
+  subcription_paystack: string;
+  admin: string;
+  has_paid_subcription: boolean;
+  application_status: string;
+  user: number;
+};
+// admin prospective member
+export const getprospectiveMemberSubmission = async ({
+  application_status = "approval_in_progress",
+}: {
+  application_status?: "approval_in_progress" | "final_approval";
+}): Promise<ProspectiveMembertype[]> => {
+  const resp = await rel8Request.get(
+    `prospectivemember/admin_manage_prospective_member/get_submissions/?application_status=${application_status}`
+  );
+  return resp.data.data;
+};
+
+export const getprospectiveMemberSubmissionDetail = async (
+  id: number
+): Promise<ProspectiveMembertype> => {
+  const resp = await rel8Request.get(
+    `prospectivemember/admin_manage_prospective_member/get_submissions/?id=${id}`
+  );
+  return resp.data.data;
+};
+
+export const updateRemarkOrStatus = async (data: {
+  id: string;
+  status?: string;
+  remark?: string;
+}) => {
+  const resp = await rel8Request.post(
+    `prospectivemember/admin_manage_prospective_member/update_prospective_status/`,
+    data
+  );
+  return resp.data;
+};
+
+// whychoose use homepage management
+
+export const createWhyChooseUsApi = async ({
+  data,
+}: {
+  data: WhyChooseUsType;
+}) => {
+  const form = new FormData();
+
+  form.append("heading", data.heading);
+  form.append("description", data.description);
+  form.append("image", data.image[0]);
+
+  const resp = await privateRequest.post(`membership/why-we-are-unique/`, form);
+  return resp.data;
+};
+
+export const updateWhyChooseUsApi = async ({
+  data,
+}: {
+  data: WhyChooseUsType;
+}) => {
+  const form = new FormData();
+
+  form.append("heading", data.heading);
+  form.append("description", data.description);
+  if (typeof data.image !== "string") {
+    form.append("image", data.image[0]);
+  }
+
+  const resp = await privateRequest.put(
+    `membership/why-we-are-unique/${data.id}/`,
+    form
+  );
+  return resp.data;
+};
+
+export const deleteWhyChooseUsApi = async (id: number) => {
+  const resp = await privateRequest.delete(
+    `membership/why-we-are-unique/${id}`
+  );
+  return resp.data;
+};
+
+export const getWhyChooseUsApi = async (): Promise<WhyChooseUsType[]> => {
+  const resp = await privateRequest.get(`membership/why-we-are-unique/`);
+  return resp.data.data;
+};
+
+// home page content
+export type HomePageContentServerResponse = {
+  id: number;
+  Logo: string;
+  slider_welcome_message: string;
+  slider_vision_message: string;
+  slider_mission_message: string;
+  vision_intro: string[];
+  mission_intro: string[];
+  advocacy_intro: string[];
+  history_intro: string[];
+  why_join_intro: string[];
+  members_intro: string[];
+  slider_image1: string | null;
+  slider_image2: string | null;
+  slider_image3: string | null;
+};
+export const getHomePageContent =
+  async (): Promise<HomePageContentServerResponse> => {
+    const resp = await privateRequest.get(`membership/home-main/`);
+    return resp.data.data;
+  };
+
+export const updateHomePageContent = async (
+  data: HomePageContentType
+): Promise<HomePageContentServerResponse> => {
+  const form = new FormData();
+
+  if (typeof data.Logo !== "string") {
+    form.append("Logo", data.Logo[0]);
+  }
+  if (typeof data.slider_image1 !== "string") {
+    form.append("slider_image1", data.slider_image1[0]);
+  }
+  if (typeof data.slider_image2 !== "string") {
+    form.append("slider_image2", data.slider_image2[0]);
+  }
+  if (typeof data.slider_image3 !== "string") {
+    form.append("slider_image2", data.slider_image3[0]);
+  }
+  form.append("slider_welcome_message", data.slider_welcome_message);
+  form.append("slider_vision_message", data.slider_vision_message);
+  form.append("slider_mission_message", data.slider_mission_message);
+
+  form.append(
+    "vision_intro",
+    JSON.stringify(data.vision_intro?.map((d) => d.value))
+  );
+  form.append(
+    "mission_intro",
+    JSON.stringify(data.mission_intro?.map((d) => d.value))
+  );
+  form.append(
+    "advocacy_intro",
+    JSON.stringify(data.advocacy_intro?.map((d) => d.value))
+  );
+  form.append(
+    "history_intro",
+    JSON.stringify(data.history_intro?.map((d) => d.value))
+  );
+  form.append(
+    "why_join_intro",
+    JSON.stringify(data.why_join_intro?.map((d) => d.value))
+  );
+  form.append(
+    "members_intro",
+    JSON.stringify(data.members_intro?.map((d) => d.value))
+  );
+
+  const resp = await privateRequest.put(`membership/home-main/`, form);
+  return resp.data.data;
 };

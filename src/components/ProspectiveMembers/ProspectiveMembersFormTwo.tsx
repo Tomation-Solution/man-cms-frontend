@@ -16,15 +16,15 @@ import { Link } from "react-router-dom";
 import { ApproveSvg, DeclineSvg } from "../../assets/svgs";
 
 const ProspectiveMembersFormTwo = () => {
-  const { register, handleSubmit } = useForm();
+  // const { register, handleSubmit } = useForm();
 
-  const onSubmitHandler = (data: any) => {
-    console.log(data);
-  };
+  // const onSubmitHandler = (data: any) => {
+  //   console.log(data);
+  // };
 
   return (
     <ProspectiveMembersFormContainer>
-      <Form onSubmit={handleSubmit(onSubmitHandler)}>
+      {/* <Form onSubmit={handleSubmit(onSubmitHandler)}> */}
         <FormHalveInput>
           <FormInput>
             <p>Corporate Affairs Commission (CAC) Forms C02 and C07</p>
@@ -93,7 +93,7 @@ const ProspectiveMembersFormTwo = () => {
             <NavigationBtn isFilled={true}>Approve Application</NavigationBtn>
           </Link>
         </NavigationBtnContainer>
-      </Form>
+      {/* </Form> */}
     </ProspectiveMembersFormContainer>
   );
 };
