@@ -520,12 +520,6 @@ const MPDCL = () => {
       accessor: "header",
       id: 1,
     },
-
-    {
-      Header: "Description",
-      accessor: "description",
-      id: 2,
-    },
   ];
 
   const tableHooks = (hooks: Hooks) => {
@@ -535,6 +529,13 @@ const MPDCL = () => {
         Header: "S/N",
         Cell: (tableProps: any) => {
           return <>{tableProps.row.index + 1}</>;
+        },
+      },
+      {
+        Header: "Description",
+        accessor: "description",
+        Cell: (tableProps: any) => {
+          return <>{tableProps.row.description?.slice(0, 50)}...</>;
         },
       },
       ...columns,
