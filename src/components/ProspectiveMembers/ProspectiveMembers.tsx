@@ -8,9 +8,20 @@ import {
   ProspectiveMembersTableApproved,
   ProspectiveMembersTablePending,
 } from "../Tables/ProspectiveMembers/ProspectiveMembersTableComp";
+import { useAuthStore } from "../../zustand/store";
+import { Navigate } from "react-router-dom";
 
 const ProspectiveMembers = () => {
-  const [options, setOptions] = useState<'pending'|'approved'>("pending");
+  const [options, setOptions] = useState<"pending" | "approved">("pending");
+  const userData = useAuthStore.getState().user;
+
+  if (
+    !["super_user", "prospective_certificates"].includes(
+      String(userData?.user_type)
+    )
+  ) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <ApplicationsTabItems>

@@ -4,8 +4,19 @@ import {
   ApplicationsTabItems,
 } from "../ProspectiveMemers.styles";
 import CertificateIssuigTable from "../../Tables/ProspectiveMembers/CertificateIssuigTable";
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../../../zustand/store";
 
 const CertificateIssuing = () => {
+  const userData = useAuthStore.getState().user;
+
+  if (
+    !["super_user", "prospective_certificates"].includes(
+      String(userData?.user_type)
+    )
+  ) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <ApplicationsTabItems>

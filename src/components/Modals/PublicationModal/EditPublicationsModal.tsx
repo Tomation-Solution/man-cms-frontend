@@ -293,11 +293,14 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                     {...register("type", { required: true })}
                   >
                     <option disabled>select an option</option>
-                    {getData.map((item: { name: string; id: number }) => (
-                      <option value={item.id} key={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
+
+                    {getData
+                      ? getData.map((item: { name: string; id: number }) => (
+                          <option value={item.id} key={item.id}>
+                            {item.name}
+                          </option>
+                        ))
+                      : null}
                   </select>
                 </label>
               </FormSelect>

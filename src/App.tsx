@@ -2,7 +2,6 @@ import { ToastContainer } from "react-toastify";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
-import Button from "./components/Button/Button";
 import NotFound from "./components/NotFound/NotFound";
 import PublicationsPage from "./pages/PublicationsPage";
 import LoginPage from "./pages/LoginPage";
@@ -26,6 +25,7 @@ import ServicePage from "./pages/ServicePage/ServicePage";
 import StructurePage from "./pages/Structure/StructurePage";
 import PaymentsPage from "./pages/PaymentsPage";
 import HomePageManagement from "./pages/HomePageManagement";
+import Unauthorized from "./components/Unauthorized/Unauthorized";
 
 function App() {
   return (
@@ -35,15 +35,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route element={<MainLayout />}>
-            <Route
-              path="/"
-              element={
-                <h1>
-                  HELLO WORLD, TYPE THIS PATH IN THE URL "/path"
-                  <Button styleType="sec">Hello world</Button>
-                </h1>
-              }
-            />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/publications" element={<PublicationsPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
@@ -65,12 +57,9 @@ function App() {
               path="/prospective-members"
               element={<ProspectiveMembers />}
             />
-                        <Route
-              path="/hompage-management"
-              element={<HomePageManagement />}
-            />
+            <Route path="/" element={<HomePageManagement />} />
 
-<Route
+            <Route
               path="/prospective-members/details/:id"
               element={<ProspectiveMembersForm />}
             />

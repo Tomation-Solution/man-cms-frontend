@@ -2,10 +2,21 @@ import React, { useState } from "react";
 import PublicationPayments from "../components/Payments/PublicationPayments";
 import TrainingsEventsPayments from "../components/Payments/TrainingsEventsPayments";
 import AGMPayments from "../components/Payments/AGMPayments";
+import { useAuthStore } from "../zustand/store";
+import { Navigate } from "react-router-dom";
 
 const PaymentsPage = () => {
   const [options, setOptions] = useState("publication");
 
+  const userData = useAuthStore.getState().user;
+
+  if (
+    !["super_user", "registrations_payments"].includes(
+      String(userData?.user_type)
+    )
+  ) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <div

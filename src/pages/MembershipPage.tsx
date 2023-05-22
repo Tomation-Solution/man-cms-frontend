@@ -3,9 +3,16 @@ import WhyJoin from "../components/Membership/WhyJoin";
 import JoinStep from "../components/Membership/JoinStep";
 import FAQS from "../components/Membership/FAQS";
 import OurMembers from "../components/Membership/OurMembers";
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../zustand/store";
 
 const MembershipPage = () => {
   const [options, setOptions] = useState("why-join");
+  const userData = useAuthStore.getState().user;
+
+  if (!["super_user", "public_view"].includes(String(userData?.user_type))) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <div
