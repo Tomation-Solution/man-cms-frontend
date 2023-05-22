@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 export type User = {
   email: string;
+  user_type: string;
   token: {
     access: string;
     refresh: string;

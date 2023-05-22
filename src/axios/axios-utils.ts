@@ -5,16 +5,17 @@ import dayjs from "dayjs";
 
 const BASE_URL = `https://web-production-9688.up.railway.app/api`;
 // const BASE_URL = "http://127.0.0.1:8000/api";
-const REL8_URL ='https://rel8-corporate-backend-production.up.railway.app/tenant/man/tenant/'
+const REL8_URL =
+  "https://rel8-corporate-backend-production.up.railway.app/tenant/man/tenant/";
 const privateRequest = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
 });
 
 export const rel8Request = axios.create({
-  baseURL:REL8_URL,
+  baseURL: REL8_URL,
   // withCredentials: true,
-})
+});
 
 privateRequest.interceptors.request.use(async (config) => {
   const userData = useAuthStore.getState().user;

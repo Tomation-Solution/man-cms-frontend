@@ -8,9 +8,16 @@ import Office from "../components/AboutUs/Office";
 import Branch from "../components/AboutUs/Branch";
 import Contacts from "../components/AboutUs/Contacts";
 import OurExcutive from "../components/AboutUs/OurExcutive";
+import { useAuthStore } from "../zustand/store";
+import { Navigate } from "react-router-dom";
 
 const AboutUsPage = () => {
   const [options, setOptions] = useState("history");
+  const userData = useAuthStore.getState().user;
+
+  if (!["super_user", "public_view"].includes(String(userData?.user_type))) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <div
@@ -181,7 +188,7 @@ const AboutUsPage = () => {
       {options === "operate-office" ? <Office /> : null}
       {options === "operate-branch" ? <Branch /> : null}
       {options === "contacts" ? <Contacts /> : null}
-      {options === "Executives" ?<OurExcutive/> : null}
+      {options === "Executives" ? <OurExcutive /> : null}
     </>
   );
 };

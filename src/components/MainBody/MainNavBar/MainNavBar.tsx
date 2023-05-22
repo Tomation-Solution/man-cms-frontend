@@ -28,10 +28,10 @@ const MainNavBar = () => {
       <MainNavContainer>
         <MainNavContentHolder>
           <MainNavProfile>
-            <IoIosNotificationsOutline />
-            <p>Man Admin</p>
+            {/* <IoIosNotificationsOutline /> */}
+            <h3 style={{ color: "#2b3513" }}>Man Admin</h3>
 
-            <img alt="" src={"ProfileImg"} />
+            {/* <img alt="" src={"ProfileImg"} /> */}
           </MainNavProfile>
         </MainNavContentHolder>
       </MainNavContainer>

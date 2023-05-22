@@ -7,7 +7,8 @@ import {
 } from "../../../globals/styles/forms.styles";
 import { useForm } from "react-hook-form";
 import { ProspectiveMembersFormContainer } from "../ProspectiveMemers.styles";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useAuthStore } from "../../../zustand/store";
 
 const CertificateAppointment = () => {
   const { register, handleSubmit } = useForm({
@@ -16,6 +17,15 @@ const CertificateAppointment = () => {
       date: "",
     },
   });
+  const userData = useAuthStore.getState().user;
+
+  if (
+    !["super_user", "prospective_certificates"].includes(
+      String(userData?.user_type)
+    )
+  ) {
+    return <Navigate to="/unauthorized" />;
+  }
   return (
     <>
       <CertificateAppointmentContainer>
