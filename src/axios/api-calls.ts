@@ -10,6 +10,7 @@ import {
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
 import { HomePageContentType } from "../pages/HomePageManagement";
+import rel8PrivateRequest from "./rel8-axios-utils";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1000,6 +1001,52 @@ export const makeQuickRegistrations = async (payload: any) => {
 export const getAllQuickRegistrations = async () => {
   try {
     const res = await privateRequest.get(`/payments/quick-agm-registration`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//REL8 Login
+export const rel8Login = async (payload: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    const res = await rel8Request.post(`auth/login/`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//REL8 post publication
+export const rel8Publication = async (payload: any) => {
+  try {
+    const res = await rel8PrivateRequest.post(
+      `publication/publicationview/`,
+      payload
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//REL8 post news
+export const rel8News = async (payload: any) => {
+  try {
+    const res = await rel8PrivateRequest.post(`news/newsview/`, payload);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+//REL8 post event
+export const rel8Event = async (payload: any) => {
+  try {
+    const res = await rel8PrivateRequest.post(`event/eventview/`, payload);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
