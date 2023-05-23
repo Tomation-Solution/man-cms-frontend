@@ -48,12 +48,11 @@ export const WhyChooseUsModal = ()=>{
     }
 
     
-
+    if(isLoading) return <Loading loading={isLoading} />
     return (
         <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
-            <Loading loading={isLoading} />
             <h2
             style={{ padding: "1rem 0" }}
             >Create Content</h2>
@@ -124,11 +123,12 @@ export const UpdateWhyChooseUsModal = ({data}:{data:WhyChooseUsType})=>{
             setValue('id',data.id)
         }
       },[data])
+      if(isLoading) return <Loading loading={isLoading} />
       return (
           <Form
           onSubmit={handleSubmit(onSubmitHandler)}
           >
-              <Loading loading={isLoading} />
+              
               <h2
               style={{ padding: "1rem 0" }}
               >Create Content</h2>
@@ -147,7 +147,9 @@ export const UpdateWhyChooseUsModal = ({data}:{data:WhyChooseUsType})=>{
   
               register={register('description')}
               />
-              
+            <img src={data.image?data.image:''}
+            style={{'width':'300px','margin':'0 auto'}}
+            alt="" />
               <InputWithLabel 
               // errorMessage={errors.image?.message}
   
