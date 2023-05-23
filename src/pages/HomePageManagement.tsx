@@ -572,7 +572,7 @@ const HomePageContent = () => {
         />
         <InputWithLabel
           register={register("slider_image1")}
-          label="slider image1"
+          label="slider image"
           type="file"
         />
       </div>
@@ -585,7 +585,7 @@ const HomePageContent = () => {
         />
         <InputWithLabel
           register={register("slider_image2")}
-          label="slider image2"
+          label="our vision image"
           type="file"
         />
       </div>
@@ -598,7 +598,7 @@ const HomePageContent = () => {
         />
         <InputWithLabel
           register={register("slider_image3")}
-          label="slider image3"
+          label="lastest update image"
           type="file"
         />
       </div>
