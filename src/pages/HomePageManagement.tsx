@@ -14,6 +14,7 @@ import {
   deleteWhyChooseUsApi,
   getHomePageContent,
   getWhyChooseUsApi,
+  updateHomePageContent,
 } from "../axios/api-calls";
 import Loading from "../components/Loading/Loading";
 import { toast } from "react-toastify";
@@ -243,6 +244,22 @@ const HomePageContent = () => {
       },
     }
   );
+  const client = useQueryClient()
+  const {isLoading:updateing,mutate}= useMutation(updateHomePageContent,{
+    'onSuccess':(data)=>{
+      toast.success("home page content saved", {
+        progressClassName: "toastProgress",
+        icon: false,
+      });
+      client.invalidateQueries('getHomePageContent')
+    },
+    'onError':(error)=>{
+      toast.error("ome page content not edited", {
+        icon: false,
+        progressClassName: "toastProgress",
+      });
+    }
+  })
   const {
     register,
     control,
@@ -303,6 +320,8 @@ const HomePageContent = () => {
   });
   const onSubmitHandler = (data: HomePageContentType) => {
     console.log({ SUbmittedData: data });
+    mutate(data)
+    
   };
 
   useEffect(() => {
@@ -344,7 +363,7 @@ const HomePageContent = () => {
   }, [data]);
   return (
     <form onSubmit={handleSubmit(onSubmitHandler)}>
-      <Loading loading={isLoading} />
+      <Loading loading={isLoading||updateing} />
       <h2>Home Page Content</h2>
       <InputWithLabel
         label="Slider Welcome Message"
