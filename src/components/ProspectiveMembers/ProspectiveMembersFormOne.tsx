@@ -881,7 +881,7 @@ const ProspectiveMembersForm = () => {
               if (id) {
                 mutate({
                   id,
-                  status: "decline",
+                  status: "pending",
                 });
               }
             }}
