@@ -189,7 +189,7 @@ export const FormLink = styled.div`
 `;
 
 export const FormError = styled.div`
-  color:crimson;
+  color: crimson;
   font-weight: 500;
   margin-top: 0.1em;
 `;
@@ -216,6 +216,10 @@ export const FormCheckbox = styled.div`
   display: flex;
   align-items: center;
   margin-top: 1em;
+
+  input[type="checkbox"] {
+    zoom: 1.5;
+  }
   input {
     margin-right: 0.5em;
   }
@@ -254,10 +258,14 @@ export const FormRadio = styled.div`
   margin-bottom: 1em;
   width: 100%;
   label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
     font-weight: 500;
     margin-bottom: 0.5em;
   }
   input {
+    zoom: 1.5;
     margin-right: 0.5em;
   }
 `;
