@@ -25,6 +25,7 @@ const CreateSectoralGroupModal = ()=>{
     const {
       register,
       control,
+      reset,
       handleSubmit,
       setValue,
       formState: { errors },
@@ -33,20 +34,25 @@ const CreateSectoralGroupModal = ()=>{
   });
     const {isLoading:creating,mutate} = useMutation(createUpdateSectoralGroupApi,{
         'onSuccess':(data)=>{
-          console.log({'success download':data})
+          reset()
       queryClient.invalidateQueries("get-sectoral");
-
+      toast.success(`Created Sectoral Group`, {
+        progressClassName: "toastProgress",
+        icon: false,
+      });
         }
       })
     const onSubmitHandler =(data: SectoralGroupTabSchemaType)=>{
         console.log({'SUbmittedData':data})
         mutate(data)
       }
+      if(creating) return   <Loading loading={creating} />
     return (
         <form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
-          <Loading loading={creating} />
+      <h2 style={{ padding: "1rem 0" }}>Sectoral Group</h2>
+        
           <InputWithLabel 
           label="header"
           register={register('header')}
@@ -79,14 +85,19 @@ export const UpdateGroupModal = ({data}:{data?:SectoralGroupTabSchemaType})=>{
       control,
       handleSubmit,
       setValue,
+      reset,
       formState: { errors },
     } = useForm<SectoralGroupTabSchemaType>({
       resolver: yupResolver(SectoralGroupTabSchema),
   });
     const {isLoading:creating,mutate} = useMutation(createUpdateSectoralGroupApi,{
         'onSuccess':(data)=>{
+          reset
           queryClient.invalidateQueries("get-sectoral");
-
+          toast.success(`Updated Sectoral Group`, {
+            progressClassName: "toastProgress",
+            icon: false,
+          });
         }
       })
       
@@ -102,11 +113,13 @@ export const UpdateGroupModal = ({data}:{data?:SectoralGroupTabSchemaType})=>{
         setValue('image',data.image)
       }
     },[data])
+    if(creating)  return   <Loading loading={creating} />
     return (
         <form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
-          <Loading loading={creating} />
+      <h2 style={{ padding: "1rem 0" }}>Update Sectoral Group</h2>
+         
           <InputWithLabel 
           label="header"
           register={register('header')}

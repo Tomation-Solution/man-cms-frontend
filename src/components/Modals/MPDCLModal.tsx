@@ -27,11 +27,13 @@ const MPDCLModal =()=>{
         control,
         handleSubmit,
         setValue,
+        reset,
         formState: { errors },
       } = useForm<MPDCLType>({
         resolver: yupResolver(schema),});
     const {mutate,isLoading} = useMutation(createMpdclApi,{
         'onSuccess':()=>{
+            reset()
             queryClient.invalidateQueries("mpdcl-list");
             toast.success("MPDCL saved", {
                 progressClassName: "toastProgress",
@@ -44,11 +46,12 @@ const MPDCLModal =()=>{
             mutate({data})
         }
         console.log(errors)
+        if(isLoading) return   <Loading loading={isLoading} />
     return (
         <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
-            <Loading loading={isLoading} />
+          
             <h2
             style={{ padding: "1rem 0" }}
             >Create MPDCL</h2>
@@ -130,11 +133,14 @@ export const MPDCLModalUpdate =({previous_data}:{previous_data:MPDCLType})=>{
                 setValue('id',previous_data.id)
             }
           },[previous_data])
+
+        if(isLoading) return   <Loading loading={isLoading} />
+
       return (
           <Form
           onSubmit={handleSubmit(onSubmitHandler)}
           >
-              <Loading loading={isLoading} />
+              {/* <Loading loading={isLoading} /> */}
               <h2
               style={{ padding: "1rem 0" }}
               >Update MPDCL</h2>

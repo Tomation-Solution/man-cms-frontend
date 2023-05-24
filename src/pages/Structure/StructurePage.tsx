@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useMediaQuery } from "react-responsive";
 import OffCanvas from "../../components/OffCanvas/OffCanvas";
@@ -39,13 +39,16 @@ import { useAuthStore } from "../../zustand/store";
 import { Navigate } from "react-router-dom";
 
 const StructurePage = () => {
-  const [options, setOptions] = useState("history");
+  const [options, setOptions] = useState("MPDCL");
   const userData = useAuthStore.getState().user;
 
   if (!["super_user", "public_view"].includes(String(userData?.user_type))) {
     return <Navigate to="/unauthorized" />;
   }
 
+  useEffect(()=>{
+
+  },[])
   return (
     <div>
       <div
@@ -897,6 +900,10 @@ const SectoralGroupTab = () => {
     deleteSectoralGroupApi,
     {
       onSuccess: (data) => {
+        toast.error(`Deleted Sectoral Group`, {
+          progressClassName: "toastProgress",
+          icon: false,
+        });
         queryClient.invalidateQueries("get-sectoral");
       },
     }
