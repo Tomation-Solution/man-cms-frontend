@@ -34,7 +34,7 @@ const InputWithLabel = ({
           <br />
           {!isTextArea ? (
             <input
-              style={{ backgroundColor: "#fff", width: "100%" }}
+              style={type=='file'?{ width: "100%" }:{ backgroundColor: "#fff", width: "100%" }}
               type={type}
               placeholder={
                 placeholder ? placeholder : `please enter name of ${label}`
