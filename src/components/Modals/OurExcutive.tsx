@@ -84,13 +84,13 @@ const CreateOurExcutiveModal=()=>{
             />
             <br />
             <InputWithLabel
-            label="Extra Title One"
+            label="Extra Title One*"
             register={register('extra_title1')}
 
             />
             <br />
             <InputWithLabel
-            label="Extra Title Two"
+            label="Extra Title Two*"
             register={register('extra_title2')}
             />
             <br />
@@ -183,13 +183,13 @@ export const UpdateOurExcutiveModal=({data}:{data?:FormI})=>{
             />
             <br />
             <InputWithLabel
-            label="Extra Title One"
+            label="Extra Title One*"
             register={register('extra_title1')}
 
             />
             <br />
             <InputWithLabel
-            label="Extra Title Two"
+            label="Extra Title Two*"
             register={register('extra_title2')}
             />
             <br />

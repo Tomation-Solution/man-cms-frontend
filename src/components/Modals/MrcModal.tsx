@@ -38,6 +38,7 @@ export const MrcModal = () => {
     control,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<FormType>({
     resolver: yupResolver(schema),
@@ -48,6 +49,7 @@ export const MrcModal = () => {
   const { append, remove, fields } = useFieldArray({ control, name: "items" });
   const { mutate, isLoading } = useMutation(createMrcApi, {
     onSuccess: (data) => {
+      reset()
       queryClient.invalidateQueries("mrc-list");
       console.log({ data });
       toast.success(`${data.name} created!`, {
@@ -74,10 +76,12 @@ export const MrcModal = () => {
     });
   };
 
+    
+      if(isLoading) return   <Loading loading={isLoading} />
+
   return (
     <Form onSubmit={handleSubmit(onSubmitHandler)}>
-      <h2 style={{ padding: "1rem 0" }}>Create Sectoral Group</h2>
-      <Loading loading={isLoading} />
+      <h2 style={{ padding: "1rem 0" }}>MRC</h2>
       <InputWithLabel
         label="Name"
         register={register("name")}
@@ -202,10 +206,12 @@ export const MrcUpdateModal = ({ mrc }: { mrc: FormType }) => {
     }
     // setValue('name',mrc.items)
   }, [mrc]);
+
+  if(isLoading) return <Loading loading={isLoading} />
   return (
     <Form onSubmit={handleSubmit(onSubmitHandler)}>
       <h2 style={{ padding: "1rem 0" }}>Create Sectoral Group</h2>
-      <Loading loading={isLoading} />
+      
       <InputWithLabel
         label="Name"
         register={register("name")}

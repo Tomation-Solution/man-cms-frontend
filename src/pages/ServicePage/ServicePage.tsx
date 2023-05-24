@@ -14,6 +14,8 @@ import { Hooks } from "react-table";
 import Loading from "../../components/Loading/Loading";
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "../../zustand/store";
+import { toast } from "react-toastify";
+import { TableReject, TableView } from "../../components/Tables/Tables.styles";
 
 const ServicePage = (): React.ReactElement => {
   const userData = useAuthStore.getState().user;
@@ -27,6 +29,10 @@ const ServicePage = (): React.ReactElement => {
     deleteServiceApi,
     {
       onSuccess: () => {
+        toast.error("Deleted", {
+          icon: false,
+          progressClassName: "toastProgress",
+        });
         queryClient.invalidateQueries("services-list");
       },
     }
@@ -90,31 +96,38 @@ const ServicePage = (): React.ReactElement => {
         id: "Delete",
         Header: "Delete",
         Cell: (tableProp: any) => (
-          <Button
-            styleType={"whiteBg"}
-            onClick={() => {
-              deleteFunc(tableProp.row.original.id);
-            }}
-          >
-            DELETE
-          </Button>
+
+          <TableReject
+          onClick={() => {
+          deleteFunc(tableProp.row.original.id);
+
+          }}
+        >
+          Delete
+        </TableReject>
+          // <Button
+          //   styleType={"whiteBg"}
+          //   onClick={() => {
+          //     deleteFunc(tableProp.row.original.id);
+          //   }}
+          // >
+          //   DELETE
+          // </Button>
         ),
       },
       {
         id: "Update",
         Header: "Update",
         Cell: (tableProp: any) => (
-          <Button
-            styleType={"whiteBg"}
-            onClick={() => {
-              setIsOpenUpdate(true);
-              console.log(tableProp.row.original);
-              setCurrentData(tableProp.row.original);
-              // deleteFunc(tableProp.row.original.id)
-            }}
-          >
-            Update
-          </Button>
+          <TableView
+          onClick={() => {
+            setIsOpenUpdate(true);
+            console.log(tableProp.row.original);
+            setCurrentData(tableProp.row.original);
+          }}
+        >
+          Edit
+        </TableView>
         ),
       },
     ]);
