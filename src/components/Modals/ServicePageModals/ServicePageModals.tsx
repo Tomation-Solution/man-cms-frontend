@@ -31,10 +31,12 @@ export type ServicePageCreationType = yup.InferType<typeof schema>
 
 const ServicePageModals =():React.ReactElement=>{
   const queryClient = useQueryClient();
-
+  const { register, handleSubmit,reset, setValue,formState: { errors } } = useForm<ServicePageCreationType>({
+    resolver: yupResolver(schema)
+  });
     const {mutate,isLoading,} = useMutation(createService,{
         'onSuccess':(data)=>{
-            console.log({data})
+            reset()
             toast.success(`${data.name} created!`, {
                 progressClassName: "toastProgress",
                 icon: false,
@@ -50,9 +52,7 @@ const ServicePageModals =():React.ReactElement=>{
             //   });
         },
     })
-    const { register, handleSubmit, setValue,formState: { errors } } = useForm<ServicePageCreationType>({
-        resolver: yupResolver(schema)
-      });
+  
       const onSubmitHandler = (data: ServicePageCreationType) => {
         // console.log(data)
         mutate(data)
@@ -137,7 +137,6 @@ export const ServicePageModalsUpdate = ({data}:{data:ServicePageModalsUpdateForm
 
   const {mutate:Update,isLoading,} = useMutation(updateServiceApi,{
     'onSuccess':(data)=>{
-        console.log({data})
         toast.success(`${data.name} updated!`, {
             progressClassName: "toastProgress",
             icon: false,
@@ -167,6 +166,7 @@ export const ServicePageModalsUpdate = ({data}:{data:ServicePageModalsUpdateForm
     setValue('name',data.name)
     setValue('description',data.description)
     setValue('type',data.type)
+    setValue('image',data.image)
     if(data?.id){
       setValue('id',data.id)
     }
@@ -174,11 +174,15 @@ export const ServicePageModalsUpdate = ({data}:{data:ServicePageModalsUpdateForm
 
   return (
     <div>
+      {
+        isLoading?
+        <Loading loading={isLoading} />
+        :
         <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
             <Loading loading={isLoading} />
-             <h2 style={{'padding':'1rem 0'}}>Update a News</h2>
+             <h2 style={{'padding':'1rem 0'}}>Update Service</h2>
             <InputWithLabel
                 label="Name"
                 register={register('name')}
@@ -225,6 +229,7 @@ export const ServicePageModalsUpdate = ({data}:{data:ServicePageModalsUpdateForm
               </CustomModalButton>
             </div>
         </Form>
+      }
     </div>
   )
 }
