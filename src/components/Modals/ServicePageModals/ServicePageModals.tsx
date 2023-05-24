@@ -57,12 +57,13 @@ const ServicePageModals =():React.ReactElement=>{
         // console.log(data)
         mutate(data)
       }
+      if(isLoading) return         <Loading loading={isLoading} />
       return(
         <Form
         onSubmit={handleSubmit(onSubmitHandler)}
         >
-            <Loading loading={isLoading} />
-             <h2 style={{'padding':'1rem 0'}}>Create a News</h2>
+            
+             <h2 style={{'padding':'1rem 0'}}>Create a Service</h2>
             <InputWithLabel
                 label="Name"
                 register={register('name')}
