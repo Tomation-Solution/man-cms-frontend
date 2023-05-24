@@ -457,6 +457,7 @@ const MrcPageContentTab = () => {
               <InputWithLabel
                 //  register={}
                 label="Objective"
+                isTextArea={true}
                 register={register(`objectives.${index}.value`)}
               />
               <Button
