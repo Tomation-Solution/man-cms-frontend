@@ -881,7 +881,7 @@ const ProspectiveMembersForm = () => {
               if (id) {
                 mutate({
                   id,
-                  status: "pending",
+                  status: "approval_in_progress",
                 });
               }
             }}
