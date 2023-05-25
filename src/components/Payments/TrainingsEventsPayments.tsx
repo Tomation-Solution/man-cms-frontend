@@ -120,7 +120,7 @@ const TrainingsEventsPayments = () => {
           <>
             {options === "event" ? (
               <EventSection
-                data={data.filter(
+                data={data?.filter(
                   (item: TrainingsEventPaymentType) => item.type === "EVENT"
                 )}
               />
@@ -128,7 +128,7 @@ const TrainingsEventsPayments = () => {
 
             {options === "mrc-training" ? (
               <TrainingSection
-                data={data.filter(
+                data={data?.filter(
                   (item: TrainingsEventPaymentType) => item.type === "TRAINING"
                 )}
                 trainingData={trainingQueryResult.data}
@@ -138,7 +138,7 @@ const TrainingsEventsPayments = () => {
 
             {options === "mpdcl-training" ? (
               <TrainingSection
-                data={data.filter(
+                data={data?.filter(
                   (item: TrainingsEventPaymentType) => item.type === "TRAINING"
                 )}
                 trainingData={trainingQueryResult.data}
@@ -148,7 +148,7 @@ const TrainingsEventsPayments = () => {
 
             {options === "others" ? (
               <TrainingSection
-                data={data.filter(
+                data={data?.filter(
                   (item: TrainingsEventPaymentType) => item.type === "TRAINING"
                 )}
                 trainingData={trainingQueryResult.data}
