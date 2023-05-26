@@ -1558,7 +1558,7 @@ export const updateHomePageContent = async (
     form.append("slider_image2", data.slider_image2[0]);
   }
   if (typeof data.slider_image3 !== "string") {
-    form.append("slider_image2", data.slider_image3[0]);
+    form.append("slider_image3", data.slider_image3[0]);
   }
   form.append("slider_welcome_message", data.slider_welcome_message);
   form.append("slider_vision_message", data.slider_vision_message);
