@@ -16,7 +16,6 @@ import { toast } from "react-toastify";
 import Loading from "../../Loading/Loading";
 import BackDrop from "../../BackDrop/BackDrop";
 import { GalleryItemAddEditContainer } from "./GalleryModal.styles";
-import { convertImageToBase64String } from "../../../utils/ImageToBase64";
 
 const schema = yup.object({
   caption: yup.string().required(),
@@ -29,6 +28,19 @@ const schema = yup.object({
           return false;
         }
         const isValid = validateFileExtension(file);
+        if (!isValid) {
+          return isValid;
+        }
+        return isValid;
+      },
+    })
+    .test({
+      message: "Image must not exceed 1.5mb",
+      test: (file: any, context) => {
+        if (!file) {
+          return false;
+        }
+        const isValid = file[0].size < 1500000;
         if (!isValid) {
           return isValid;
         }
@@ -85,12 +97,11 @@ const GalleryItemAddModal: React.FC<{
   });
 
   const onSubmitHandler = (data: InputData) => {
-    const { image, ...payload } = data;
-
-    const newImage = convertImageToBase64String(image);
-    newImage.then((res: any) => {
-      mutate({ gallery: galleryid, image: res, ...payload });
-    });
+    const formData = new FormData();
+    formData.append("caption", data.caption);
+    formData.append("gallery", galleryid.toString());
+    formData.append("image", (data.image as FileList)[0]);
+    mutate(formData);
   };
 
   return (

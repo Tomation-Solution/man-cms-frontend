@@ -50,22 +50,11 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.mixed().test({
-    message: "Please provide a supported file type",
-    test: (file, context) => {
-      if (!file) {
-        return false;
-      }
-      const isValid = validateFileExtension(file, false);
-      if (!isValid) {
-        return isValid;
-      }
-      return isValid;
-    },
-  }),
+  link: yup.mixed().notRequired(),
   image: yup.mixed().required(),
   is_paid: yup.string().required(),
   type: yup.string().required(),
+  readmore_link: yup.string().url().notRequired(),
   to_rel8: yup.string().required("please select an option"),
   details: yup
     .array(
@@ -95,6 +84,7 @@ const CreatePublicationsModal = () => {
       title: "",
       link: "",
       type: "",
+      readmore_link: "",
       price: "",
       to_rel8: "",
       is_paid: "",
@@ -202,7 +192,10 @@ const CreatePublicationsModal = () => {
         FormDataHandler.append(key, payload[key])
       );
       FormDataHandler.append("image", image);
-      FormDataHandler.append("link", link[0]);
+      if ((link as unknown as FileList).length > 0) {
+        link = link[0];
+        FormDataHandler.append("link", link);
+      }
       FormDataHandler.append("details", JSON.stringify(details));
 
       mutateAsync(FormDataHandler);
@@ -216,7 +209,10 @@ const CreatePublicationsModal = () => {
         FormDataHandler.append(key, payload[key])
       );
       FormDataHandler.append("image", image);
-      FormDataHandler.append("link", link[0]);
+      if ((link as unknown as FileList).length > 0) {
+        link = link[0];
+        FormDataHandler.append("link", link);
+      }
       FormDataHandler.append("details", JSON.stringify(details));
 
       mutateAsync(FormDataHandler);
@@ -335,6 +331,7 @@ const CreatePublicationsModal = () => {
                   />
                 </label>
               </FormInput>
+
               {fields.map((fields, index) => (
                 <section key={fields.id}>
                   <FormInput>
@@ -389,13 +386,28 @@ const CreatePublicationsModal = () => {
               <FormError>{errors?.link?.message}</FormError>
               <FormInput>
                 <label>
-                  Upload File*
+                  Upload File
                   <br />
                   <input
                     type={"file"}
                     accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                     style={{ backgroundColor: "#fff" }}
-                    {...register("link", { required: true })}
+                    {...register("link")}
+                  />
+                </label>
+              </FormInput>
+
+              <FormError>{errors?.readmore_link?.message}</FormError>
+              <FormInput>
+                <label>
+                  Read More Link
+                  <br />
+                  <small>for free publications only</small>
+                  <br />
+                  <input
+                    type={"url"}
+                    style={{ backgroundColor: "#fff" }}
+                    {...register("readmore_link")}
                   />
                 </label>
               </FormInput>

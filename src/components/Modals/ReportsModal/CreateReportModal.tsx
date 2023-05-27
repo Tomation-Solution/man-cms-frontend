@@ -36,19 +36,8 @@ type formInputData = {
 const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
-  link: yup.mixed().test({
-    message: "Please provide a supported file type",
-    test: (file, context) => {
-      if (!file) {
-        return false;
-      }
-      const isValid = validateFileExtension(file, false);
-      if (!isValid) {
-        return isValid;
-      }
-      return isValid;
-    },
-  }),
+  readmore_link: yup.string().url().notRequired(),
+  link: yup.mixed().notRequired(),
   image: yup.mixed().required(),
   details: yup
     .array(
@@ -75,6 +64,7 @@ const CreateReportModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
       name: "",
       title: "",
       link: "",
+      readmore_link: "",
       image: null,
       details: [
         {
@@ -124,10 +114,13 @@ const CreateReportModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     console.log(data);
     let { image, details, link, ...payload } = data;
     image = image[0];
-    link = link[0];
+
     const FormDataHandler = new FormData();
     FormDataHandler.append("image", image);
-    FormDataHandler.append("link", link);
+    if ((link as unknown as FileList).length > 0) {
+      link = link[0];
+      FormDataHandler.append("link", link);
+    }
     FormDataHandler.append("details", JSON.stringify(details));
     Object.keys(payload)?.forEach((key) =>
       //@ts-ignore
@@ -177,13 +170,26 @@ const CreateReportModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors?.link?.message}</FormError>
             <FormInput>
               <label>
-                Upload File*
+                Upload File
                 <br />
                 <input
                   type={"file"}
                   accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                   style={{ backgroundColor: "#fff" }}
-                  {...register("link", { required: true })}
+                  {...register("link")}
+                />
+              </label>
+            </FormInput>
+
+            <FormError>{errors?.readmore_link?.message}</FormError>
+            <FormInput>
+              <label>
+                Readmore Link
+                <br />
+                <input
+                  type={"url"}
+                  style={{ backgroundColor: "#fff" }}
+                  {...register("readmore_link")}
                 />
               </label>
             </FormInput>

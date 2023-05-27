@@ -21,7 +21,6 @@ import {
 } from "../../../axios/api-calls";
 import Loading from "../../Loading/Loading";
 import { toast } from "react-toastify";
-import { convertImageToBase64String } from "../../../utils/ImageToBase64";
 
 const schema = yup.object({
   caption: yup.string().required(),
@@ -98,19 +97,17 @@ const GalleryItemEdit: React.FC<{
   const onSubmitHandler = (data: InputData) => {
     let { image, caption } = data;
 
-    let payload = {};
+    let payload = new FormData();
 
     if (typeof data.image !== "string" && data.image instanceof FileList) {
-      const newImage = convertImageToBase64String(image);
-      newImage.then((res: any) => {
-        payload = { caption, image: res };
+      payload.append("caption", caption);
+      payload.append("image", (image as FileList)[0]);
 
-        mutateAsync({ id: galleryItemId, ...payload });
-      });
+      mutateAsync({ id: galleryItemId, payload });
     } else {
-      payload = { caption };
+      payload.append("caption", caption);
 
-      mutateAsync({ id: galleryItemId, ...payload });
+      mutateAsync({ id: galleryItemId, payload });
     }
   };
 
@@ -144,6 +141,8 @@ const GalleryItemEdit: React.FC<{
               <FormInput>
                 <label>
                   Image
+                  <br />
+                  <small>ensure image size is below 1.5mb</small>
                   <br />
                   <input
                     type="file"
