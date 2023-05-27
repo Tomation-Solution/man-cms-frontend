@@ -811,10 +811,13 @@ export const galleryItemRetrieve = async (id: number) => {
   }
 };
 
-export const galleryItemUpdate = async (payload: any) => {
-  const { id, ...data } = payload;
+export const galleryItemUpdate = async (payloadx: any) => {
+  const { id, payload } = payloadx;
   try {
-    const res = await privateRequest.patch(`/gallery/gallery-item/${id}`, data);
+    const res = await privateRequest.patch(
+      `/gallery/gallery-item/${id}`,
+      payload
+    );
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);

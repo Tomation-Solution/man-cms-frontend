@@ -37,6 +37,7 @@ const schema = yup.object({
   name: yup.string().required(),
   title: yup.string().required(),
   image: yup.mixed().required(),
+  readmore_link: yup.string().url().notRequired(),
   details: yup
     .array(
       yup.object({
@@ -57,7 +58,6 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
     handleSubmit,
     control,
     register,
-    getValues,
     reset,
     formState: { errors },
   } = useForm({
@@ -66,6 +66,7 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
       name: "",
       title: "",
       link: "",
+      readmore_link: "",
       image: null,
       details: [
         {
@@ -98,6 +99,7 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
         name: data.name,
         title: data.title,
         link: data.link,
+        readmore_link: data?.readmore_link,
         image: data.image,
         details: data.details,
       };
@@ -202,13 +204,26 @@ const EditReportsModal: React.FC<{ reportId: number; closefn: () => void }> = ({
             <FormError>{errors?.link?.message}</FormError>
             <FormInput>
               <label>
-                Upload File*
+                Upload File
                 <br />
                 <input
                   type={"file"}
                   accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                   style={{ backgroundColor: "#fff" }}
-                  {...register("link", { required: true })}
+                  {...register("link")}
+                />
+              </label>
+            </FormInput>
+
+            <FormError>{errors?.readmore_link?.message}</FormError>
+            <FormInput>
+              <label>
+                Read More Link
+                <br />
+                <input
+                  type={"url"}
+                  style={{ backgroundColor: "#fff" }}
+                  {...register("readmore_link")}
                 />
               </label>
             </FormInput>

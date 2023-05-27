@@ -48,6 +48,7 @@ const schema = yup.object({
   image: yup.mixed().required(),
   is_paid: yup.string().required(),
   type: yup.string().required(),
+  readmore_link: yup.string().url().notRequired(),
   details: yup
     .array(
       yup.object({
@@ -86,6 +87,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
       title: "",
       link: "",
       type: "",
+      readmore_link: "",
       price: "",
       is_paid: "",
       image: null,
@@ -106,6 +108,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
         link: data.link,
         type: data.type,
         price: data.price,
+        readmore_link: data?.readmore_link,
         is_paid: data.is_paid,
         image: data.image,
         details: data.details,
@@ -380,16 +383,32 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
               <FormError>{errors?.link?.message}</FormError>
               <FormInput>
                 <label>
-                  Upload File*
+                  Upload File
                   <br />
                   <input
                     type={"file"}
                     accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
                     style={{ backgroundColor: "#fff" }}
-                    {...register("link", { required: true })}
+                    {...register("link")}
                   />
                 </label>
               </FormInput>
+
+              <FormError>{errors?.readmore_link?.message}</FormError>
+              <FormInput>
+                <label>
+                  Read More Link
+                  <br />
+                  <small>for free publications only</small>
+                  <br />
+                  <input
+                    type={"url"}
+                    style={{ backgroundColor: "#fff" }}
+                    {...register("readmore_link")}
+                  />
+                </label>
+              </FormInput>
+
               <div>
                 <CustomModalButton isDisabled={isLoading}>
                   SAVE
