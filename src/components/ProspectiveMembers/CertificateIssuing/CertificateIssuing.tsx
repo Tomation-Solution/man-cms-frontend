@@ -24,7 +24,6 @@ const CertificateIssuing = () => {
           <option>12.03.23 - 20.03.23</option>
         </ApplicationFilter>
       </ApplicationsTabItems>
-
       <CertificateIssuigTable />
     </>
   );

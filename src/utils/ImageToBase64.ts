@@ -11,3 +11,19 @@ export const convertImageToBase64String = (file: any) => {
     };
   });
 };
+
+
+export function base64ToImage(base64String:string):string {
+  // Remove data type prefix if present
+  if (base64String.includes('data:image')) {
+    base64String = base64String.split(',')[1];
+  }
+
+  // Create an image element
+  var img = document.createElement('img');
+
+  // Set the image source to the base64 string
+  // img.src =
+
+  return 'data:image/png;base64,' + base64String;
+}
