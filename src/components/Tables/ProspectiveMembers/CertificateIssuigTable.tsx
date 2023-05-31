@@ -84,10 +84,10 @@ const CertificateIssuigTable = () => {
                 context.fillText(row.original.name_of_company, 50, 50);}
                 if(circle_canvas){
                   // @ts-ignore
-                  let bs44img = circle_canvas?.toDataURL()
-                 
-                    console.log(base64ToImage(bs44img))
-// window.open(base64ToImage(bs44img),'_blank')
+                  // console.log(base64ToImage(bs44img))
+                  // console.log(circle_canvas?.toDataURL('png'))
+                  window.open(circle_canvas?.toDataURL(),'_blank')
+                  // window.open(base64ToImage(bs44img),'_blank')
                 }
           }}>
             {" "}
@@ -105,7 +105,7 @@ const CertificateIssuigTable = () => {
           
          >
             {" "}
-            <canvas id="canvas" width="150" height="150" ></canvas>
+            <canvas id="canvas" width="200" height="100"  ></canvas>
           </TableView>
         ),
       },
