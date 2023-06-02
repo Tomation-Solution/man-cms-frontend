@@ -41,6 +41,7 @@ type formInputData = {
   link: string;
   is_paid: string;
   price: string;
+  readmore_link: string;
   to_rel8: string;
   type: string;
   image: any;

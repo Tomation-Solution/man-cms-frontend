@@ -28,8 +28,8 @@ const schema = yup.object({
     .required(),
   manager_name: yup
     .string()
-    .max(300, "manager name shouldn't be more than 300 characters")
-    .required(),
+    .max(300, "executive secretary shouldn't be more than 300 characters")
+    .required("executive secretary is a required field"),
   title: yup
     .string()
     .max(300, "title shouldn't be more than 300 characters")
@@ -120,7 +120,7 @@ const CreateBranch: React.FC<{ closefn: () => void }> = ({ closefn }) => {
             <FormError>{errors.manager_name?.message}</FormError>
             <FormInput>
               <label>
-                Manager Name
+                Executive Secretary
                 <br />
                 <input
                   type="text"
