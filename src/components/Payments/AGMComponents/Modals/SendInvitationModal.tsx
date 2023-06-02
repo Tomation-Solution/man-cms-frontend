@@ -2,7 +2,11 @@ import React from "react";
 import BackDrop from "../../../BackDrop/BackDrop";
 import { GalleryItemAddEditContainer } from "../../../Modals/GalleryModals/GalleryModal.styles";
 import { ModalsContainer } from "../../../Modals/Modals.styles";
-import { Form } from "../../../../globals/styles/forms.styles";
+import {
+  Form,
+  FormError,
+  FormSelect,
+} from "../../../../globals/styles/forms.styles";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -16,10 +20,7 @@ import Loading from "../../../Loading/Loading";
 const schema = yup.object({
   email: yup.string().email().required(),
   company_name: yup.string().required("company name is a required field"),
-  type: yup
-    .mixed()
-    .oneOf(["exhibitor-participant", "guest", "media", "staff"])
-    .required(),
+  type: yup.mixed().oneOf(["guest", "media", "staff"]).required(),
 });
 
 interface InputData extends yup.InferType<typeof schema> {}
@@ -70,7 +71,7 @@ const SendInvitationModal: React.FC<{ closefn: () => void }> = ({
     <>
       <Loading loading={isLoading} />
       <BackDrop>
-        <GalleryItemAddEditContainer>
+        <GalleryItemAddEditContainer style={{ width: "400px" }}>
           <ModalsContainer>
             <Form onSubmit={handleSubmit(onSubmitHandler)}>
               <InputWithLabel
@@ -85,11 +86,15 @@ const SendInvitationModal: React.FC<{ closefn: () => void }> = ({
                 errorMessage={errors.company_name?.message}
               />
 
-              <InputWithLabel
-                label={"Type"}
-                register={register("type")}
-                errorMessage={errors.type?.message}
-              />
+              <FormSelect>
+                <label>Type</label>
+                <select {...register("type")}>
+                  <option value={"guest"}>guest</option>
+                  <option value={"media"}>media</option>
+                  <option value={"staff"}>staff</option>
+                </select>
+              </FormSelect>
+              <FormError>{errors.type?.message}</FormError>
 
               <div>
                 <CustomModalButton>SEND</CustomModalButton>

@@ -67,7 +67,7 @@ const MembersRegistrationItem: React.FC<{
       </p>
 
       <p>
-        <span className="darkend">AGM registration status: </span>
+        <span className="darkend">AGM registration mail delivery status: </span>
         {data.mail_recevied ? "received" : "not received"}
       </p>
 

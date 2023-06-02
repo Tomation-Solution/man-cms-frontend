@@ -11,37 +11,41 @@ const TrainingSection: React.FC<{
   if (trainingTypeFilter === "others") {
     return (
       <>
-        {data
-          .filter((item) => {
-            const trainingId = item.training;
-            const trainingType = trainingData
-              .find((item: any) => item.id === trainingId)
-              .training_type.toLowerCase();
-            if (!["mrc", "mpdcl"].includes(trainingType)) {
-              return true;
-            }
-          })
-          .map((item, index: number) => {
-            return <TrainingsEventsPaymentItem data={item} key={index} />;
-          })}
+        {data && trainingData
+          ? data
+              .filter((item) => {
+                const trainingId = item.training;
+                const trainingType = trainingData
+                  .find((item: any) => item.id === trainingId)
+                  ?.training_type.toLowerCase();
+                if (!["mrc", "mpdcl"].includes(trainingType)) {
+                  return true;
+                }
+              })
+              .map((item, index: number) => {
+                return <TrainingsEventsPaymentItem data={item} key={index} />;
+              })
+          : null}
       </>
     );
   }
   return (
     <>
-      {data
-        .filter((item) => {
-          const trainingId = item.training;
-          const trainingType = trainingData
-            .find((item: any) => item.id === trainingId)
-            .training_type.toLowerCase();
-          if (trainingType === trainingTypeFilter) {
-            return true;
-          }
-        })
-        .map((item, index: number) => {
-          return <TrainingsEventsPaymentItem data={item} key={index} />;
-        })}
+      {data && trainingData
+        ? data
+            .filter((item) => {
+              const trainingId = item.training;
+              const trainingType = trainingData
+                .find((item: any) => item.id === trainingId)
+                ?.training_type.toLowerCase();
+              if (trainingType === trainingTypeFilter) {
+                return true;
+              }
+            })
+            .map((item, index: number) => {
+              return <TrainingsEventsPaymentItem data={item} key={index} />;
+            })
+        : null}
     </>
   );
 };

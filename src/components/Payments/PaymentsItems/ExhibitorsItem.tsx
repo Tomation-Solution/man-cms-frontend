@@ -37,6 +37,11 @@ const ExhibitorsItem: React.FC<{ data: ExhibitorItemType }> = ({ data }) => {
       </p>
 
       <p>
+        <span className="darkend">AGM Exhibitor Registration Id: </span>
+        {data.id}
+      </p>
+
+      <p>
         <span className="darkend"></span>
         {}
       </p>
@@ -83,7 +88,7 @@ const ExhibitorsItem: React.FC<{ data: ExhibitorItemType }> = ({ data }) => {
       </p>
 
       <p>
-        <span className="darkend">AGM registration status: </span>
+        <span className="darkend">AGM registration mail delivery status: </span>
         {data.mail_recevied ? "received" : "not received"}
       </p>
 
