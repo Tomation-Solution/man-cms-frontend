@@ -8,9 +8,11 @@ const EventSection: React.FC<{ data: TrainingsEventPaymentType[] }> = ({
 }) => {
   return (
     <>
-      {data.map((item, index: number) => (
-        <TrainingsEventsPaymentItem data={item} key={index} />
-      ))}
+      {data
+        ? data.map((item, index: number) => (
+            <TrainingsEventsPaymentItem data={item} key={index} />
+          ))
+        : null}
     </>
   );
 };
