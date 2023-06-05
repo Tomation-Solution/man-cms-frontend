@@ -1309,6 +1309,7 @@ type ExecutiveType = {
   image?: string;
   name: string;
   title: string;
+  tenor?: string;
   extra_title1?: string;
   extra_title2?: string;
   type: string;
@@ -1325,6 +1326,7 @@ export const createExecutiveApi = async (data: ExecutiveType): Promise<any> => {
   form.append("name", data.name);
   form.append("title", data.title);
   form.append("type", data.type);
+  form.append("tenor", data.tenor!);
   if (data.extra_title1) {
     form.append("extra_title1", data.extra_title1);
   }
@@ -1344,6 +1346,7 @@ export const updateExecutiveApi = async (data: ExecutiveType): Promise<any> => {
   form.append("name", data.name);
   form.append("title", data.title);
   form.append("type", data.type);
+  form.append("tenor", data.tenor!);
   if (data.extra_title1) {
     form.append("extra_title1", data.extra_title1);
   }
