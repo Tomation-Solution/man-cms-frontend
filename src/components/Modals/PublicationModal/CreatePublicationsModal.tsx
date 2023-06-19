@@ -389,6 +389,12 @@ const CreatePublicationsModal = () => {
                 <label>
                   Upload File
                   <br />
+                  <small>
+                    max file size of 5mb, if large files are to be used upload
+                    should be done manually and the link is to be provided in
+                    the read moe link field
+                  </small>
+                  <br />
                   <input
                     type={"file"}
                     accept=".doc,.docx,.odt,.pdf,.xls,.xlsx,.ppt,.pptx,.txt,.ods"
