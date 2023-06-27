@@ -10,10 +10,10 @@ import { useQuery } from "react-query";
 import { datefromatter } from "../../../utils/DateFormatter";
 import Loading from "../../Loading/Loading";
 
-export const ProspectiveMembersTableApproved = () => {
+export const ProspectiveMembersTableApproved = ({status}:{status:string}) => {
   const { isLoading, isError, data, isFetching } = useQuery(
-    "all-approved-applications",
-    ()=>getprospectiveMemberSubmission({'application_status':'final_approval'}),
+    ["all-approved-applications",status],
+    ()=>getprospectiveMemberSubmission({'application_status':status?status:'approval_in_progress'}),
     {
       // select: (data) => data.data,
       refetchOnWindowFocus: false,
@@ -76,33 +76,6 @@ export const ProspectiveMembersTableApproved = () => {
     ]);
   };
 
-  const selectionHook = (hooks: any) => {
-    hooks.visibleColumns.push((columns: any) => [
-      // Let's make a column for selection
-      {
-        id: "selection",
-        // The header can use the table's getToggleAllRowsSelectedProps method
-        // to render a checkbox
-        Header: ({
-          getToggleAllRowsSelectedProps,
-        }: {
-          getToggleAllRowsSelectedProps: any;
-        }) => (
-          <div>
-            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-          </div>
-        ),
-        // The cell can use the individual row's getToggleRowSelectedProps method
-        // to the render a checkbox
-        Cell: ({ row }: { row: any }) => (
-          <div>
-            <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-          </div>
-        ),
-      },
-      ...columns,
-    ]);
-  };
 
   return (
     <>
@@ -143,7 +116,6 @@ export const ProspectiveMembersTablePending = () => {
    
    
   ];
-  console.log({data})
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
@@ -189,33 +161,7 @@ export const ProspectiveMembersTablePending = () => {
     ]);
   };
 
-  const selectionHook = (hooks: any) => {
-    hooks.visibleColumns.push((columns: any) => [
-      // Let's make a column for selection
-      {
-        id: "selection",
-        // The header can use the table's getToggleAllRowsSelectedProps method
-        // to render a checkbox
-        Header: ({
-          getToggleAllRowsSelectedProps,
-        }: {
-          getToggleAllRowsSelectedProps: any;
-        }) => (
-          <div>
-            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-          </div>
-        ),
-        // The cell can use the individual row's getToggleRowSelectedProps method
-        // to the render a checkbox
-        Cell: ({ row }: { row: any }) => (
-          <div>
-            <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-          </div>
-        ),
-      },
-      ...columns,
-    ]);
-  };
+ 
 
   return (
     <>

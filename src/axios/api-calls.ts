@@ -1448,7 +1448,7 @@ export type ProspectiveMembertype = {
 export const getprospectiveMemberSubmission = async ({
   application_status = "approval_in_progress",
 }: {
-  application_status?: "approval_in_progress" | "final_approval";
+  application_status?:string;
 }): Promise<ProspectiveMembertype[]> => {
   const resp = await rel8Request.get(
     `prospectivemember/admin_manage_prospective_member/get_submissions/?application_status=${application_status}`
@@ -1477,6 +1477,24 @@ export const updateRemarkOrStatus = async (data: {
   return resp.data;
 };
 
+export const acknowledgeApplication =async(data:{id:number})=>{
+  const resp = await rel8Request.post(
+    `prospectivemember/admin_manage_prospective_member/acknowledgement_of_application/`,
+    data
+  );
+  return resp.data;
+}
+
+export const factoryInspection = async(data:any)=>{
+  const form = new FormData()
+  form.append('id',data.id)
+  form.append('file',data.file)
+  const resp = await rel8Request.post(
+    `prospectivemember/admin_manage_prospective_member/factory_inspection/`,
+    form
+  );
+  return resp.data;
+}
 // whychoose use homepage management
 
 export const createWhyChooseUsApi = async ({

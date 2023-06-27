@@ -18,6 +18,8 @@ import { ApproveSvg, DeclineSvg } from "../../assets/svgs";
 import { Link, Navigate, json, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import {
+  acknowledgeApplication,
+  factoryInspection,
   getprospectiveMemberSubmissionDetail,
   updateRemarkOrStatus,
 } from "../../axios/api-calls";
@@ -81,7 +83,23 @@ const ProspectiveMembersForm = () => {
       ],
     },
   });
+  const { mutate:acknowle,isLoading:isLoading__acknowle} = useMutation(acknowledgeApplication,{
+    'onSuccess':(data)=>{
+        toast.info('Application Acknowledge', {
+          progressClassName: "toastProgress",
+          icon: false,
+        });
+    }
+  })
 
+  const {isLoading:uploadingInspection,mutate:inspectionApi} = useMutation(factoryInspection,{
+    'onSuccess':(data)=>{
+      toast.info('Factory Inspection Completed', {
+        progressClassName: "toastProgress",
+        icon: false,
+      });
+    }
+  })
   const { isLoading, data } = useQuery(
     "prospective-member-detail",
     () => getprospectiveMemberSubmissionDetail(id ? parseInt(id) : -1),
@@ -208,9 +226,10 @@ const ProspectiveMembersForm = () => {
     return <Navigate to="/unauthorized" />;
   }
 
+  const [file,setFile] = useState<any>(null)
   return (
     <ProspectiveMembersFormContainer>
-      <Loading loading={isLoading || mutating} />
+      <Loading loading={isLoading || mutating||isLoading__acknowle||uploadingInspection} />
       <Form onSubmit={handleSubmit(onHandleSubmit)}>
         <FormHalveInput>
           <FormInput>
@@ -874,7 +893,70 @@ const ProspectiveMembersForm = () => {
         </ProspectiveMembersFormContainer>
         <br></br>
         <br></br>
-        <CustomButtons>
+        <div style={{'width':'50%','margin':'0 auto'}}>
+        {
+          data?.application_status==='ready_for_presentation_of_national_council'?
+         <>
+         <br />
+          <h2>Ready For Presentation Of National Council</h2>
+         <br />
+          <Button style={{'width':'100%'}}
+          onClick={e=>{
+            e.preventDefault()
+            if (id) {
+              mutate({
+                id,
+                status: "final_approval",
+              });
+            }
+          }}
+          >Approve</Button>
+         </>:''
+        }
+
+        </div>
+
+        {
+          data?.application_status==='approval_in_progress'?
+          <Button 
+          onClick={e=>{
+            acknowle({'id':data.id})
+          }}
+          style={{'width':'50%','margin':'0 auto'}}>
+            Click to Acknowledge Application
+          </Button>:''
+        }
+        {
+          data?.application_status==='inspection_of_factory_inspection'?
+          <div style={{'width':'50%','margin':'0 auto'}}>
+          <label htmlFor="">Factory Inspection File</label>
+          <input type="file" onChange={e=>{
+            e.preventDefault()
+            // @ts-ignore
+            setFile(e.target.files[0])
+          }} />
+          <Button 
+          onClick={e=>{
+            if(!file){
+              toast.info('Please Upload Inspection', {
+                progressClassName: "toastProgress",
+                icon: false,
+              });
+              return 
+              //
+            }
+            inspectionApi({
+              'id':data?.id,
+              'file':file
+            })
+          }}
+          style={{'width':'50%','margin':'0 auto'}}>
+            Click to Upload Factory Inspection
+          </Button>
+          
+          </div>:''
+        }
+        {/* <CustomButtons>
           <DeclineSvg
             clickfn={() => {
               // e.pr
@@ -899,8 +981,8 @@ const ProspectiveMembersForm = () => {
             }}
             styling={{ cursor: "pointer" }}
           />
-        </CustomButtons>
-
+        </CustomButtons> */}
+{/* 
         <FormInput>
           <label>
             Remark
@@ -912,10 +994,9 @@ const ProspectiveMembersForm = () => {
               }}
             />
           </label>
-        </FormInput>
+        </FormInput> */}
 
-        <NavigationBtnContainer>
-          {/* <NavigationBtn isFilled={false}>Save & Continue Later</NavigationBtn> */}
+        {/* <NavigationBtnContainer>
           <NavigationBtn
             onClick={(e) => {
               e.preventDefault();
@@ -927,7 +1008,7 @@ const ProspectiveMembersForm = () => {
           >
             Submit Remark
           </NavigationBtn>
-        </NavigationBtnContainer>
+        </NavigationBtnContainer> */}
       </Form>
     </ProspectiveMembersFormContainer>
   );
