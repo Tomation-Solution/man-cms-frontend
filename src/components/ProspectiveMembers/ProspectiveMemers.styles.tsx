@@ -5,13 +5,17 @@ export const ApplicationsTabItems = styled.div`
   display: flex;
   gap: 30px;
   align-items: center;
+  flex-wrap: wrap;
+  /* overflow-x: auto; */
 
   ${Laptop({
     flexDirection: "column",
   })}
 `;
 
-export const ApplicationsTabItem = styled.button<{ isFilled: boolean }>`
+export const ApplicationsTabItem = styled.button<{
+  isFilled: boolean;
+}>`
   padding: 15px;
   background-color: ${(props) => (props.isFilled ? "#2b3513" : "#fff")};
   color: ${(props) => (props.isFilled ? "#fff" : "#2b3513")};
