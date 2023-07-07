@@ -916,7 +916,7 @@ const ProspectiveMembersForm = () => {
 
         </div>
 
-        {
+        {/* {
           data?.application_status==='approval_in_progress'?
           <Button 
           onClick={e=>{
@@ -925,7 +925,7 @@ const ProspectiveMembersForm = () => {
           style={{'width':'50%','margin':'0 auto'}}>
             Click to Acknowledge Application
           </Button>:''
-        }
+        } */}
         {
           data?.application_status==='inspection_of_factory_inspection'?
           <div style={{'width':'50%','margin':'0 auto'}}>

@@ -5,11 +5,18 @@ import { IndeterminateCheckbox } from "../Checkbox";
 import { TableView } from "../Tables.styles";
 import { Hooks } from "react-table";
 import { Link } from "react-router-dom";
-import { getprospectiveMemberSubmission } from "../../../axios/api-calls";
-import { useQuery } from "react-query";
+import { acknowledgeApplication, createUserApi, getprospectiveMemberSubmission } from "../../../axios/api-calls";
+import { useMutation, useQuery } from "react-query";
 import { datefromatter } from "../../../utils/DateFormatter";
 import Loading from "../../Loading/Loading";
-
+import Button from "../../Button/Button";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+import OffCanvas from "../../OffCanvas/OffCanvas";
+import { Form, FormInput } from "../../../globals/styles/forms.styles";
+import { CustomModalButton } from "../../../globals/styles/CustomFormComponents";
+import { toast } from "react-toastify";
+import { generatePassword } from "../../../utils/extraFunction";
 export const ProspectiveMembersTableApproved = ({status}:{status:string}) => {
   const { isLoading, isError, data, isFetching } = useQuery(
     ["all-approved-applications",status],
@@ -31,6 +38,11 @@ export const ProspectiveMembersTableApproved = ({status}:{status:string}) => {
    
    
   ];
+      
+  const isMobileScreen = useMediaQuery({ maxWidth: 600 });
+  const [isOpenApplicationLetter, setIsOpenApplicationLetter] = useState(false);
+
+  const [currentPropectiveID,setCurrentProspectiveID] = useState(-1)
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       ...columns,
@@ -73,12 +85,45 @@ export const ProspectiveMembersTableApproved = ({status}:{status:string}) => {
           </TableView>
         ),
       },
+      {
+        id: "Generate Letter",
+        Header: "Generate Letter",
+        Cell: ({ row }:any) => (
+          <TableView>
+            {" "}
+            {status ==='approval_in_progress'?
+            <Button
+            onClick={e=>{
+              setCurrentProspectiveID(row.original.id)
+              setIsOpenApplicationLetter(true)
+            }}
+            styleType='sec'>Generate Letter
+            {/* Acknowledgment Letter */}
+            </Button>:''
+          }
+          </TableView>
+        ),
+      }
+      
     ]);
   };
 
 
   return (
     <>
+    
+<OffCanvas
+        size={isMobileScreen ? 100 : 50}
+        btnClick={() => null}
+        setIsOpen={setIsOpenApplicationLetter}
+        isOpen={isOpenApplicationLetter}
+      >
+        <div>
+          <HandleSendingAcknowledgementLetter  id={currentPropectiveID}/>
+        </div>
+      </OffCanvas>
+
+
     <Loading loading={ isLoading} />
       {/* {isFetching || isLoading ? (
       ) : !isError ? ( */}
@@ -103,6 +148,7 @@ export const ProspectiveMembersTablePending = () => {
         refetchOnWindowFocus: false,
       }
     );
+
 
   const columns = [
     {
@@ -182,3 +228,102 @@ export const ProspectiveMembersTablePending = () => {
     </>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+const HandleSendingAcknowledgementLetter = ({id}:{id?:number})=>{
+  const [content,setContent] = useState('')
+  const [email,setEmail] = useState('example@gmai.comm')
+
+  const { mutate:acknowle,isLoading:isLoading__acknowle} = useMutation(acknowledgeApplication,{
+    'onSuccess':(data)=>{
+        toast.success('Application Acknowledge And Letter Sent' , {
+          progressClassName: "toastProgress",
+          icon: false,
+        });
+    }
+  })
+
+
+  const {mutate,isLoading} = useMutation(createUserApi,{
+    'onSuccess':()=>{
+      toast.success('Executive Account Has Been Created')
+      toast.warning('Currently Sending Letter To Prospective Member And Alerting Executive Member')
+      if(id){
+        acknowle({
+          id,
+          email,
+          content
+        })
+
+      }
+    },
+    'onError':()=>{
+      toast.error('Some Error Occured Could not create Executive Account')
+    }
+  })
+  const onSubmit = ()=>{
+    if(!email || !content){
+      toast.error("Email or Content are required",);    
+      return 
+    }
+    let password =generatePassword(7)
+    console.log({password})
+    mutate({email,password,'userType':'executive_secretary'})
+
+  }
+
+  return (
+    <div>
+      <br />
+      <h2>Generate Acknowledgment Letter Of Application</h2>
+    <br /><br />
+      <Loading loading={isLoading||isLoading__acknowle} />
+      <FormInput>
+        <label>
+          Executive Email(Assign to this prospective member)
+          <br />
+        </label>
+          <input
+            type={"email"}
+            value={email}
+            onChange={e=>{
+             setEmail(e.target.value) 
+            }}
+            style={{ backgroundColor: "#fff" }}
+          />
+      </FormInput>
+      <FormInput>
+        <label>
+          Letter Description*
+          <br />
+          <textarea
+            style={{ backgroundColor: "#fff" }}
+            rows={6}
+            cols={50}
+            value={content}
+            onChange={e=>{
+              setContent(e.target.value)
+            }}
+          />
+        </label>
+      </FormInput>
+
+        <CustomModalButton 
+        isDisabled={isLoading}
+        clickfn={onSubmit}
+        >
+        Send & Assign
+        </CustomModalButton>
+    </div>
+  )
+}

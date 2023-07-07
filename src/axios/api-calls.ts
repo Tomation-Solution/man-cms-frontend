@@ -43,7 +43,16 @@ export const logoutUser = async (payload: { refresh: string }) => {
     throw new AxiosError(e);
   }
 };
-
+//userType ... u can add more users type options that is avalable in the backend
+type createUserProp = {
+  email:string,
+  password:string,
+  userType:'executive_secretary',
+}
+export const createUserApi = async ({email,password,userType}:createUserProp):Promise<{message:string}>=>{
+  const resp= await privateRequest.post(`/auth/create-account/?user_type=${userType}`,{email,password})
+  return resp.data
+}
 //PUBLICATIONS
 export const publicationCreate = async (payload: any) => {
   try {
@@ -1447,11 +1456,17 @@ export type ProspectiveMembertype = {
 // admin prospective member
 export const getprospectiveMemberSubmission = async ({
   application_status = "approval_in_progress",
+  executive_email,
 }: {
   application_status?:string;
+  executive_email?:string
 }): Promise<ProspectiveMembertype[]> => {
+  let url =`prospectivemember/admin_manage_prospective_member/get_submissions/${application_status?'?application_status='+application_status:''}`
+  if(executive_email){
+    url =`prospectivemember/admin_manage_prospective_member/get_submissions/${executive_email?'?executive_email='+executive_email:''}`
+  }
   const resp = await rel8Request.get(
-    `prospectivemember/admin_manage_prospective_member/get_submissions/?application_status=${application_status}`
+    url 
   );
   return resp.data.data;
 };
@@ -1477,7 +1492,7 @@ export const updateRemarkOrStatus = async (data: {
   return resp.data;
 };
 
-export const acknowledgeApplication =async(data:{id:number})=>{
+export const acknowledgeApplication =async(data:{id:number,email:string,content:string})=>{
   const resp = await rel8Request.post(
     `prospectivemember/admin_manage_prospective_member/acknowledgement_of_application/`,
     data
