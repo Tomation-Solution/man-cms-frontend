@@ -1463,7 +1463,7 @@ export const getprospectiveMemberSubmission = async ({
 }): Promise<ProspectiveMembertype[]> => {
   let url =`prospectivemember/admin_manage_prospective_member/get_submissions/${application_status?'?application_status='+application_status:''}`
   if(executive_email){
-    url =`prospectivemember/admin_manage_prospective_member/get_submissions/${executive_email?'?executive_email='+executive_email:''}`
+    url =`prospectivemember/admin_manage_prospective_member/get_submissions/${executive_email?'?executive_email='+executive_email:''}${application_status?'&application_status='+application_status:''}`
   }
   const resp = await rel8Request.get(
     url 
@@ -1510,6 +1510,23 @@ export const factoryInspection = async(data:any)=>{
   );
   return resp.data;
 }
+export const ReviewInspectionOfFactory = async({
+  id,decision,review
+}:{
+  review:string,
+  id:number|string,
+  decision:string
+})=>{
+  const form = new FormData()
+  form.append('id',id.toString())
+  form.append('review',review)
+  form.append('decision',decision)
+  const resp = await rel8Request.post(
+    `prospectivemember/admin_manage_prospective_member/review_factory/`,form
+  )
+  return resp.data
+}
+
 // whychoose use homepage management
 
 export const createWhyChooseUsApi = async ({

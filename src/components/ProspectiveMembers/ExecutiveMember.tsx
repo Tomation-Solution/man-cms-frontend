@@ -7,16 +7,20 @@ import { Hooks } from "react-table";
 import { datefromatter } from "../../utils/DateFormatter";
 import Loading from "../Loading/Loading";
 import { useAuthStore } from "../../zustand/store";
+import { ApplicationsTabItem, ApplicationsTabItems } from "./ProspectiveMemers.styles";
+import { useState } from "react";
 
 
 
 
 const ExecutiveMemberViewPage = ()=>{
     const userData = useAuthStore.getState().user;
+    // const [options,setOptions] =useState<'approval_in_progress'|'rework'>('approval_in_progress')
   const { isLoading, isError, data, isFetching } = useQuery(
-    ["all-approved-applications",userData?.email],
+    ["all-approved-applications",userData?.email,],
     ()=>getprospectiveMemberSubmission({
-        'executive_email':userData?.email
+        'executive_email':userData?.email,
+        // 'application_status':options
     }),
     {
       // select: (data) => data.data,
@@ -54,7 +58,7 @@ const ExecutiveMemberViewPage = ()=>{
         accessor: "status",
         Cell: ({ row }:any) => (
           <>
-          pending
+          {row.original.application_status}
           </>
         ),
       },
@@ -81,10 +85,29 @@ const ExecutiveMemberViewPage = ()=>{
   };
     return (
         <div>
+
+{/* <ApplicationsTabItems>
+        <ApplicationsTabItem
+          isFilled={options === "approval_in_progress" ? true : false}
+          onClick={() => setOptions("approval_in_progress")}
+        >
+          Applications Pending
+        </ApplicationsTabItem>
+
+
+        <ApplicationsTabItem
+          isFilled={options === "rework" ? true : false}
+          onClick={() => setOptions("rework")}
+        >
+          Rework
+        </ApplicationsTabItem>
+
+      </ApplicationsTabItems> */}
             <Loading loading={isLoading}/>
                  <ProspectiveMembersTable
         tableColumn={columns}
-        tableData={data?data:[]}
+        // @ts-ignore
+        tableData={data?data.filter((e=>e.application_status==='rework'||e.application_status==='application_pending')):[]}
         // tableData={pendingApplication}
         customHooks={[tableHooks,]}
       /> 
