@@ -18,6 +18,7 @@ import { ApproveSvg, DeclineSvg } from "../../assets/svgs";
 import { Link, Navigate, json, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import {
+  ReviewInspectionOfFactory,
   acknowledgeApplication,
   factoryInspection,
   getprospectiveMemberSubmissionDetail,
@@ -100,6 +101,16 @@ const ProspectiveMembersForm = () => {
       });
     }
   })
+
+  
+  const {isLoading:RewiewuploadingInspection,mutate:ReviewinspectionApi} = useMutation(ReviewInspectionOfFactory,{
+    'onSuccess':(data)=>{
+      toast.info('Factory Inspection Completed', {
+        progressClassName: "toastProgress",
+        icon: false,
+      });
+    }
+  })
   const { isLoading, data } = useQuery(
     "prospective-member-detail",
     () => getprospectiveMemberSubmissionDetail(id ? parseInt(id) : -1),
@@ -107,6 +118,8 @@ const ProspectiveMembersForm = () => {
       // refetchOnWindowFocus:false,
       enabled: typeof id === "string" ? true : false,
       onSuccess: (data) => {
+        // @ts-ignore
+        setRemark(data.review)
         console.log({ "Gotten detaisl": data });
         // if(data.)
         setValue("name_of_company", data.name_of_company);
@@ -214,12 +227,11 @@ const ProspectiveMembersForm = () => {
     console.log(data);
   };
 
-  console.log({ "some things": id });
 
   const userData = useAuthStore.getState().user;
 
   if (
-    !["super_user", "prospective_certificates"].includes(
+    !["super_user", "prospective_certificates",'executive_secretary'].includes(
       String(userData?.user_type)
     )
   ) {
@@ -914,9 +926,42 @@ const ProspectiveMembersForm = () => {
          </>:''
         }
 
+{
+(
+data?.application_status==='rework' ||data?.application_status==='application_pending'
+)?
+   <div style={{'width':'50%','margin':'0 auto'}}>
+   <label htmlFor="">Factory Inspection File</label>
+   <input type="file" onChange={e=>{
+     e.preventDefault()
+     // @ts-ignore
+     setFile(e.target.files[0])
+   }} />
+   <Button 
+   onClick={e=>{
+     if(!file){
+       toast.info('Please Upload Inspection', {
+         progressClassName: "toastProgress",
+         icon: false,
+       });
+       return 
+       //
+     }
+     inspectionApi({
+       'id':data?.id,
+       'file':file
+     })
+    // console.log({file})
+   }}
+   style={{'width':'50%','margin':'0 auto'}}>
+     Click to Upload Factory Inspection
+   </Button>
+   
+   </div>:''
+}
         </div>
 
-        {
+        {/* {
           data?.application_status==='approval_in_progress'?
           <Button 
           onClick={e=>{
@@ -925,37 +970,58 @@ const ProspectiveMembersForm = () => {
           style={{'width':'50%','margin':'0 auto'}}>
             Click to Acknowledge Application
           </Button>:''
-        }
+        } */}
         {
           data?.application_status==='inspection_of_factory_inspection'?
-          <div style={{'width':'50%','margin':'0 auto'}}>
-          <label htmlFor="">Factory Inspection File</label>
-          <input type="file" onChange={e=>{
-            e.preventDefault()
-            // @ts-ignore
-            setFile(e.target.files[0])
-          }} />
+          <div style={{'width':'70%','margin':'0 auto'}}>
+          <label>Review Factory Inspection File:{': '}</label>
+          {/* @ts-ignore */}
+          <a href={data?.inspection_factory_file} target="_blank">View Inspection FIle</a>
+          <textarea 
+            onChange={e=>{
+              if(e.target.value){
+                  setRemark(e.target.value)
+              }
+            }}
+            value={remark}
+          ></textarea>
+          <br />
+          <br />
+          <div style={{'display':'flex','gap':'15px'}}>
           <Button 
           onClick={e=>{
-            if(!file){
-              toast.info('Please Upload Inspection', {
-                progressClassName: "toastProgress",
-                icon: false,
-              });
-              return 
-              //
+            if(id&&remark){
+              ReviewinspectionApi({
+                'review':remark,
+                'id':id,
+                'decision':'ready_for_presentation_of_national_council'
+              })
             }
-            inspectionApi({
-              'id':data?.id,
-              'file':file
-            })
+            console.log({remark})
           }}
           style={{'width':'50%','margin':'0 auto'}}>
-            Click to Upload Factory Inspection
+            Accept
           </Button>
+          <Button 
+          styleType="sec"
+          onClick={e=>{
+            if(id&&remark){
+              ReviewinspectionApi({
+                'review':remark,
+                'id':id,
+                'decision':'rework'
+              })
+            }
+          }}
+          style={{'width':'50%','margin':'0 auto'}}>
+            ReWork!
+          </Button>
+          </div>
           
           </div>:''
         }
+
+        
         {/* <CustomButtons>
           <DeclineSvg
             clickfn={() => {

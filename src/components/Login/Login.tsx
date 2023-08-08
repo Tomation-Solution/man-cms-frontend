@@ -61,7 +61,11 @@ const Login = () => {
           icon: false,
         });
         setUserFn(data);
-        navigate("/publications");
+        if(data.user_type==='executive_secretary'){
+        navigate("/prospective-members-executive");
+        }else{
+          navigate("/publications");
+        }
       },
       onError: (error) => {
         const err = error as AxiosError;

@@ -10,6 +10,7 @@ import {
 } from "../Tables/ProspectiveMembers/ProspectiveMembersTableComp";
 import { useAuthStore } from "../../zustand/store";
 import { Navigate } from "react-router-dom";
+import Button from "../Button/Button";
 
 const ProspectiveMembers = () => {
   const [options, setOptions] = useState<
@@ -31,7 +32,7 @@ const ProspectiveMembers = () => {
   }
   return (
     <>
-      <ApplicationsTabItems>
+    <ApplicationsTabItems>
         <ApplicationsTabItem
           isFilled={options === "approval_in_progress" ? true : false}
           onClick={() => setOptions("approval_in_progress")}
