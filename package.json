@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "start": "serve dist -s -n -L -p 3000"
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "serve dist -s -n -L -p $PORT"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.0.0",
