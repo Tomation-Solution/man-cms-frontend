@@ -27,6 +27,7 @@ import PaymentsPage from "./pages/PaymentsPage";
 import HomePageManagement from "./pages/HomePageManagement";
 import Unauthorized from "./components/Unauthorized/Unauthorized";
 import ExecutiveMemberViewPage from "./components/ProspectiveMembers/ExecutiveMember";
+import AGMSectionPage from "./pages/AGMSectionPage";
 
 function App() {
   return (
@@ -76,11 +77,13 @@ function App() {
               path="/certificate-appointment"
               element={<CertificateAppointment />}
             />
-            <Route 
-            path="/prospective-members-executive"
-            element={
-              <ExecutiveMemberViewPage />
-            } />
+            <Route
+              path="/prospective-members-executive"
+              element={<ExecutiveMemberViewPage />}
+            />
+
+            <Route path="/agm-section" element={<AGMSectionPage />} />
+
             <Route
               path="/approval-message"
               element={

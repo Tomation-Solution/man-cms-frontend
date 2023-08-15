@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import { User } from "../zustand/store";
 import privateRequest, { rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
@@ -11,9 +11,10 @@ import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupMo
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
 import { HomePageContentType } from "../pages/HomePageManagement";
 import rel8PrivateRequest from "./rel8-axios-utils";
+import { tryCatch } from "../utils/extraFunction";
 
-const BASE_URL = "https://web-production-9688.up.railway.app/api";
-// const BASE_URL = "http://127.0.0.1:8000/api";
+// const BASE_URL = "https://web-production-9688.up.railway.app/api";
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -45,14 +46,21 @@ export const logoutUser = async (payload: { refresh: string }) => {
 };
 //userType ... u can add more users type options that is avalable in the backend
 type createUserProp = {
-  email:string,
-  password:string,
-  userType:'executive_secretary',
-}
-export const createUserApi = async ({email,password,userType}:createUserProp):Promise<{message:string}>=>{
-  const resp= await privateRequest.post(`/auth/create-account/?user_type=${userType}`,{email,password})
-  return resp.data
-}
+  email: string;
+  password: string;
+  userType: "executive_secretary";
+};
+export const createUserApi = async ({
+  email,
+  password,
+  userType,
+}: createUserProp): Promise<{ message: string }> => {
+  const resp = await privateRequest.post(
+    `/auth/create-account/?user_type=${userType}`,
+    { email, password }
+  );
+  return resp.data;
+};
 //PUBLICATIONS
 export const publicationCreate = async (payload: any) => {
   try {
@@ -1458,16 +1466,18 @@ export const getprospectiveMemberSubmission = async ({
   application_status = "approval_in_progress",
   executive_email,
 }: {
-  application_status?:string;
-  executive_email?:string
+  application_status?: string;
+  executive_email?: string;
 }): Promise<ProspectiveMembertype[]> => {
-  let url =`prospectivemember/admin_manage_prospective_member/get_submissions/${application_status?'?application_status='+application_status:''}`
-  if(executive_email){
-    url =`prospectivemember/admin_manage_prospective_member/get_submissions/${executive_email?'?executive_email='+executive_email:''}${application_status?'&application_status='+application_status:''}`
+  let url = `prospectivemember/admin_manage_prospective_member/get_submissions/${
+    application_status ? "?application_status=" + application_status : ""
+  }`;
+  if (executive_email) {
+    url = `prospectivemember/admin_manage_prospective_member/get_submissions/${
+      executive_email ? "?executive_email=" + executive_email : ""
+    }${application_status ? "&application_status=" + application_status : ""}`;
   }
-  const resp = await rel8Request.get(
-    url 
-  );
+  const resp = await rel8Request.get(url);
   return resp.data.data;
 };
 
@@ -1492,40 +1502,47 @@ export const updateRemarkOrStatus = async (data: {
   return resp.data;
 };
 
-export const acknowledgeApplication =async(data:{id:number,email:string,content:string})=>{
+export const acknowledgeApplication = async (data: {
+  id: number;
+  email: string;
+  content: string;
+}) => {
   const resp = await rel8Request.post(
     `prospectivemember/admin_manage_prospective_member/acknowledgement_of_application/`,
     data
   );
   return resp.data;
-}
+};
 
-export const factoryInspection = async(data:any)=>{
-  const form = new FormData()
-  form.append('id',data.id)
-  form.append('file',data.file)
+export const factoryInspection = async (data: any) => {
+  const form = new FormData();
+  form.append("id", data.id);
+  form.append("file", data.file);
   const resp = await rel8Request.post(
     `prospectivemember/admin_manage_prospective_member/factory_inspection/`,
     form
   );
   return resp.data;
-}
-export const ReviewInspectionOfFactory = async({
-  id,decision,review
-}:{
-  review:string,
-  id:number|string,
-  decision:string
-})=>{
-  const form = new FormData()
-  form.append('id',id.toString())
-  form.append('review',review)
-  form.append('decision',decision)
+};
+export const ReviewInspectionOfFactory = async ({
+  id,
+  decision,
+  review,
+}: {
+  review: string;
+  id: number | string;
+  decision: string;
+}) => {
+  const form = new FormData();
+  form.append("id", id.toString());
+  form.append("review", review);
+  form.append("decision", decision);
   const resp = await rel8Request.post(
-    `prospectivemember/admin_manage_prospective_member/review_factory/`,form
-  )
-  return resp.data
-}
+    `prospectivemember/admin_manage_prospective_member/review_factory/`,
+    form
+  );
+  return resp.data;
+};
 
 // whychoose use homepage management
 
@@ -1648,3 +1665,234 @@ export const updateHomePageContent = async (
   const resp = await privateRequest.put(`membership/home-main/`, form);
   return resp.data.data;
 };
+
+//REVAMPED AGM SECTION
+
+export const getAgmHomepage = async () => {
+  try {
+    const res = await privateRequest.get(`/agmcms/homepage`);
+
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const updateAgmHomepage = async (payload: any) => {
+  try {
+    const res = await privateRequest.patch(`/agmcms/homepage`, payload);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const getAgmProgramme = async () => {
+  try {
+    const res = await privateRequest.get(`/agmcms/programme`);
+
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const updateAgmProgramme = async (payload: any) => {
+  try {
+    const res = await privateRequest.patch(`/agmcms/programme`, payload);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const getAllAgmPrograms = async () => {
+  try {
+    const res = await privateRequest.get(`/agmcms/program`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const createAgmProgram = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/agmcms/program`, payload);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const retrieveAgmProgram = async (id: any) => {
+  try {
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.get(`/agmcms/program/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const updateAgmProgram = async (data: { [key: string]: any }) => {
+  try {
+    const { id, formData } = data;
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.patch(`/agmcms/program/${id}`, formData);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const deleteAgmProgram = async (id: any) => {
+  try {
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.delete(`/agmcms/program/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const getAllAgmSpeakers = async () => {
+  try {
+    const res = await privateRequest.get(`/agmcms/speakers`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const createAgmSpeaker = async (payload: any) => {
+  try {
+    const res = await privateRequest.post(`/agmcms/speakers`, payload);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const retrieveAgmSpeaker = async (id: any) => {
+  try {
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.get(`/agmcms/speakers/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const updateAgmSpeaker = async (data: { [key: string]: any }) => {
+  try {
+    const { id, formData } = data;
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.patch(`/agmcms/speakers/${id}`, formData);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const deleteAgmSpeaker = async (id: any) => {
+  try {
+    if (id === 0) {
+      return [];
+    }
+    const res = await privateRequest.delete(`/agmcms/speakers/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
+export const getAllAgmExhibitionImages = tryCatch(async () => {
+  const res = await privateRequest.get(`/agmcms/previous-exhibition-images`);
+  return res.data;
+});
+
+export const createAgmExhibitionImage = tryCatch(async (payload: any) => {
+  const res = await privateRequest.post(
+    `/agmcms/previous-exhibition-images`,
+    payload
+  );
+  return res.data;
+});
+
+export const deleteAgmExhibitionImage = tryCatch(async (id: any) => {
+  const res = await privateRequest.delete(
+    `/agmcms/previous-exhibition-images/${id}`
+  );
+  return res.data;
+});
+
+export const getVenuePageContent = tryCatch(async () => {
+  const res = await privateRequest.get(`/agmcms/venue`);
+  return res.data;
+});
+
+export const updateVenuePageContent = tryCatch(async (payload: any) => {
+  const res = await privateRequest.patch(`/agmcms/venue`, payload);
+  return res.data;
+});
+
+export const getExhibitionPageContent = tryCatch(async () => {
+  const res = await privateRequest.get(`/agmcms/exhibition`);
+  return res.data;
+});
+
+export const updateExhibtionPageContent = tryCatch(async (payload: any) => {
+  const res = await privateRequest.patch(`/agmcms/exhibition`, payload);
+  return res.data;
+});
+
+export const getAllAgmFaq = tryCatch(async () => {
+  const res = await privateRequest.get(`/agmcms/faq`);
+  return res.data;
+});
+
+export const createAgmFaq = tryCatch(async (payload: any) => {
+  const res = await privateRequest.post(`/agmcms/faq`, payload);
+  return res.data;
+});
+
+export const retrieveAgmFaq = tryCatch(async (id: any) => {
+  if (!id || id === 0) {
+    return [];
+  }
+
+  const res = await privateRequest.get(`/agmcms/faq/${id}`);
+  return res.data;
+});
+
+export const editAgmFaq = tryCatch(async (payload: any) => {
+  const { id, formData } = payload;
+
+  if (!id || id === 0) {
+    return [];
+  }
+
+  const res = await privateRequest.patch(`/agmcms/faq/${id}`, formData);
+  return res.data;
+});
+
+export const deleteAgmFaq = tryCatch(async (id: any) => {
+  if (!id || id === 0) {
+    return [];
+  }
+
+  const res = await privateRequest.delete(`/agmcms/faq/${id}`);
+  return res.data;
+});
+
+//REVAMPED AGM SECTION

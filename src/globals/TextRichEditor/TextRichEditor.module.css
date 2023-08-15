@@ -1,0 +1,11 @@
+.textRichEditorContainer {
+  margin: 50px 0px;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.header {
+  color: #353535;
+  margin: 5px 0px;
+  font-size: 25px;
+}

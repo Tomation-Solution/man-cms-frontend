@@ -46,10 +46,12 @@ const SideBar: FC<Props> = ({ show }) => {
         navigate("/login");
       },
       onError: () => {
-        toast.error("Logout failed", {
+        toast.info("Logout successful", {
           progressClassName: "toastProgress",
           icon: false,
         });
+        deleteUserHandler();
+        navigate("/login");
       },
     }
   );
@@ -78,6 +80,11 @@ const SideBar: FC<Props> = ({ show }) => {
           <CustomSideBarNavLinks where="/publications">
             <MdGroups2 />
             Publications
+          </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/agm-section">
+            <MdEmojiEvents />
+            AGM Section
           </CustomSideBarNavLinks>
 
           <CustomSideBarNavLinks where="/prospective-members">
