@@ -46,3 +46,14 @@
   color: #2b3513;
   transition: all 0.5s;
 }
+
+.ql-editor {
+  height: 300px !important;
+  border: 2px solid transparent;
+
+  transition: all 0.5s;
+}
+
+.ql-editor:focus {
+  border: 2px solid black;
+}

@@ -10,7 +10,8 @@ type Prop = {
   isTextArea?: boolean;
   register?: any;
   errorMessage?: string;
-  type?: "password" | "text" | "file";
+  accept?: string;
+  type?: "password" | "text" | "file" | "date" | "time";
   containerStyle?: React.CSSProperties;
   // containerStyle:
 };
@@ -21,6 +22,7 @@ const InputWithLabel = ({
   register,
   type = "text",
   placeholder,
+  accept,
   errorMessage,
   containerStyle = {},
 }: Prop) => {
@@ -34,7 +36,12 @@ const InputWithLabel = ({
           <br />
           {!isTextArea ? (
             <input
-              style={type=='file'?{ width: "100%" }:{ backgroundColor: "#fff", width: "100%" }}
+              style={
+                type == "file"
+                  ? { width: "100%" }
+                  : { backgroundColor: "#fff", width: "100%" }
+              }
+              accept={accept}
               type={type}
               placeholder={
                 placeholder ? placeholder : `please enter name of ${label}`
@@ -56,7 +63,7 @@ const InputWithLabel = ({
         </label>
       </FormInput>
       <FormError>
-        <small>{errorMessage}</small>
+        <small>{errorMessage?.replace("_", " ")}</small>
       </FormError>
     </div>
   );
