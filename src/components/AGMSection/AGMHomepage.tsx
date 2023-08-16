@@ -128,10 +128,15 @@ function AGMHomepage() {
         register={register("main_image")}
         errorMessage={errors.main_image?.message}
       />
-      <InputWithLabel
+      {/* <InputWithLabel
         label="Intro Text"
         register={register("intro_text")}
         errorMessage={errors.intro_text?.message}
+      /> */}
+      <TextRichEditor
+        header="Intro Text"
+        editorState={watch("intro_text")}
+        setEditorState={(e) => setValue("intro_text", e)}
       />
       <InputWithLabel
         label="Location"
