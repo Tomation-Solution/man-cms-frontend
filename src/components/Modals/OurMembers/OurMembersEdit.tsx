@@ -17,6 +17,7 @@ import Loading from "../../Loading/Loading";
 const schema = yup.object({
   name: yup.string().required(),
   website: yup.string().url().notRequired(),
+  description: yup.string().url().notRequired(),
 });
 
 interface InputData extends yup.InferType<typeof schema> {}
@@ -37,6 +38,7 @@ const OurMembersEdit: React.FC<{ closefn: () => void; memId: number }> = ({
     defaultValues: {
       name: "",
       website: "",
+      description: "",
     },
   });
 
@@ -54,6 +56,7 @@ const OurMembersEdit: React.FC<{ closefn: () => void; memId: number }> = ({
       const main_data = {
         name: data.name,
         website: data.website,
+        description: "",
       };
 
       reset(main_data);
@@ -112,6 +115,14 @@ const OurMembersEdit: React.FC<{ closefn: () => void; memId: number }> = ({
                 Website
                 <br />
                 <input type="text" {...register("website")} />
+              </label>
+            </FormInput>
+            <FormError>{errors?.description?.message}</FormError>
+            <FormInput>
+              <label>
+                Description
+                <br />
+                <input type="text" {...register("description")} />
               </label>
             </FormInput>
 

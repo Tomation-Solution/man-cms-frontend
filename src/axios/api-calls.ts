@@ -738,6 +738,7 @@ export const ourMembersGetAll = async () => {
 
 export const ourMembersRetrieve = async (id: any) => {
   try {
+    if (id === 0 || !id) return [];
     const res = await privateRequest.get(`/membership/our-members/${id}`);
     return res.data;
   } catch (e: any) {
@@ -1896,3 +1897,45 @@ export const deleteAgmFaq = tryCatch(async (id: any) => {
 });
 
 //REVAMPED AGM SECTION
+
+//ADVERTS
+export const createAdvert = tryCatch(async (payload: any) => {
+  const res = await privateRequest.post(`/membership/advertisement`, payload);
+  return res.data;
+});
+
+export const getAllAdverts = tryCatch(async () => {
+  const res = await privateRequest.get(`/membership/advertisement`);
+  return res.data;
+});
+
+// export const updateAdvert = tryCatch(async (payload: any) => {
+//   const { id, formData } = payload;
+
+//   if (id === 0 || !id) {
+//     return [];
+//   }
+//   const res = await privateRequest.patch(
+//     `/membership/advertisement/${id}`,
+//     formData
+//   );
+//   return res.data;
+// });
+
+// export const retrieveAdvert = tryCatch(async (id: any) => {
+//   if (!id || id === 0) {
+//     return [];
+//   }
+
+//   const res = await privateRequest.get(`/membership/advertisement/${id}`);
+//   return res.data;
+// });
+
+export const deleteAdvert = tryCatch(async (id: any) => {
+  if (!id || id === 0) {
+    return [];
+  }
+
+  const res = await privateRequest.delete(`/membership/advertisement/${id}`);
+  return res.data;
+});

@@ -26,6 +26,7 @@ import { AddMoreButton } from "../globals/styles/CustomFormComponents";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useAuthStore } from "../zustand/store";
 import { Navigate } from "react-router-dom";
+import AdvertSection from "../components/AdvertSection/AdvertSection";
 
 const HomePageManagement = () => {
   const [options, setOptions] = useState<string>("WhyWeareUnique");
@@ -79,10 +80,28 @@ const HomePageManagement = () => {
         >
           HomePage Content
         </span>
+
+        <span
+          style={{
+            fontWeight: "500",
+            color: `${options === "Advertisements" ? "#4FDE9D" : "#2b3513"}`,
+            cursor: "pointer",
+            borderRight: "1px solid #2b3513",
+            flex: "0 0 160px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setOptions("Advertisements")}
+        >
+          Advertisements
+        </span>
       </div>
 
       {options === "WhyWeareUnique" && <WhyWeAreUnique />}
       {options === "HomePageContent" && <HomePageContent />}
+      {options === "Advertisements" && <AdvertSection />}
     </div>
   );
 };
@@ -244,22 +263,22 @@ const HomePageContent = () => {
       },
     }
   );
-  const client = useQueryClient()
-  const {isLoading:updateing,mutate}= useMutation(updateHomePageContent,{
-    'onSuccess':(data)=>{
+  const client = useQueryClient();
+  const { isLoading: updateing, mutate } = useMutation(updateHomePageContent, {
+    onSuccess: (data) => {
       toast.success("home page content saved", {
         progressClassName: "toastProgress",
         icon: false,
       });
-      client.invalidateQueries('getHomePageContent')
+      client.invalidateQueries("getHomePageContent");
     },
-    'onError':(error)=>{
+    onError: (error) => {
       toast.error("ome page content not edited", {
         icon: false,
         progressClassName: "toastProgress",
       });
-    }
-  })
+    },
+  });
   const {
     register,
     control,
@@ -320,8 +339,7 @@ const HomePageContent = () => {
   });
   const onSubmitHandler = (data: HomePageContentType) => {
     console.log({ SUbmittedData: data });
-    mutate(data)
-    
+    mutate(data);
   };
 
   useEffect(() => {
@@ -363,7 +381,7 @@ const HomePageContent = () => {
   }, [data]);
   return (
     <form onSubmit={handleSubmit(onSubmitHandler)}>
-      <Loading loading={isLoading||updateing} />
+      <Loading loading={isLoading || updateing} />
       <h2>Home Page Content</h2>
       <InputWithLabel
         label="Slider Welcome Message"

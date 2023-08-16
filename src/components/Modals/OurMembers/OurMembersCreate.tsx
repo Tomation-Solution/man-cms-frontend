@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 const schema = yup.object({
   name: yup.string().required(),
   website: yup.string().url().notRequired(),
+  description: yup.string().url().notRequired(),
 });
 
 interface InputData extends yup.InferType<typeof schema> {}
@@ -34,6 +35,7 @@ const OurMembersCreate: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     defaultValues: {
       name: "",
       website: "",
+      description: "",
     },
   });
 
@@ -85,6 +87,14 @@ const OurMembersCreate: React.FC<{ closefn: () => void }> = ({ closefn }) => {
               Website
               <br />
               <input type="text" {...register("website")} />
+            </label>
+          </FormInput>
+          <FormError>{errors?.description?.message}</FormError>
+          <FormInput>
+            <label>
+              Description
+              <br />
+              <input type="text" {...register("description")} />
             </label>
           </FormInput>
 
