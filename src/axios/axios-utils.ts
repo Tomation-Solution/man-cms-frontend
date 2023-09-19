@@ -3,10 +3,10 @@ import { useAuthStore } from "../zustand/store";
 import jwtDecode from "jwt-decode";
 import dayjs from "dayjs";
 
-const BASE_URL = `https://web-production-9688.up.railway.app/api`;
+const BASE_URL = `http://23.254.238.194:8000/api`;
 // const BASE_URL = "http://127.0.0.1:8000/api";
 export const REL8_URL =
-  "https://rel8-corporate-backend-production.up.railway.app/tenant/man/tenant/";
+  "https://web-production-81544.up.railway.app/tenant/man/tenant/";
 const privateRequest = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
