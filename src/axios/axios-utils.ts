@@ -3,7 +3,8 @@ import { useAuthStore } from "../zustand/store";
 import jwtDecode from "jwt-decode";
 import dayjs from "dayjs";
 
-const BASE_URL = `https://web-production-9688.up.railway.app/api`;
+// const BASE_URL = `https://web-production-9688.up.railway.app/api`;
+const BASE_URL = 'https://rela8mancmsbackend-production.up.railway.app/api'
 // const BASE_URL = "http://127.0.0.1:8000/api";
 export const REL8_URL =
   "https://rel8-corporate-backend-production.up.railway.app/tenant/man/tenant/";
