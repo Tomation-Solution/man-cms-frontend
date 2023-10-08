@@ -12,6 +12,7 @@ import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChoo
 import { HomePageContentType } from "../pages/HomePageManagement";
 import rel8PrivateRequest from "./rel8-axios-utils";
 import { tryCatch } from "../utils/extraFunction";
+import { createSliderschemaType } from "../components/HomePageSlider/HomePageSlider";
 
 const BASE_URL = "https://web-production-9688.up.railway.app/api";
 // const BASE_URL = "http://127.0.0.1:8000/api";
@@ -1666,6 +1667,39 @@ export const updateHomePageContent = async (
   const resp = await privateRequest.put(`membership/home-main/`, form);
   return resp.data.data;
 };
+// Home Page Slider
+
+export const getHomeSliderApi = async ()=>{
+  const resp = await privateRequest.get('homepage/add-slider/get_slider/')
+  return resp.data
+}
+
+export const createHomeSliderApi = async (data:createSliderschemaType)=>{
+  const form = new FormData()
+  form.append('content',data.content)
+  form.append('title',data.title)
+  form.append('banner',data.banner)
+  const resp = await privateRequest.post('homepage/add-slider/',form)
+  return resp.data
+}
+export const editHomeSliderApi = async (data:createSliderschemaType)=>{
+  const form = new FormData()
+  form.append('content',data.content)
+  form.append('title',data.title)
+  if(data.banner){
+
+    console.log('loggin banner')
+    form.append('banner',data.banner)
+  }
+  const resp = await privateRequest.patch(`homepage/add-slider/${data?.id}/`,form)
+  return resp.data
+}
+
+export const deleteHomeSliderApi = async(id:string|number)=>{
+  const resp = await privateRequest.patch(`homepage/add-slider/${id}/`,)
+  return resp.data
+}
+
 
 //REVAMPED AGM SECTION
 

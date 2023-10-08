@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useMediaQuery } from "react-responsive";
+
 import OffCanvas from "../components/OffCanvas/OffCanvas";
 import Button from "../components/Button/Button";
 import Tables from "../components/Tables/Tables";
@@ -27,6 +28,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useAuthStore } from "../zustand/store";
 import { Navigate } from "react-router-dom";
 import AdvertSection from "../components/AdvertSection/AdvertSection";
+import HomePageSlider from "../components/HomePageSlider/HomePageSlider";
 
 const HomePageManagement = () => {
   const [options, setOptions] = useState<string>("WhyWeareUnique");
@@ -97,11 +99,28 @@ const HomePageManagement = () => {
         >
           Advertisements
         </span>
+        <span
+          style={{
+            fontWeight: "500",
+            color: `${options === "Slider" ? "#4FDE9D" : "#2b3513"}`,
+            cursor: "pointer",
+            borderRight: "1px solid #2b3513",
+            flex: "0 0 160px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={() => setOptions("Slider")}
+        >
+          Home Page Slider
+        </span>
       </div>
 
       {options === "WhyWeareUnique" && <WhyWeAreUnique />}
       {options === "HomePageContent" && <HomePageContent />}
       {options === "Advertisements" && <AdvertSection />}
+      {options === "Slider" && <HomePageSlider />}
     </div>
   );
 };
