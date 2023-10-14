@@ -1,6 +1,6 @@
 import axios, { Axios, AxiosError } from "axios";
 import { User } from "../zustand/store";
-import privateRequest, { rel8Request } from "./axios-utils";
+import privateRequest, { BASE_URL, rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
 import {
@@ -14,8 +14,6 @@ import rel8PrivateRequest from "./rel8-axios-utils";
 import { tryCatch } from "../utils/extraFunction";
 import { createSliderschemaType } from "../components/HomePageSlider/HomePageSlider";
 
-const BASE_URL = "https://web-production-9688.up.railway.app/api";
-// const BASE_URL = "http://127.0.0.1:8000/api";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
