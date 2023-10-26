@@ -243,6 +243,7 @@ export const ProspectiveMembersTablePending = () => {
 const HandleSendingAcknowledgementLetter = ({id}:{id?:number})=>{
   const [content,setContent] = useState('')
   const [email,setEmail] = useState('example@gmai.comm')
+  const [executivePassword,setExecutivePassword,] = useState<string>()
 
   const { mutate:acknowle,isLoading:isLoading__acknowle} = useMutation(acknowledgeApplication,{
     'onSuccess':(data)=>{
@@ -262,7 +263,8 @@ const HandleSendingAcknowledgementLetter = ({id}:{id?:number})=>{
         acknowle({
           id,
           email,
-          content
+          content,
+          'password':executivePassword
         })
 
       }
@@ -276,7 +278,8 @@ const HandleSendingAcknowledgementLetter = ({id}:{id?:number})=>{
       toast.error("Email or Content are required",);    
       return 
     }
-    let password =generatePassword(7)
+    let password =generatePassword(7).toLowerCase()
+    setExecutivePassword(password)
     console.log({password})
     mutate({email,password,'userType':'executive_secretary'})
 

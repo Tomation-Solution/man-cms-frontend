@@ -19,7 +19,7 @@ const ProspectiveMembers = () => {
     | "acknowledgement_of_application"
     | "inspection_of_factory_inspection"
     | "ready_for_presentation_of_national_council"
-    | "review_of_factory_inspection_report_and_presentation_to_national_counci"
+    | "review_of_factory_inspection_report_and_presentation_to_national_counci"|'rework'
   >("approval_in_progress");
   const userData = useAuthStore.getState().user;
 
@@ -47,6 +47,14 @@ const ProspectiveMembers = () => {
           Acknowledgement Of Application
         </ApplicationsTabItem>
 
+        <ApplicationsTabItem
+          isFilled={
+            options === "rework" ? true : false
+          }
+          onClick={() => setOptions("rework")}
+        >
+          Factory Inspection(Currently Rework)
+        </ApplicationsTabItem>
         <ApplicationsTabItem
           isFilled={
             options === "inspection_of_factory_inspection" ? true : false

@@ -1506,6 +1506,7 @@ export const acknowledgeApplication = async (data: {
   id: number;
   email: string;
   content: string;
+  password?:string
 }) => {
   const resp = await rel8Request.post(
     `prospectivemember/admin_manage_prospective_member/acknowledgement_of_application/`,
