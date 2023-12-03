@@ -1695,7 +1695,7 @@ export const editHomeSliderApi = async (data:createSliderschemaType)=>{
 }
 
 export const deleteHomeSliderApi = async(id:string|number)=>{
-  const resp = await privateRequest.patch(`homepage/add-slider/${id}/`,)
+  const resp = await privateRequest.delete(`homepage/add-slider/${id}/`,)
   return resp.data
 }
 
