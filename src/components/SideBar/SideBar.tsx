@@ -92,10 +92,10 @@ const SideBar: FC<Props> = ({ show }) => {
             Prospective Members
           </CustomSideBarNavLinks>
 
-          <CustomSideBarNavLinks where="/certificate-issuing">
+          {/* <CustomSideBarNavLinks where="/certificate-issuing">
             <MdCardMembership />
             Certificate Issuing
-          </CustomSideBarNavLinks>
+          </CustomSideBarNavLinks> */}
 
           <CustomSideBarNavLinks where="/news">
             <BiNews />
