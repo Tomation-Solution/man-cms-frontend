@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GalleryContainer } from "./Gallery.styles";
 import GalleryModal from "../Modals/GalleryModals/GalleryModal";
 import OffCanvas from "../OffCanvas/OffCanvas";
@@ -17,19 +17,49 @@ const Gallery = () => {
   const [showModal, setShowModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
+
   const [galleryId, setGalleryId] = useState(0);
   const [galleryName, setGalleryName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showRenameModal, setShowRenameModal] = useState(false);
 
-  const { isLoading, isFetching, isError, data } = useQuery(
-    "all-gallery",
-    galleryGetAll,
-    {
-      refetchOnWindowFocus: false,
-      select: (data) => data.data,
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [nextUrl, setNextUrl] = useState(null);
+  const [url, setUrl] = useState("/gallery/");
+  const [updateNext, setUpdateNext] = useState<boolean>(true);
+
+  const {
+    isLoading,
+    isFetching,
+    isError,
+    data: results,
+  } = useQuery(["all-gallery", url], () => galleryGetAll(url), {
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (results?.results) {
+      setData((prevData) => {
+        const existingIds = new Set(prevData.map((item) => item.id)); // Track existing IDs
+        const newData = results.results.filter(
+          (item: any) => !existingIds.has(item.id)
+        ); // Filter out duplicates
+
+        const mergedData = [...prevData, ...newData]; // Append only new unique items
+        return mergedData.sort(
+          (a, b) =>
+            new Date(String(b.updated_at)).getTime() -
+            new Date(String(a.updated_at)).getTime()
+        );
+      });
+
+      if (updateNext) {
+        setNextUrl(results.next || null);
+      }
+      setUpdateNext(true);
     }
-  );
+  }, [results]);
+
   return (
     <>
       {isLoading || isFetching ? (
@@ -72,7 +102,14 @@ const Gallery = () => {
               justifyContent: "center",
             }}
           >
-            <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
+            <Button
+              styleType={"sec"}
+              onClick={() => {
+                setIsOpen(true);
+                setUrl("/gallery/");
+                setUpdateNext(false);
+              }}
+            >
               Create New
             </Button>
           </div>
@@ -120,6 +157,24 @@ const Gallery = () => {
                   </div>
                 </div>
               ))}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                paddingTop: "2rem",
+                paddingBottom: "2rem",
+              }}
+            >
+              <Button
+                style={{
+                  opacity: !nextUrl ? "0.5" : "1",
+                }}
+                disabled={!nextUrl}
+                onClick={() => setUrl(nextUrl!)}
+              >
+                Load More
+              </Button>
             </div>
           </GalleryContainer>
         </>

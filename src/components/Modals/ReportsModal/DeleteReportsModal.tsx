@@ -9,8 +9,9 @@ import Loading from "../../Loading/Loading";
 
 const DeleteReportsModal: React.FC<{
   reportId: number;
+  reportName: string;
   closefn: () => void;
-}> = ({ reportId, closefn }) => {
+}> = ({ reportId, closefn, reportName }) => {
   const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useMutation((id: number) => reportsDelete(id), {
@@ -47,7 +48,7 @@ const DeleteReportsModal: React.FC<{
       ) : (
         <>
           <Header>
-            ARE YOU SURE YOU WANT TO DELETE REPORT WITH THE ID OF {reportId}
+            ARE YOU SURE YOU WANT TO DELETE REPORT WITH THE NAME "{reportName}"
           </Header>
           <CustomModalButton clickfn={deleteHandler}>DELETE</CustomModalButton>
         </>

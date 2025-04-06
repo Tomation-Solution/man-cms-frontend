@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import OffCanvas from "../../components/OffCanvas/OffCanvas";
 import CreateNewsModal from "../../components/Modals/NewsModal/CreateNewsModal";
@@ -21,10 +21,19 @@ const ServicePage = (): React.ReactElement => {
   const userData = useAuthStore.getState().user;
   const queryClient = useQueryClient();
   const [currentData, setCurrentData] = useState();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
-  const { isLoading, data } = useQuery("services-list", getServices);
+
+  const [data, setData] = useState<any>([]);
+  const [nextUrl, setNextUrl] = useState("");
+  const [updateNext, setUpdateNext] = useState(true);
+
+  const [url, setUrl] = useState("/services/all-services");
+  const { isLoading, data: results } = useQuery(["services-list", url], () =>
+    getServices(url)
+  );
   const { isLoading: deleting, mutate: deleteFunc } = useMutation(
     deleteServiceApi,
     {
@@ -53,6 +62,26 @@ const ServicePage = (): React.ReactElement => {
       accessor: "type",
     },
   ];
+
+  useEffect(() => {
+    if (results?.results) {
+      setData((prevData: any[]) => {
+        const existingIds = new Set(prevData.map((item) => item.id));
+        const newData = results.results.data.filter(
+          (item: any) => !existingIds.has(item.id)
+        ); // Filter out duplicates
+
+        const mergedData = [...prevData, ...newData]; // Append only new unique items
+        return mergedData;
+      });
+
+      if (updateNext) {
+        setNextUrl(results.next || null);
+      }
+      setUpdateNext(true);
+    }
+  }, [results, updateNext]);
+
   const tableHooks = (hooks: Hooks) => {
     hooks.visibleColumns.push((columns) => [
       {
@@ -96,15 +125,13 @@ const ServicePage = (): React.ReactElement => {
         id: "Delete",
         Header: "Delete",
         Cell: (tableProp: any) => (
-
           <TableReject
-          onClick={() => {
-          deleteFunc(tableProp.row.original.id);
-
-          }}
-        >
-          Delete
-        </TableReject>
+            onClick={() => {
+              deleteFunc(tableProp.row.original.id);
+            }}
+          >
+            Delete
+          </TableReject>
           // <Button
           //   styleType={"whiteBg"}
           //   onClick={() => {
@@ -120,14 +147,14 @@ const ServicePage = (): React.ReactElement => {
         Header: "Update",
         Cell: (tableProp: any) => (
           <TableView
-          onClick={() => {
-            setIsOpenUpdate(true);
-            console.log(tableProp.row.original);
-            setCurrentData(tableProp.row.original);
-          }}
-        >
-          Edit
-        </TableView>
+            onClick={() => {
+              setIsOpenUpdate(true);
+              console.log(tableProp.row.original);
+              setCurrentData(tableProp.row.original);
+            }}
+          >
+            Edit
+          </TableView>
         ),
       },
     ]);
@@ -168,6 +195,25 @@ const ServicePage = (): React.ReactElement => {
         tableData={data ? data : []}
         customHooks={[tableHooks]}
       />
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row-reverse",
+          paddingTop: "2rem",
+          paddingBottom: "2rem",
+        }}
+      >
+        <Button
+          style={{
+            opacity: !nextUrl ? "0.5" : "1",
+          }}
+          disabled={!nextUrl}
+          onClick={() => setUrl(nextUrl!)}
+        >
+          Load More
+        </Button>
+      </div>
     </div>
   );
 };

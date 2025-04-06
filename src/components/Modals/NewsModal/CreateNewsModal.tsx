@@ -24,6 +24,7 @@ import Button from "../../Button/Button";
 import { validateFileExtension } from "../../../utils/extensionValidator";
 import useRel8AuthStore from "../../../zustand/rel8-store";
 import Rel8LoginModal from "../Rel8LoginModal";
+import AdvancedEditor from "../../TextEditor/AdvancedQuill";
 
 type detailsObj = {
   header: string;
@@ -32,16 +33,18 @@ type detailsObj = {
 
 type formInputData = {
   name: string;
-  title: string;
+  // title?: string;
+  newsContent: string;
   link: string;
   to_rel8: string;
   image: any;
-  details: detailsObj[];
+  // details?: detailsObj[];
 };
 
 const schema = yup.object({
   name: yup.string().required(),
-  title: yup.string().required(),
+  // title: yup.string().nullable(),
+  newsContent: yup.string().required(),
   link: yup.mixed().test({
     message: "Please provide a supported file type",
     test: (file, context) => {
@@ -57,14 +60,14 @@ const schema = yup.object({
   }),
   image: yup.mixed().required(),
   to_rel8: yup.string().required("please select an option"),
-  details: yup
-    .array(
-      yup.object({
-        header: yup.string().required(),
-        value: yup.string().required(),
-      })
-    )
-    .min(1, "Please add atleast one header value pair"),
+  // details: yup
+  //   .array(
+  //     yup.object({
+  //       header: yup.string().required(),
+  //       value: yup.string().required(),
+  //     })
+  //   )
+  //   .min(0),
 });
 
 const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
@@ -72,36 +75,39 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
   const [loginModal, setLoginModal] = useState(false);
   const rel8UserData = useRel8AuthStore.getState().user;
 
+  const [newsContent, setNewsContent] = useState("");
+
   const {
     handleSubmit,
     control,
     register,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
-      title: "",
+      newsContent: "",
       to_rel8: "",
       link: "",
       image: null,
-      details: [
-        {
-          header: "please fill header field",
-          value: "please fill value field",
-        },
-      ],
+      // details: [
+      //   {
+      //     header: "please fill header field",
+      //     value: "please fill value field",
+      //   },
+      // ],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    name: "details",
-    control,
-    rules: {
-      required: "Please add atleast one header value pair",
-    },
-  });
+  // const { fields, append, remove } = useFieldArray({
+  //   name: "details",
+  //   control,
+  //   rules: {
+  //     required: "Please add atleast one header value pair",
+  //   },
+  // });
 
   const { mutate, isLoading } = useMutation((data: any) => newsCreate(data), {
     onMutate: () => {
@@ -141,6 +147,7 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
 
   const onSubmitHandler = (dataInput: formInputData) => {
     let { to_rel8, ...data } = dataInput;
+
     if (to_rel8 === "yes") {
       if (!rel8UserData?.token) {
         setLoginModal(true);
@@ -151,32 +158,24 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
         rel8FormData.append("is_exco", "false");
         rel8FormData.append("is_committe", "false");
         rel8FormData.append("is_member", "false");
-        rel8FormData.append("body", data.title);
+        // if (data.title) rel8FormData.append("body", data.title);
         rel8FormData.append("image", data.image[0]);
-        const rel8newsparagraph = data.details.map((item) => ({
-          heading: item.header,
-          paragragh: item.value,
-        }));
-        rel8FormData.append(
-          "news_paragraph",
-          JSON.stringify(rel8newsparagraph)
-        );
+        rel8FormData.append("news_paragraph", data.newsContent);
 
         rel8NewsMutResult.mutateAsync(rel8FormData);
       }
     }
 
-    let { image, details, link, ...payload } = data;
+    let { image, link, name, newsContent } = data;
+
     image = image[0];
     link = link[0];
     const FormDataHandler = new FormData();
     FormDataHandler.append("image", image);
     FormDataHandler.append("link", link);
-    FormDataHandler.append("details", JSON.stringify(details));
-    Object.keys(payload)?.forEach((key) =>
-      //@ts-ignore
-      FormDataHandler.append(key, payload[key])
-    );
+    FormDataHandler.append("name", name);
+    FormDataHandler.append("news_content", newsContent);
+    setNewsContent("");
     mutate(FormDataHandler);
   };
 
@@ -205,7 +204,7 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
               <FormError>{errors?.image?.message}</FormError>
               <FormInput>
                 <label>
-                  Image
+                  Cover Image
                   <br />
                   <input
                     type="file"
@@ -215,16 +214,18 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                   />
                 </label>
               </FormInput>
-              <FormError>{errors?.title?.message}</FormError>
+              <FormError>{errors?.newsContent?.message}</FormError>
               <FormInput>
-                <label>
-                  Title
-                  <br />
-                  <input
-                    type="text"
-                    {...register("title", { required: true })}
-                  />
-                </label>
+                <label>News Content</label>
+                <AdvancedEditor
+                  value={newsContent}
+                  onChange={(newNewsContent: string) => {
+                    setNewsContent(newNewsContent);
+                    setValue("newsContent", newNewsContent, {
+                      shouldValidate: true,
+                    });
+                  }}
+                />
               </FormInput>
               <FormError>{errors?.link?.message}</FormError>
               <FormInput>
@@ -240,7 +241,7 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 </label>
               </FormInput>
 
-              {fields.map((fields, index) => (
+              {/* {fields.map((fields, index) => (
                 <section key={fields.id}>
                   <FormInput>
                     <label>
@@ -289,7 +290,7 @@ const CreateNewsModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 }
               >
                 Add More
-              </AddMoreButton>
+              </AddMoreButton> */}
 
               <section>
                 <Header>

@@ -1,11 +1,7 @@
 import React from "react";
-import TrainingsEventsPaymentItem, {
-  TrainingsEventPaymentType,
-} from "../PaymentsItems/TrainingsEventsPaymentItem";
+import TrainingsEventsPaymentItem from "../PaymentsItems/TrainingsEventsPaymentItem";
 
-const EventSection: React.FC<{ data: TrainingsEventPaymentType[] }> = ({
-  data,
-}) => {
+const EventSection: React.FC<{ data: any[] }> = ({ data }) => {
   return (
     <>
       {data

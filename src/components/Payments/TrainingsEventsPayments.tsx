@@ -1,32 +1,46 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import {
+  downloadEventAndTrainingPayments,
   eventTrainingPaymentRegistration,
-  trainingsGetAll,
 } from "../../axios/api-calls";
 import { ContactMainContainer } from "../Modals/Modals.styles";
 import Loading from "../Loading/Loading";
 import { FormError } from "../../globals/styles/forms.styles";
-import { TrainingsEventPaymentType } from "./PaymentsItems/TrainingsEventsPaymentItem";
 import EventSection from "./TrainingsEventsPaymentComponents/EventSection";
 import TrainingSection from "./TrainingsEventsPaymentComponents/TrainingSection";
+import Pagination from "./Pagination";
+import FilterModal from "../Modals/payment/FilterModal";
+import { FiFilter } from "react-icons/fi";
+import DownloadModal from "../Modals/payment/DownloadModal";
 
 const TrainingsEventsPayments = () => {
   const [options, setOptions] = useState("event");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({});
 
-  const { isLoading, isError, isFetching, data } = useQuery(
-    "all-events-registrations",
-    eventTrainingPaymentRegistration,
+  const { isLoading, isError, isFetching, data, isPreviousData } = useQuery(
+    ["all-events-registrations", currentPage, options, filters],
+    () => eventTrainingPaymentRegistration(currentPage, options, filters),
     {
-      select: (data) => data.data,
       refetchOnWindowFocus: false,
+      keepPreviousData: true,
     }
   );
 
-  const trainingQueryResult = useQuery("all-trainings", trainingsGetAll, {
-    select: (data) => data.data,
-    refetchOnWindowFocus: false,
+  const { mutate: download, isLoading: isDownloading } = useMutation({
+    mutationFn: downloadEventAndTrainingPayments,
+    onSuccess: () => setDownloadModalOpen(false),
   });
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > Math.ceil(data?.count / 10)) return;
+    setCurrentPage(page);
+  };
+
+  const totalPages = Math.ceil(data?.count / 10);
 
   return (
     <>
@@ -105,56 +119,78 @@ const TrainingsEventsPayments = () => {
         >
           other training
         </span>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "0.25rem",
+            width: "100%",
+          }}
+        >
+          <button
+            onClick={() => setFilterModalOpen(true)}
+            style={{
+              marginLeft: "auto",
+              padding: "8px 12px",
+              backgroundColor: "#2b3513",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+            }}
+          >
+            <FiFilter style={{ marginRight: "6px" }} /> Filter
+          </button>
+          <button
+            onClick={() => setDownloadModalOpen(true)}
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#2b3513",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+            }}
+          >
+            Download
+          </button>
+        </div>
       </div>
+
+      <FilterModal
+        isOpen={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        onApply={(appliedFilters: any) => {
+          setFilters(appliedFilters);
+          setCurrentPage(1);
+        }}
+      />
+
+      <DownloadModal
+        isOpen={downloadModalOpen}
+        onClose={() => setDownloadModalOpen(false)}
+        onApply={(appliedFilters: any) => {
+          download({ ...appliedFilters, options });
+        }}
+      />
+
       <ContactMainContainer>
-        <Loading
-          loading={
-            isLoading ||
-            isFetching ||
-            trainingQueryResult.isLoading ||
-            trainingQueryResult.isFetching
-          }
-        />
-        {(!isError || !trainingQueryResult.isError) &&
-        (data || trainingQueryResult.data) ? (
+        <Loading loading={isLoading || isFetching} />
+
+        {!isError && data ? (
           <>
-            {options === "event" ? (
-              <EventSection
-                data={data?.filter(
-                  (item: TrainingsEventPaymentType) => item.type === "EVENT"
-                )}
-              />
-            ) : null}
+            {options === "event" && <EventSection data={data?.results} />}
 
-            {options === "mrc-training" ? (
+            {options !== "event" && (
               <TrainingSection
-                data={data?.filter(
-                  (item: TrainingsEventPaymentType) => item.type === "TRAINING"
-                )}
-                trainingData={trainingQueryResult.data}
-                trainingTypeFilter={"mrc"}
-              />
-            ) : null}
-
-            {options === "mpdcl-training" ? (
-              <TrainingSection
-                data={data?.filter(
-                  (item: TrainingsEventPaymentType) => item.type === "TRAINING"
-                )}
-                trainingData={trainingQueryResult.data}
-                trainingTypeFilter={"mpdcl"}
-              />
-            ) : null}
-
-            {options === "others" ? (
-              <TrainingSection
-                data={data?.filter(
-                  (item: TrainingsEventPaymentType) => item.type === "TRAINING"
-                )}
-                trainingData={trainingQueryResult.data}
+                data={data?.results}
                 trainingTypeFilter={"others"}
               />
-            ) : null}
+            )}
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           </>
         ) : (
           <FormError>

@@ -1,12 +1,17 @@
 import React from "react";
-import { ContactContainer } from "../../Modals/Modals.styles";
 import { datefromatter } from "../../../utils/DateFormatter";
 import { formatMoney } from "../../../utils/moneyFormatter";
 
 export type PublicationsPaymentType = {
   id: number;
   publication: number;
-  ref: string;
+  payment: {
+    payment_ref: string;
+    amount: string;
+    payment_method: string | null;
+    access_code: string;
+    status: string;
+  };
   fullname: string;
   email: string;
   phone_number: string;
@@ -20,54 +25,126 @@ export type PublicationsPaymentType = {
 const PublicationPaymentItem: React.FC<{ data: PublicationsPaymentType }> = ({
   data,
 }) => {
+  const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+      padding: "20px",
+      marginBottom: "20px",
+      backgroundColor: "#f9f9f9",
+      borderRadius: "8px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+    },
+    heading: {
+      fontSize: "1.8rem",
+      fontWeight: "bold",
+      color: "#333",
+      marginBottom: "10px",
+    },
+    infoList: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.25rem",
+    },
+    infoItem: {
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "0.5rem 0",
+    },
+    label: {
+      fontWeight: "bold",
+      color: "#555",
+    },
+    value: {
+      color: "#333",
+    },
+    verified: {
+      color: "green",
+    },
+    notVerified: {
+      color: "red",
+    },
+    received: {
+      color: "blue",
+    },
+    notReceived: {
+      color: "orange",
+    },
+  };
+
+  console.log("PublicationPaymentItem data:", data);
+
   return (
-    <ContactContainer>
-      <h1>{data.company_name}</h1>
-      <p>
-        <span className="darkend">Publication paymennt reference number: </span>
-        {data.ref}
-      </p>
+    <div style={styles.container}>
+      <h1 style={styles.heading}>{data.company_name}</h1>
+      <div style={styles.infoList}>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Reference Number: </span>
+          <span style={styles.value}>{data.payment.payment_ref}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Id of publication bought:</span>
-        {data.publication}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Publication ID: </span>
+          <span style={styles.value}>{data.publication}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Email: </span>
-        {data.email}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Email: </span>
+          <span style={styles.value}>{data.email}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Fullname: </span>
-        {data.fullname}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Full Name: </span>
+          <span style={styles.value}>{data.fullname}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Phone number: </span>
-        {data.phone_number}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Phone Number: </span>
+          <span style={styles.value}>{data.phone_number}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Publication price: </span>
-        {formatMoney(data.amount_to_pay)}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Payment Method: </span>
+          <span style={styles.value}>
+            {data.payment.payment_method || "N/A"}
+          </span>
+        </div>
 
-      <p>
-        <span className="darkend">Payment verification status: </span>
-        {data.is_verified ? "confirmed" : "not confirmed"}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Amount: </span>
+          <span style={styles.value}>{formatMoney(data.amount_to_pay)}</span>
+        </div>
 
-      <p>
-        <span className="darkend">Publication file delivery status: </span>
-        {data.file_received ? "received" : "not received"}
-      </p>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Verification Status: </span>
+          <span
+            style={{
+              ...styles.value,
+              ...(data.is_verified ? styles.verified : styles.notVerified),
+            }}
+          >
+            {data.is_verified ? "Confirmed" : "Not Confirmed"}
+          </span>
+        </div>
 
-      <p>
-        <span className="darkend">Payment initialization date: </span>
-        {datefromatter(new Date(data.created_at))}
-      </p>
-    </ContactContainer>
+        <div style={styles.infoItem}>
+          <span style={styles.label}>File Delivery Status: </span>
+          <span
+            style={{
+              ...styles.value,
+              ...(data.file_received ? styles.received : styles.notReceived),
+            }}
+          >
+            {data.file_received ? "Received" : "Not Received"}
+          </span>
+        </div>
+
+        <div style={styles.infoItem}>
+          <span style={styles.label}>Payment Date: </span>
+          <span style={styles.value}>
+            {datefromatter(new Date(data.created_at))}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
 

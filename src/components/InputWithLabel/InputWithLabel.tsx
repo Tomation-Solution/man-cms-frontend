@@ -11,7 +11,7 @@ type Prop = {
   register?: any;
   errorMessage?: string;
   accept?: string;
-  type?: "password" | "text" | "file" | "date" | "time";
+  type?: "password" | "text" | "file" | "date" | "time" | "number";
   containerStyle?: React.CSSProperties;
   // containerStyle:
 };
@@ -77,6 +77,7 @@ type SelectProp = {
   options: { option: string; label: string }[];
   containerStyle?: React.CSSProperties;
   formName: string; //should be samme with the  actual yupSchema
+  onchange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 export const SelectWithLabel = ({
   label,
@@ -84,6 +85,7 @@ export const SelectWithLabel = ({
   setValue,
   options,
   formName,
+  onchange,
 }: SelectProp) => {
   return (
     <div>
@@ -93,8 +95,10 @@ export const SelectWithLabel = ({
           <select
             style={{ width: "100%", backgroundColor: "white" }}
             onChange={(e) => {
-              if (setValue) {
-                setValue(formName, e.target.value);
+              if (onchange) {
+                onchange(e);
+              } else {
+                setValue(formName, e.target.value, { shouldValidate: true });
               }
             }}
           >

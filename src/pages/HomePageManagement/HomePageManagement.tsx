@@ -2,33 +2,34 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useMediaQuery } from "react-responsive";
 
-import OffCanvas from "../components/OffCanvas/OffCanvas";
-import Button from "../components/Button/Button";
-import Tables from "../components/Tables/Tables";
+import OffCanvas from "../../components/OffCanvas/OffCanvas";
+import Button from "../../components/Button/Button";
+import Tables from "../../components/Tables/Tables";
 import {
   UpdateWhyChooseUsModal,
   WhyChooseUsModal,
-} from "../components/Modals/HomePageManagement/WhyChooseUse";
+} from "../../components/Modals/HomePageManagement/WhyChooseUse";
 import { Hooks } from "react-table";
-import { TableReject, TableView } from "../components/Tables/Tables.styles";
+import { TableReject, TableView } from "../../components/Tables/Tables.styles";
 import {
   deleteWhyChooseUsApi,
   getHomePageContent,
   getWhyChooseUsApi,
   updateHomePageContent,
-} from "../axios/api-calls";
-import Loading from "../components/Loading/Loading";
+} from "../../axios/api-calls";
+import Loading from "../../components/Loading/Loading";
 import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import InputWithLabel from "../components/InputWithLabel/InputWithLabel";
-import BoxWithHeading from "../components/BoxWithHeading";
-import { AddMoreButton } from "../globals/styles/CustomFormComponents";
+import InputWithLabel from "../../components/InputWithLabel/InputWithLabel";
+import BoxWithHeading from "../../components/BoxWithHeading";
+import { AddMoreButton } from "../../globals/styles/CustomFormComponents";
 import { useForm, useFieldArray } from "react-hook-form";
-import { useAuthStore } from "../zustand/store";
+import { useAuthStore } from "../../zustand/store";
 import { Navigate } from "react-router-dom";
-import AdvertSection from "../components/AdvertSection/AdvertSection";
-import HomePageSlider from "../components/HomePageSlider/HomePageSlider";
+import AdvertSection from "../../components/AdvertSection/AdvertSection";
+import HomePageSlider from "../../components/HomePageSlider/NewHomePageSlider";
+import AdvancedEditor from "../../components/TextEditor/AdvancedQuill";
 
 const HomePageManagement = () => {
   const [options, setOptions] = useState<string>("WhyWeareUnique");
@@ -269,6 +270,7 @@ const HomePageContentSchema = yup.object({
   slider_image2: yup.mixed(),
   slider_image3: yup.mixed(),
 });
+
 export type HomePageContentType = yup.InferType<typeof HomePageContentSchema>;
 const HomePageContent = () => {
   const { isLoading, data } = useQuery(
@@ -435,6 +437,8 @@ const HomePageContent = () => {
             <br />
           </>
         ))}
+
+        <AdvancedEditor />
       </BoxWithHeading>
 
       <AddMoreButton
@@ -617,12 +621,12 @@ const HomePageContent = () => {
       <div style={{ margin: "0 10px" }}>
         <img
           src={data?.slider_image2 ?? ""}
-          style={{ width: "75px", height: "75px" }}
+          style={{ width: "75px", aspectRatio: "33.5/10" }}
           alt=""
         />
         <InputWithLabel
           register={register("slider_image2")}
-          label="our vision image"
+          label="Our Vision Image (Recommended: 670x200px, Aspect Ratio 33.5:10)"
           type="file"
         />
       </div>
@@ -630,12 +634,12 @@ const HomePageContent = () => {
       <div style={{ margin: "0 10px" }}>
         <img
           src={data?.slider_image3 ?? ""}
-          style={{ width: "75px", height: "75px" }}
+          style={{ width: "75px", aspectRatio: "16/10" }}
           alt=""
         />
         <InputWithLabel
           register={register("slider_image3")}
-          label="lastest update image"
+          label="lastest update image (Recommended: 800x500px, Aspect Ratio 16:10)"
           type="file"
         />
       </div>
