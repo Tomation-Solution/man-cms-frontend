@@ -24,7 +24,7 @@ import NewsLetterPage from "./pages/NewsLetterPage";
 import ServicePage from "./pages/ServicePage/ServicePage";
 import StructurePage from "./pages/Structure/StructurePage";
 import PaymentsPage from "./pages/PaymentsPage";
-import HomePageManagement from "./pages/HomePageManagement";
+import HomePageManagement from "./pages/HomePageManagement/NewHomePageManagement";
 import Unauthorized from "./components/Unauthorized/Unauthorized";
 import ExecutiveMemberViewPage from "./components/ProspectiveMembers/ExecutiveMember";
 import AGMSectionPage from "./pages/AGMSectionPage";

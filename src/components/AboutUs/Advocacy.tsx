@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalsContainer } from "../Modals/Modals.styles";
 import { Form, FormError, FormInput } from "../../globals/styles/forms.styles";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -14,36 +14,30 @@ import Button from "../Button/Button";
 import { toast } from "react-toastify";
 import { advocacyRetrieve, advocacyUpdate } from "../../axios/api-calls";
 import Loading from "../Loading/Loading";
+import BoxWithHeading from "../BoxWithHeading";
+import AdvancedEditor from "../TextEditor/AdvancedQuill";
+import { validateUnorderedListOnly } from "../../utils";
 
 const schema = yup.object({
-  main_achievements: yup
-    .array()
-    .min(1, "Please add atleast one main achievements paragraph"),
+  main_achievements: yup.string().required(),
 });
 
 const Advocacy = () => {
   const queryClient = useQueryClient();
+  const [mainAchievements, setMainAcheivements] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+    setError,
     reset,
-    control,
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       main_image: null,
-      main_achievements: ["NEW MAIN ACHEIVEMENTS PARAGRAPH"],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    //@ts-ignore
-    name: "main_achievements",
-    control,
-    rules: {
-      required: "Please add atleast one main achievements paragraph",
+      main_achievements: "",
     },
   });
 
@@ -63,6 +57,7 @@ const Advocacy = () => {
         main_image: data.main_image,
         main_achievements: data.main_achievements,
       };
+      setMainAcheivements(data?.main_achievements || "");
       reset(main_data);
     }
   }, [reset, data]);
@@ -107,12 +102,24 @@ const Advocacy = () => {
       FormDataHandler.append("main_image", main_image);
     }
 
-    Object.keys(payload)?.forEach((key) =>
+    let errorThrown = false;
+    Object.keys(payload)?.forEach((key) => {
+      if (
+        key === "main_achievements" &&
+        !validateUnorderedListOnly(payload[key])
+      ) {
+        setError(key as "main_achievements", {
+          type: "manual",
+          message: "Must be an unordered list.",
+        });
+        errorThrown = true;
+        return;
+      }
       //@ts-ignore
-      FormDataHandler.append(key, JSON.stringify(payload[key]))
-    );
+      return FormDataHandler.append(key, payload[key]);
+    });
 
-    mutate(FormDataHandler);
+    if (!errorThrown) mutate(FormDataHandler);
   };
 
   const previousMainCoreImage = getValues("main_image");
@@ -138,36 +145,19 @@ const Advocacy = () => {
               </label>
             </FormInput>
 
-            {fields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Advocacy Achievements Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`main_achievements.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button styleType={"whiteBg"} onClick={() => remove(index)}>
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.main_achievements?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => append("NEW_PARAGRAPH")}
-            >
-              Add More Advocacy Achievements Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="Advocacy Paragraphs*">
+              <AdvancedEditor
+                onlyList
+                value={mainAchievements}
+                onChange={(newContent: string) => {
+                  setMainAcheivements(newContent);
+                  setValue("main_achievements", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.main_achievements?.message}</FormError>
+            </BoxWithHeading>
 
             <br />
             <Button styleType="pry">EDIT</Button>

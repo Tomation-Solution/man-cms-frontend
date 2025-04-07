@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalsContainer } from "../Modals/Modals.styles";
 import Loading from "../Loading/Loading";
 import { Form, FormError, FormInput } from "../../globals/styles/forms.styles";
@@ -17,6 +17,9 @@ import {
   howWeOperateUpdate,
 } from "../../axios/api-calls";
 import { toast } from "react-toastify";
+import { containsActualText, validateUnorderedListOnly } from "../../utils";
+import BoxWithHeading from "../BoxWithHeading";
+import AdvancedEditor from "../TextEditor/AdvancedQuill";
 
 const schema = yup.object({
   national_secretariat: yup.string().required(),
@@ -26,11 +29,17 @@ const schema = yup.object({
 
 const HowWeOperate = () => {
   const queryClient = useQueryClient();
+  const [nationalSecretariat, setNationalSecretariat] = useState("");
+  const [corporateOffice, setCorporateOffice] = useState("");
+  const [branchText, setBranchText] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+    setError,
+    setValue,
     reset,
   } = useForm({
     resolver: yupResolver(schema),
@@ -60,6 +69,10 @@ const HowWeOperate = () => {
         coorprate_office: data.coorprate_office,
         branch_text: data.branch_text,
       };
+
+      setNationalSecretariat(data.national_secretariat || "");
+      setCorporateOffice(data.coorprate_office || "");
+      setBranchText(data.branch_text || "");
       reset(main_data);
     }
   }, [reset, data]);
@@ -102,12 +115,24 @@ const HowWeOperate = () => {
       FormDataHandler.append("main_image", main_image);
     }
 
-    Object.keys(payload)?.forEach((key) =>
+    let errorThrown = false;
+    Object.keys(payload)?.forEach((key) => {
+      if (!containsActualText(payload[key])) {
+        setError(
+          key as "national_secretariat" | "coorprate_office" | "branch_text",
+          {
+            type: "manual",
+            message: "This field must not be empty.",
+          }
+        );
+        errorThrown = true;
+        return;
+      }
       //@ts-ignore
-      FormDataHandler.append(key, payload[key])
-    );
+      return FormDataHandler.append(key, payload[key]);
+    });
 
-    mutate(FormDataHandler);
+    if (!errorThrown) mutate(FormDataHandler);
   };
 
   const previousMainCoreImage = getValues("main_image");
@@ -133,36 +158,42 @@ const HowWeOperate = () => {
               </label>
             </FormInput>
 
-            <FormError>{errors.national_secretariat?.message}</FormError>
-            <FormInput>
-              <label>
-                National Secretariat Text
-                <br />
-                <textarea
-                  {...register("national_secretariat", { required: true })}
-                />
-              </label>
-            </FormInput>
+            <BoxWithHeading heading="National Secretariat*">
+              <AdvancedEditor
+                value={nationalSecretariat}
+                onChange={(newContent: string) => {
+                  setNationalSecretariat(newContent);
+                  setValue("national_secretariat", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.national_secretariat?.message}</FormError>
+            </BoxWithHeading>
 
-            <FormError>{errors.coorprate_office?.message}</FormError>
-            <FormInput>
-              <label>
-                Co-operate Office Text
-                <br />
-                <textarea
-                  {...register("coorprate_office", { required: true })}
-                />
-              </label>
-            </FormInput>
+            <BoxWithHeading heading="Corporate Office*">
+              <AdvancedEditor
+                value={corporateOffice}
+                onChange={(newContent: string) => {
+                  setCorporateOffice(newContent);
+                  setValue("coorprate_office", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.coorprate_office?.message}</FormError>
+            </BoxWithHeading>
 
-            <FormError>{errors.branch_text?.message}</FormError>
-            <FormInput>
-              <label>
-                Branch Office Text
-                <br />
-                <textarea {...register("branch_text", { required: true })} />
-              </label>
-            </FormInput>
+            <BoxWithHeading heading="Branch Office*">
+              <AdvancedEditor
+                value={branchText}
+                onChange={(newContent: string) => {
+                  setBranchText(newContent);
+                  setValue("branch_text", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.branch_text?.message}</FormError>
+            </BoxWithHeading>
 
             <br />
             <Button styleType="pry">EDIT</Button>

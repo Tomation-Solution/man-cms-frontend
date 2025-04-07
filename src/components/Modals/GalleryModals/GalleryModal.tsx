@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BackDrop from "../../BackDrop/BackDrop";
 import { GalleryModalContainer } from "./GalleryModal.styles";
 import Button from "../../Button/Button";
@@ -18,16 +18,66 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
   const [showGalleryAdd, setShowGalleryAdd] = useState(false);
   const [galleryId, setGalleryId] = useState(0);
   const [galleryName, setGalleryName] = useState("");
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [data, setData] = useState<any>();
 
-  const { isLoading, isFetching, isError, data } = useQuery(
-    `gallery-item-${galleryid}`,
-    () => galleryRetrieve(galleryid as number),
+  const [nextUrl, setNextUrl] = useState<string>();
+  const [url, setUrl] = useState("");
+  const [updateNext, setUpdateNext] = useState(true);
+
+  const {
+    isLoading,
+    isFetching,
+    isError,
+    data: results,
+  } = useQuery(
+    [`gallery-item-${galleryid}`, url],
+    () => galleryRetrieve(galleryid as number, url),
     {
       refetchOnWindowFocus: false,
     }
   );
+
+  useEffect(() => {
+    if (results?.results) {
+      setData((prevData: any) => {
+        const fetchedResults = results?.results;
+        if (!fetchedResults) return prevData;
+
+        const existingIds = new Set(
+          (prevData?.gallery_items || []).map((item: any) => item.id)
+        ); // Track existing gallery item IDs
+
+        // Filter out duplicates and merge new gallery items
+        const newGalleryItems =
+          fetchedResults.gallery_items?.filter(
+            (item: any) => !existingIds.has(item.id)
+          ) || [];
+
+        const updatedGalleryItems = [
+          ...(prevData?.gallery_items || []),
+          ...newGalleryItems,
+        ].sort(
+          (a, b) =>
+            new Date(String(b.updated_at)).getTime() -
+            new Date(String(a.updated_at)).getTime() // Sort by latest updated
+        );
+
+        return {
+          ...fetchedResults,
+          gallery_items: updatedGalleryItems,
+        };
+      });
+
+      if (updateNext) {
+        setNextUrl(results.next || null);
+      }
+      setUpdateNext(true);
+    }
+  }, [results]);
+
   return (
     <>
       {showGalleryAdd && (
@@ -60,7 +110,7 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
             </div>
 
             <div className="title-add-more">
-              <h1>{data.name}</h1>
+              <h1>{data?.name}</h1>
 
               <Button onClick={() => setShowGalleryAdd(!showGalleryAdd)}>
                 Add Gallery Item
@@ -69,7 +119,7 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
 
             <div className="gallery-scroll">
               <div className="gallery-modal-items">
-                {data?.gallery_images.map(
+                {data?.gallery_items?.map(
                   (
                     item: { id: number; caption: string; image: string },
                     index: number
@@ -102,6 +152,25 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
                   )
                 )}
               </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                paddingTop: "2rem",
+                paddingBottom: "2rem",
+              }}
+            >
+              <Button
+                style={{
+                  opacity: !nextUrl ? "0.5" : "1",
+                }}
+                disabled={!nextUrl}
+                onClick={() => setUrl(nextUrl!)}
+              >
+                Load More
+              </Button>
             </div>
           </GalleryModalContainer>
         ) : (

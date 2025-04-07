@@ -9,6 +9,7 @@ export type ButtonProp = React.PropsWithChildren<{
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isLoading?: boolean;
   isSmall?: boolean;
+  disabled?: boolean;
 }>;
 
 // export type PropStyle={
@@ -20,12 +21,13 @@ const Button = ({
   children,
   styleType = "pry",
   isLoading = false,
+  disabled,
   ...rest
 }: ButtonProp): React.ReactElement => {
   return (
     <ButtonStyle
       styleType={styleType}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       whileTap={{ scale: 0.9 }}
       animate={{
         transition: {

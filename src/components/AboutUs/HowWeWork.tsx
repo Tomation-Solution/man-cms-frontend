@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalsContainer } from "../Modals/Modals.styles";
 import { Form, FormError, FormInput } from "../../globals/styles/forms.styles";
 import Button from "../Button/Button";
@@ -14,49 +14,57 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { howWeWorkRetrieve, howWeWorkUpdate } from "../../axios/api-calls";
 import { toast } from "react-toastify";
+import { validateUnorderedListOnly } from "../../utils";
+import BoxWithHeading from "../BoxWithHeading";
+import AdvancedEditor from "../TextEditor/AdvancedQuill";
 
 const schema = yup.object({
-  how_we_work: yup
-    .array()
-    .min(1, "Please add atleast one how we work paragraph"),
-  how_we_work_details: yup
-    .array()
-    .min(1, "Please add atleast how we work details paragraph"),
-  committees: yup.array().min(1, "Please add atleast one committees paragraph"),
-  committee_details: yup
-    .array()
-    .min(1, "Please add atleast one committee details paragraph"),
-  adhoc: yup.array().min(1, "Please add atleast one adhoc paragraph"),
-  spvehicles: yup.array().min(1, "Please add atleast one spvehicles paragraph"),
-  spgroups: yup.array().min(1, "Please add atleast one spgroups paragraph"),
-  conduct: yup.array().min(1, "Please add atleast one conduct paragraph"),
-  conduct_listing: yup
-    .array()
-    .min(1, "Please add atleast conduct listing ops paragraph"),
+  how_we_work: yup.string().required(),
+  how_we_work_details: yup.string().required(),
+  committees: yup.string().required(),
+  committee_details: yup.string().required(),
+  adhoc: yup.string().required(),
+  spvehicles: yup.string().required(),
+  spgroups: yup.string().required(),
+  conduct: yup.string().required(),
+  conduct_listing: yup.string().required(),
 });
 
 const HowWeWork = () => {
   const queryClient = useQueryClient();
+  const [howWeWork, setHowWeWork] = useState("");
+  const [howWeWorkDetails, setHowWeWorkDetails] = useState("");
+
+  const [committees, setCommittees] = useState("");
+  const [committeeDetails, setCommitteeDetails] = useState("");
+  const [adhoc, setAdhoc] = useState("");
+  const [spVehicles, setSpVehicles] = useState("");
+
+  const [spGroups, setSpGroups] = useState("");
+  const [conduct, setConduct] = useState("");
+  const [conductListing, setConductListing] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+    setError,
+    setValue,
     reset,
-    control,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       main_image: null,
-      how_we_work: ["NEW HOW WE WORK PARAGRAPH"],
-      how_we_work_details: ["NEW HOW WE WORK DETAILS PARAGRAPH"],
-      committees: ["NEW HOW WE COMMITTEES PARAGRAPH"],
-      committee_details: ["NEW COMMITTEES DETAILS PARAGRAPH"],
-      adhoc: ["NEW ADHOC PARAGRAPH"],
-      spvehicles: ["NEW SPVEHICLES PARAGRAPH"],
-      spgroups: ["NEW SPGROUPS PARAGRAPH"],
-      conduct: ["NEW CONDUCT PARAGRAPH"],
-      conduct_listing: ["NEW CONDUCT LISTING PARAGRAPH"],
+      how_we_work: "",
+      how_we_work_details: "",
+      committees: "",
+      committee_details: "",
+      adhoc: "",
+      spvehicles: "",
+      spgroups: "",
+      conduct: "",
+      conduct_listing: "",
     },
   });
 
@@ -84,122 +92,20 @@ const HowWeWork = () => {
         conduct: data.conduct,
         conduct_listing: data.conduct_listing,
       };
+
+      setHowWeWork(data.how_we_work || "");
+      setHowWeWorkDetails(data.how_we_work_details || "");
+      setCommittees(data.committees || "");
+      setCommitteeDetails(data.committee_details || "");
+      setAdhoc(data.adhoc || "");
+      setSpVehicles(data.spvehicles || "");
+      setSpGroups(data.spgroups || "");
+      setConduct(data.conduct || "");
+      setConductListing(data.conduct_listing || "");
+
       reset(main_data);
     }
   }, [reset, data]);
-
-  const { fields, append, remove } = useFieldArray({
-    //@ts-ignore
-    name: "how_we_work",
-    control,
-    rules: {
-      required: "Please add atleast one how we work paragraph",
-    },
-  });
-
-  const {
-    fields: howdetails,
-    append: howappend,
-    remove: howremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "how_we_work_details",
-    control,
-    rules: {
-      required: "Please add atleast one how we work details paragraph",
-    },
-  });
-
-  const {
-    fields: committeesfields,
-    append: committeesappend,
-    remove: committeesremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "committees",
-    control,
-    rules: {
-      required: "Please add atleast one committees paragraph",
-    },
-  });
-
-  const {
-    fields: committeedetailsfields,
-    append: committeedetailsappend,
-    remove: committeedetailsremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "committee_details",
-    control,
-    rules: {
-      required: "Please add atleast one committee details paragraph",
-    },
-  });
-
-  const {
-    fields: adhocfields,
-    append: adhocappend,
-    remove: adhocremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "adhoc",
-    control,
-    rules: {
-      required: "Please add atleast one adhoc paragraph",
-    },
-  });
-
-  const {
-    fields: spvehiclesfields,
-    append: spvehiclesappend,
-    remove: spvehiclesremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "spvehicles",
-    control,
-    rules: {
-      required: "Please add atleast one spvehicles paragraph",
-    },
-  });
-
-  const {
-    fields: spgroupsfields,
-    append: spgroupsappend,
-    remove: spgroupsremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "spgroups",
-    control,
-    rules: {
-      required: "Please add atleast one spgroups paragraph",
-    },
-  });
-
-  const {
-    fields: conductfields,
-    append: conductappend,
-    remove: conductremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "conduct",
-    control,
-    rules: {
-      required: "Please add atleast one conduct paragraph",
-    },
-  });
-
-  const {
-    fields: conductlistingdfields,
-    append: conductlistingappend,
-    remove: conductlistingremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "conduct_listing",
-    control,
-    rules: {
-      required: "Please add atleast one conduct listing paragraph",
-    },
-  });
 
   const { mutate, isLoading } = useMutation(
     (data: any) => howWeWorkUpdate(data),
@@ -241,12 +147,24 @@ const HowWeWork = () => {
       FormDataHandler.append("main_image", main_image);
     }
 
-    Object.keys(payload)?.forEach((key) =>
+    let errorThrown = false;
+    Object.keys(payload)?.forEach((key) => {
+      if (
+        (key === "committees" || key === "conduct_listing") &&
+        !validateUnorderedListOnly(payload[key])
+      ) {
+        setError(key as "committees" | "conduct_listing", {
+          type: "manual",
+          message: "Must be an unordered list.",
+        });
+        errorThrown = true;
+        return;
+      }
       //@ts-ignore
-      FormDataHandler.append(key, JSON.stringify(payload[key]))
-    );
+      return FormDataHandler.append(key, payload[key]);
+    });
 
-    mutate(FormDataHandler);
+    if (!errorThrown) mutate(FormDataHandler);
   };
 
   const previousMainCoreImage = getValues("main_image");
@@ -272,308 +190,112 @@ const HowWeWork = () => {
               </label>
             </FormInput>
 
-            {fields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    How We Work Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`how_we_work.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
+            <BoxWithHeading heading="How We Work Paragraphs*">
+              <AdvancedEditor
+                value={howWeWork}
+                onChange={(newContent: string) => {
+                  setHowWeWork(newContent);
+                  setValue("how_we_work", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.how_we_work?.message}</FormError>
+            </BoxWithHeading>
 
-                <div>
-                  <Button styleType={"whiteBg"} onClick={() => remove(index)}>
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.how_we_work?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => append("NEW_PARAGRAPH")}
-            >
-              Add More How We Work Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="How We Work Details*">
+              <AdvancedEditor
+                value={howWeWorkDetails}
+                onChange={(newContent: string) => {
+                  setHowWeWorkDetails(newContent);
+                  setValue("how_we_work_details", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.how_we_work_details?.message}</FormError>
+            </BoxWithHeading>
 
-            {howdetails.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    How We Work Details Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`how_we_work_details.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
+            <BoxWithHeading heading="Committees*">
+              <AdvancedEditor
+                onlyList
+                value={committees}
+                onChange={(newContent: string) => {
+                  setCommittees(newContent);
+                  setValue("committees", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.committees?.message}</FormError>
+            </BoxWithHeading>
 
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => howremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.how_we_work_details?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => howappend("NEW_PARAGRAPH")}
-            >
-              Add More OPS Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="Committee Details*">
+              <AdvancedEditor
+                value={committeeDetails}
+                onChange={(newContent: string) => {
+                  setCommitteeDetails(newContent);
+                  setValue("committee_details", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.committee_details?.message}</FormError>
+            </BoxWithHeading>
 
-            {committeesfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Committes Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`committees.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
+            <BoxWithHeading heading="Adhoc*">
+              <AdvancedEditor
+                value={adhoc}
+                onChange={(newContent: string) => {
+                  setAdhoc(newContent);
+                  setValue("adhoc", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.adhoc?.message}</FormError>
+            </BoxWithHeading>
 
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => committeesremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.committees?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => committeesappend("NEW_PARAGRAPH")}
-            >
-              Add More Committes Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="SP Vehicles*">
+              <AdvancedEditor
+                value={spVehicles}
+                onChange={(newContent: string) => {
+                  setSpVehicles(newContent);
+                  setValue("spvehicles", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.spvehicles?.message}</FormError>
+            </BoxWithHeading>
 
-            {committeedetailsfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Committes Details Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`committee_details.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
+            <BoxWithHeading heading="SP Groups*">
+              <AdvancedEditor
+                value={spGroups}
+                onChange={(newContent: string) => {
+                  setSpGroups(newContent);
+                  setValue("spgroups", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.spgroups?.message}</FormError>
+            </BoxWithHeading>
 
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => committeedetailsremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.committee_details?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => committeedetailsappend("NEW_PARAGRAPH")}
-            >
-              Add More Committes Details Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="Conduct*">
+              <AdvancedEditor
+                value={conduct}
+                onChange={(newContent: string) => {
+                  setConduct(newContent);
+                  setValue("conduct", newContent, { shouldValidate: true });
+                }}
+              />
+              <FormError>{errors?.conduct?.message}</FormError>
+            </BoxWithHeading>
 
-            {adhocfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Ad-Hoc Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`adhoc.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => adhocremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.adhoc?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => adhocappend("NEW_PARAGRAPH")}
-            >
-              Add More Ad-Hoc Paragraphs
-            </AddMoreButton>
-
-            {spvehiclesfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Sp Vehicles Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`spvehicles.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => spvehiclesremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.spvehicles?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => spvehiclesappend("NEW_PARAGRAPH")}
-            >
-              Add More Sp Vehicles Paragraphs
-            </AddMoreButton>
-
-            {spgroupsfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Sp Groups Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`spgroups.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => spgroupsremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.spgroups?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => spgroupsappend("NEW_PARAGRAPH")}
-            >
-              Add More Sp Groups Paragraphs
-            </AddMoreButton>
-
-            {conductfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Conduct Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`conduct.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => conductremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.conduct?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => conductappend("NEW_PARAGRAPH")}
-            >
-              Add More Conduct Paragraphs
-            </AddMoreButton>
-
-            {conductlistingdfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Conduct Listing Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`conduct_listing.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => conductlistingremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.conduct_listing?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => conductlistingappend("NEW_PARAGRAPH")}
-            >
-              Add More Conduct Listing Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="Conduct Listing*">
+              <AdvancedEditor
+                onlyList
+                value={conductListing}
+                onChange={(newContent: string) => {
+                  setConductListing(newContent);
+                  setValue("conduct_listing", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.conduct_listing?.message}</FormError>
+            </BoxWithHeading>
 
             <br />
             <Button styleType="pry">EDIT</Button>

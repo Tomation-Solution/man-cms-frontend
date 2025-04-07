@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import History from "../components/AboutUs/History";
+import History from "../components/AboutUs/history/History";
 import Advocacy from "../components/AboutUs/Advocacy";
 import Affilliates from "../components/AboutUs/Affilliates";
 import HowWeWork from "../components/AboutUs/HowWeWork";

@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import {
-  AddMoreButton,
-  CustomModalButton,
-} from "../../../globals/styles/CustomFormComponents";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { CustomModalButton } from "../../../globals/styles/CustomFormComponents";
 import {
   Form,
   FormError,
@@ -13,7 +10,6 @@ import {
   FormSelect,
   Header,
 } from "../../../globals/styles/forms.styles";
-import Button from "../../Button/Button";
 import { ModalsContainer } from "../Modals.styles";
 
 import * as yup from "yup";
@@ -26,30 +22,26 @@ import {
 } from "../../../axios/api-calls";
 import { toast } from "react-toastify";
 import Loading from "../../Loading/Loading";
-import { validateFileExtension } from "../../../utils/extensionValidator";
 import useRel8AuthStore from "../../../zustand/rel8-store";
 import Rel8LoginModal from "../Rel8LoginModal";
-
-type detailsObj = {
-  header: string;
-  value: string;
-};
+import AdvancedEditor from "../../TextEditor/AdvancedQuill";
 
 type formInputData = {
   name: string;
   title: string;
-  link: string;
+  publication_content: string;
+  link: any;
   is_paid: string;
   price: string;
-  readmore_link: string;
+  readmore_link?: string;
   to_rel8: string;
   type: string;
   image: any;
-  details: detailsObj[];
 };
 
 const schema = yup.object({
   name: yup.string().required(),
+  publication_content: yup.string().required(),
   title: yup.string().required(),
   link: yup.mixed().notRequired(),
   image: yup.mixed().required(),
@@ -57,31 +49,26 @@ const schema = yup.object({
   type: yup.string().required(),
   readmore_link: yup.string().url().notRequired(),
   to_rel8: yup.string().required("please select an option"),
-  details: yup
-    .array(
-      yup.object({
-        header: yup.string().required(),
-        value: yup.string().required(),
-      })
-    )
-    .min(1, "Please add atleast one header value pair"),
 });
 
 const CreatePublicationsModal = () => {
   const queryClient = useQueryClient();
   const [loginModal, setLoginModal] = useState(false);
   const rel8UserData = useRel8AuthStore.getState().user;
+  const [publicationContent, setPublicationContent] = useState("");
 
   const {
     handleSubmit,
-    control,
     register,
     reset,
+    setValue,
+    setError,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
+      publication_content: "",
       title: "",
       link: "",
       type: "",
@@ -90,12 +77,6 @@ const CreatePublicationsModal = () => {
       to_rel8: "",
       is_paid: "",
       image: null,
-      details: [
-        {
-          header: "please fill header field",
-          value: "please fill value field",
-        },
-      ],
     },
   });
 
@@ -147,14 +128,6 @@ const CreatePublicationsModal = () => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    name: "details",
-    control,
-    rules: {
-      required: "Please add atleast one header value pair",
-    },
-  });
-
   const onSubmitHandler = async (dataInput: formInputData) => {
     let { to_rel8, ...data } = dataInput;
     if (to_rel8 === "yes") {
@@ -167,14 +140,8 @@ const CreatePublicationsModal = () => {
         rel8FormData.append("is_exco", "false");
         rel8FormData.append("is_committe", "false");
         rel8FormData.append("body", data.title);
-        const rel8PubParagraph = data.details.map((item) => ({
-          heading: item.header,
-          paragragh: item.value,
-        }));
-        rel8FormData.append(
-          "publication_paragraph",
-          JSON.stringify(rel8PubParagraph)
-        );
+
+        rel8FormData.append("publication_paragraph", data.publication_content);
         rel8FormData.append("image", data.image[0]);
         rel8FormData.append("is_paid", data.is_paid);
         rel8FormData.append("amount", `${data.price ? data.price : "0.00"}`);
@@ -183,42 +150,53 @@ const CreatePublicationsModal = () => {
       }
     }
 
-    if (data.is_paid == "true") {
-      let { image, details, link, ...payload } = data;
-      image = image[0];
+    const {
+      name,
+      publication_content,
+      link,
+      title,
+      is_paid,
+      price,
+      readmore_link,
+      type,
+      image,
+    } = data;
 
-      const FormDataHandler = new FormData();
-      Object.keys(payload)?.forEach((key) =>
-        //@ts-ignore
-        FormDataHandler.append(key, payload[key])
-      );
-      FormDataHandler.append("image", image);
-      if ((link as unknown as FileList).length > 0) {
-        link = link[0];
-        FormDataHandler.append("link", link);
-      }
-      FormDataHandler.append("details", JSON.stringify(details));
-
-      mutateAsync(FormDataHandler);
-    } else {
-      let { image, details, price, link, ...payload } = data;
-      image = image[0];
-
-      const FormDataHandler = new FormData();
-      Object.keys(payload)?.forEach((key) =>
-        //@ts-ignore
-        FormDataHandler.append(key, payload[key])
-      );
-      FormDataHandler.append("image", image);
-      if ((link as unknown as FileList).length > 0) {
-        link = link[0];
-        FormDataHandler.append("link", link);
-      }
-      FormDataHandler.append("details", JSON.stringify(details));
-
-      mutateAsync(FormDataHandler);
+    // Validate price if publication is paid
+    if (is_paid === "true" && (!price || price.trim() === "")) {
+      setError("price", {
+        type: "manual",
+        message: "Price is required for paid publications.",
+      });
+      return;
     }
+
+    const FormDataHandler = new FormData();
+
+    // Append all text fields
+    FormDataHandler.append("name", name);
+    FormDataHandler.append("publication_content", publication_content);
+    FormDataHandler.append("title", title);
+    FormDataHandler.append("is_paid", is_paid);
+    FormDataHandler.append("type", type);
+    if (readmore_link) FormDataHandler.append("readmore_link", readmore_link);
+    if (to_rel8) FormDataHandler.append("to_rel8", to_rel8);
+    if (is_paid === "true" && price) FormDataHandler.append("price", price);
+
+    // Handle file uploads
+    if (image instanceof FileList && image.length > 0) {
+      FormDataHandler.append("image", image[0]);
+    }
+    if (link instanceof FileList && link.length > 0) {
+      FormDataHandler.append("link", link[0]);
+    }
+
+    // Submit the form data
+    mutateAsync(FormDataHandler);
+
+    setPublicationContent("");
   };
+
   return (
     <>
       {loginModal && <Rel8LoginModal closefn={() => setLoginModal(false)} />}
@@ -269,20 +247,33 @@ const CreatePublicationsModal = () => {
                 </label>
               </FormInput>
 
+              <FormError>{errors?.title?.message}</FormError>
+              <FormInput>
+                <label>
+                  Title*
+                  <br />
+                  <input
+                    type={"text"}
+                    style={{ backgroundColor: "#fff" }}
+                    {...register("title", { required: true })}
+                  />
+                </label>
+              </FormInput>
+
               <FormError>{errors?.is_paid?.message}</FormError>
               <FormSelect>
                 <label>
                   Is this a paid publication*
                   <br />
-                  <small>if true a valid price must be provided</small>
+                  <small>if yes a valid price must be provided</small>
                   <br />
                   <select
                     defaultValue={"false"}
                     {...register("is_paid", { required: true })}
                   >
                     <option disabled>select an option</option>
-                    <option value="true">True</option>
-                    <option value="false">False</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
                   </select>
                 </label>
               </FormSelect>
@@ -320,6 +311,20 @@ const CreatePublicationsModal = () => {
                 </label>
               </FormSelect>
 
+              <FormError>{errors?.publication_content?.message}</FormError>
+              <FormInput>
+                <label>Publiction Content</label>
+                <AdvancedEditor
+                  value={publicationContent}
+                  onChange={(newPublicationContent: string) => {
+                    setPublicationContent(newPublicationContent);
+                    setValue("publication_content", newPublicationContent, {
+                      shouldValidate: true,
+                    });
+                  }}
+                />
+              </FormInput>
+              {/* 
               <FormError>{errors?.title?.message}</FormError>
               <FormInput>
                 <label>
@@ -331,9 +336,9 @@ const CreatePublicationsModal = () => {
                     {...register("title", { required: true })}
                   />
                 </label>
-              </FormInput>
+              </FormInput> */}
 
-              {fields.map((fields, index) => (
+              {/* {fields.map((fields, index) => (
                 <section key={fields.id}>
                   <FormInput>
                     <label>
@@ -382,7 +387,7 @@ const CreatePublicationsModal = () => {
                 }
               >
                 Add More
-              </AddMoreButton>
+              </AddMoreButton> */}
 
               <FormError>{errors?.link?.message}</FormError>
               <FormInput>

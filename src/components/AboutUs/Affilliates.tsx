@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalsContainer } from "../Modals/Modals.styles";
 import { Form, FormError, FormInput } from "../../globals/styles/forms.styles";
 import Button from "../Button/Button";
@@ -14,29 +14,34 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import Loading from "../Loading/Loading";
 import { toast } from "react-toastify";
 import { affilliatesRetrieve, affilliatesUpdate } from "../../axios/api-calls";
+import { containsActualText, validateUnorderedListOnly } from "../../utils";
+import BoxWithHeading from "../BoxWithHeading";
+import AdvancedEditor from "../TextEditor/AdvancedQuill";
 
 const schema = yup.object({
-  international_partners: yup
-    .array()
-    .min(1, "Please add atleast one international partners paragraph"),
-  ops: yup.array().min(1, "Please add atleast one ops paragraph"),
+  international_partners: yup.string().required(),
+  ops: yup.string().required(),
 });
 
 const Affilliates = () => {
   const queryClient = useQueryClient();
+  const [internationalPartners, setInternationalPartners] = useState("");
+  const [ops, setOps] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+    setError,
+    setValue,
     reset,
-    control,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       main_image: null,
-      ops: ["NEW OPS PARAGRAPH"],
-      international_partners: ["NEW INTERNATIONAL PARTNERS PARAGRAPH"],
+      ops: "",
+      international_partners: "",
     },
   });
 
@@ -57,31 +62,11 @@ const Affilliates = () => {
         ops: data.ops,
         international_partners: data.international_partners,
       };
+      setInternationalPartners(data?.international_partners || "");
+      setOps(data?.ops || "");
       reset(main_data);
     }
   }, [reset, data]);
-
-  const { fields, append, remove } = useFieldArray({
-    //@ts-ignore
-    name: "international_partners",
-    control,
-    rules: {
-      required: "Please add atleast one international achievements paragraph",
-    },
-  });
-
-  const {
-    fields: opsfields,
-    append: opsappend,
-    remove: opsremove,
-  } = useFieldArray({
-    //@ts-ignore
-    name: "ops",
-    control,
-    rules: {
-      required: "Please add atleast one ops paragraph",
-    },
-  });
 
   const { mutate, isLoading } = useMutation(
     (data: any) => affilliatesUpdate(data),
@@ -123,12 +108,24 @@ const Affilliates = () => {
       FormDataHandler.append("main_image", main_image);
     }
 
-    Object.keys(payload)?.forEach((key) =>
+    let errorThrown = false;
+    Object.keys(payload)?.forEach((key) => {
+      if (
+        (key === "ops" || key === "international_partners") &&
+        !validateUnorderedListOnly(payload[key])
+      ) {
+        setError(key as "ops" | "international_partners", {
+          type: "manual",
+          message: "Must be an unordered list.",
+        });
+        errorThrown = true;
+        return;
+      }
       //@ts-ignore
-      FormDataHandler.append(key, JSON.stringify(payload[key]))
-    );
+      return FormDataHandler.append(key, payload[key]);
+    });
 
-    mutate(FormDataHandler);
+    if (!errorThrown) mutate(FormDataHandler);
   };
 
   const previousMainCoreImage = getValues("main_image");
@@ -154,70 +151,33 @@ const Affilliates = () => {
               </label>
             </FormInput>
 
-            {fields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Advocacy International Partners Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`international_partners.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
+            <BoxWithHeading heading="International Partners Paragraphs*">
+              <AdvancedEditor
+                onlyList
+                value={internationalPartners}
+                onChange={(newContent: string) => {
+                  setInternationalPartners(newContent);
+                  setValue("international_partners", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.international_partners?.message}</FormError>
+            </BoxWithHeading>
 
-                <div>
-                  <Button styleType={"whiteBg"} onClick={() => remove(index)}>
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.international_partners?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => append("NEW_PARAGRAPH")}
-            >
-              Add More International Partners Paragraphs
-            </AddMoreButton>
-
-            {opsfields.map((fields, index) => (
-              <section key={fields.id}>
-                <FormInput>
-                  <label>
-                    Advocacy OPS Paragraphs*
-                    <br />
-                    <textarea
-                      style={{ backgroundColor: "#fff" }}
-                      {...register(`ops.${index}`, {
-                        required: true,
-                      })}
-                    />
-                  </label>
-                </FormInput>
-
-                <div>
-                  <Button
-                    styleType={"whiteBg"}
-                    onClick={() => opsremove(index)}
-                  >
-                    DELETE
-                  </Button>
-                  <br />
-                </div>
-              </section>
-            ))}
-            <FormError>{errors?.ops?.message}</FormError>
-            <AddMoreButton
-              justify="center"
-              click={() => opsappend("NEW_PARAGRAPH")}
-            >
-              Add More OPS Paragraphs
-            </AddMoreButton>
+            <BoxWithHeading heading="Organized Private Sector Paragraphs*">
+              <AdvancedEditor
+                onlyList
+                value={ops}
+                onChange={(newContent: string) => {
+                  setOps(newContent);
+                  setValue("ops", newContent, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+              <FormError>{errors?.ops?.message}</FormError>
+            </BoxWithHeading>
 
             <br />
             <Button styleType="pry">EDIT</Button>

@@ -9,8 +9,9 @@ import { toast } from "react-toastify";
 
 const DeleteNewsModal: React.FC<{
   newsId: number;
+  newsName: string;
   closefn: () => void;
-}> = ({ newsId, closefn }) => {
+}> = ({ newsId, newsName, closefn }) => {
   const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useMutation((id: number) => newsDelete(id), {
@@ -47,7 +48,7 @@ const DeleteNewsModal: React.FC<{
       ) : (
         <>
           <Header>
-            ARE YOU SURE YOU WANT TO DELETE NEWS WITH THE ID OF {newsId}
+            ARE YOU SURE YOU WANT TO DELETE NEWS WITH THE NAME "{newsName}"
           </Header>
           <CustomModalButton clickfn={deleteHandler}>DELETE</CustomModalButton>
         </>

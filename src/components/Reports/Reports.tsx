@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button/Button";
 import OffCanvas from "../OffCanvas/OffCanvas";
 import { useMediaQuery } from "react-responsive";
-import CreateReportModal from "../Modals/ReportsModal/CreateReportModal";
+import CreateReportModal from "../Modals/ReportsModal/NewCreateReportModal";
 import ReportTable from "../Tables/ReportTables/ReportTable";
 
 const Reports = () => {

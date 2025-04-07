@@ -25,38 +25,29 @@ import {
 } from "../../../globals/styles/CustomFormComponents";
 import { toast } from "react-toastify";
 import { validateFileExtension } from "../../../utils/extensionValidator";
-
-type detailsObj = {
-  header: string;
-  value: string;
-};
+import AdvancedEditor from "../../TextEditor/AdvancedQuill";
 
 type formInputData = {
   name: string;
+  publication_content: string;
   title: string;
   link: any;
   is_paid: string;
   price: string;
+  readmore_link?: string;
   type: string;
   image: any;
-  details: detailsObj[];
 };
 
 const schema = yup.object({
   name: yup.string().required(),
+  publication_content: yup.string().required(),
   title: yup.string().required(),
+  link: yup.mixed().notRequired(),
   image: yup.mixed().required(),
   is_paid: yup.string().required(),
   type: yup.string().required(),
   readmore_link: yup.string().url().notRequired(),
-  details: yup
-    .array(
-      yup.object({
-        header: yup.string().required(),
-        value: yup.string().required(),
-      })
-    )
-    .min(1, "Please add atleast one header value pair"),
 });
 
 const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
@@ -64,7 +55,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
   close,
 }) => {
   const queryClient = useQueryClient();
-
+  const [publicationContent, setPublicationContent] = useState("");
   const { isLoading, isFetching, data, isError } = useQuery(
     `publication-${pubid}`,
     () => publicationRetrieve(pubid),
@@ -75,55 +66,43 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
 
   const {
     handleSubmit,
-    control,
     register,
     reset,
-    getValues,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
-      title: "",
+      publication_content: "",
       link: "",
+      title: "",
       type: "",
       readmore_link: "",
       price: "",
+      to_rel8: "",
       is_paid: "",
       image: null,
-      details: [
-        {
-          header: "please fill header field",
-          value: "please fill value field",
-        },
-      ],
     },
   });
 
   useEffect(() => {
     if (data) {
       const main_data = {
-        name: data.name,
-        title: data.title,
-        link: data.link,
-        type: data.type,
-        price: data.price,
+        name: data.name || "",
+        title: data.title || "",
+        publication_content: data.publication_content || "",
+        link: data.link || "",
+        type: data.type || "",
+        price: data.price || "",
         readmore_link: data?.readmore_link,
         is_paid: data.is_paid,
         image: data.image,
-        details: data.details,
       };
+      setPublicationContent(data?.publication_content || "");
       reset(main_data);
     }
   }, [reset, data]);
-
-  const { fields, append, remove } = useFieldArray({
-    name: "details",
-    control,
-    rules: {
-      required: "Please add atleast one header value pair",
-    },
-  });
 
   const {
     isLoading: getLoading,
@@ -163,45 +142,38 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
   );
 
   const onSubmitHandler = (data: formInputData) => {
-    if (data.is_paid === "true") {
-      const FormDataHandler = new FormData();
-      let { image, details, link, ...payload } = data;
-      if (typeof data.image !== "string" && data.image instanceof FileList) {
-        image = image[0];
-        FormDataHandler.append("image", image);
-      }
-      if (typeof data.link !== "string" && data.link instanceof FileList) {
-        link = link[0];
-        FormDataHandler.append("link", link);
-      }
+    const FormDataHandler = new FormData();
 
-      Object.keys(payload)?.forEach((key) =>
-        //@ts-ignore
-        FormDataHandler.append(key, payload[key])
-      );
-      FormDataHandler.append("details", JSON.stringify(details));
-
-      mutate({ pubid, FormDataHandler });
-    } else {
-      const FormDataHandler = new FormData();
-      let { image, details, price, link, ...payload } = data;
-      if (typeof data.image !== "string" && data.image instanceof FileList) {
-        image = image[0];
-        FormDataHandler.append("image", image);
-      }
-      if (typeof data.link !== "string" && data.link instanceof FileList) {
-        link = link[0];
-        FormDataHandler.append("link", link);
-      }
-
-      Object.keys(payload)?.forEach((key) =>
-        //@ts-ignore
-        FormDataHandler.append(key, payload[key])
-      );
-      FormDataHandler.append("details", JSON.stringify(details));
-
-      mutate({ pubid, FormDataHandler });
+    // Ensure image is a file before appending
+    if (data.image instanceof FileList && data.image.length > 0) {
+      FormDataHandler.append("image", data.image[0]);
     }
+
+    // Ensure link is a file before appending
+    if (data.link instanceof FileList && data.link.length > 0) {
+      FormDataHandler.append("link", data.link[0]);
+    }
+
+    // Append simple fields directly
+    FormDataHandler.append("name", data.name);
+    FormDataHandler.append("title", data.title);
+    FormDataHandler.append("publication_content", data.publication_content);
+    FormDataHandler.append("is_paid", data.is_paid);
+    FormDataHandler.append("type", data.type);
+
+    // Append optional readmore_link if provided
+    if (data.readmore_link) {
+      FormDataHandler.append("readmore_link", data.readmore_link);
+    }
+
+    // Append price only if is_paid is "true"
+    if (data.is_paid === "true" && data.price) {
+      FormDataHandler.append("price", data.price);
+    }
+
+    // Send the data
+    mutate({ pubid, FormDataHandler });
+    setPublicationContent("");
   };
 
   const previousImage = data?.image;
@@ -254,20 +226,33 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                 </label>
               </FormInput>
 
+              <FormError>{errors?.title?.message}</FormError>
+              <FormInput>
+                <label>
+                  Title*
+                  <br />
+                  <input
+                    type={"text"}
+                    style={{ backgroundColor: "#fff" }}
+                    {...register("title", { required: true })}
+                  />
+                </label>
+              </FormInput>
+
               <FormError>{errors?.is_paid?.message}</FormError>
               <FormSelect>
                 <label>
                   Is this a paid publication*
                   <br />
-                  <small>if true a valid price must be provided</small>
+                  <small>if yes a valid price must be provided</small>
                   <br />
                   <select
                     defaultValue={"false"}
                     {...register("is_paid", { required: true })}
                   >
                     <option disabled>select an option</option>
-                    <option value="true">True</option>
-                    <option value="false">False</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
                   </select>
                 </label>
               </FormSelect>
@@ -308,7 +293,21 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                 </label>
               </FormSelect>
 
-              <FormError>{errors?.title?.message}</FormError>
+              <FormError>{errors?.publication_content?.message}</FormError>
+              <FormInput>
+                <label>Publiction Content</label>
+                <AdvancedEditor
+                  value={publicationContent}
+                  onChange={(newPublicationContent: string) => {
+                    setPublicationContent(newPublicationContent);
+                    setValue("publication_content", newPublicationContent, {
+                      shouldValidate: true,
+                    });
+                  }}
+                />
+              </FormInput>
+
+              {/* <FormError>{errors?.title?.message}</FormError>
               <FormInput>
                 <label>
                   Title*
@@ -369,7 +368,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
                 }
               >
                 Add More or Show All
-              </AddMoreButton>
+              </AddMoreButton> */}
 
               <div>
                 <a

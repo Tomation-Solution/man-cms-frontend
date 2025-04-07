@@ -9,11 +9,11 @@ import {
 } from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
-import { HomePageContentType } from "../pages/HomePageManagement";
+import { HomePageContentType } from "../pages/HomePageManagement/_components/HomePageContent";
 import rel8PrivateRequest from "./rel8-axios-utils";
 import { tryCatch } from "../utils/extraFunction";
-import { createSliderschemaType } from "../components/HomePageSlider/HomePageSlider";
-
+import { createSliderschemaType } from "../components/HomePageSlider/_components/CreateSlider";
+import { containsActualText } from "../utils";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -70,9 +70,9 @@ export const publicationCreate = async (payload: any) => {
   }
 };
 
-export const publicationGetAll = async () => {
+export const publicationGetAll = async (url: string) => {
   try {
-    const res = await privateRequest.get("/publications/");
+    const res = await privateRequest.get(url);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -94,7 +94,7 @@ export const publicationUpdate = async (data: {
 }) => {
   const { pubid, FormDataHandler } = data;
   try {
-    const res = await privateRequest.put(
+    const res = await privateRequest.patch(
       `/publications/${pubid}`,
       FormDataHandler
     );
@@ -160,9 +160,9 @@ export const newsCreate = async (payload: any) => {
   }
 };
 
-export const newsGetAll = async () => {
+export const newsGetAll = async (url: string) => {
   try {
-    const res = await privateRequest.get(`/news/`);
+    const res = await privateRequest.get(url);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -181,7 +181,7 @@ export const newsRetrieve = async (newsId: number) => {
 export const newsUpdate = async (payload: any) => {
   const { newsId, FormDataHandler } = payload;
   try {
-    const res = await privateRequest.put(`/news/${newsId}`, FormDataHandler);
+    const res = await privateRequest.patch(`/news/${newsId}`, FormDataHandler);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -207,9 +207,9 @@ export const reportsCreate = async (payload: any) => {
   }
 };
 
-export const reportsGetAll = async () => {
+export const reportsGetAll = async (url: string) => {
   try {
-    const res = await privateRequest.get(`/reports/`);
+    const res = await privateRequest.get(url);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -418,6 +418,7 @@ export const howWeWorkUpdate = async (payload: any) => {
 export const howWeWorkRetrieve = async () => {
   try {
     const res = await privateRequest.get(`/aboutus/how-we-work`);
+
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -679,9 +680,9 @@ export const faqCreate = async (payload: any) => {
   }
 };
 
-export const faqGetAll = async () => {
+export const faqGetAll = async (url: string) => {
   try {
-    const res = await privateRequest.get(`/membership/faq`);
+    const res = await privateRequest.get(url);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -765,9 +766,9 @@ export const ourMembersDelete = async (id: any) => {
 };
 
 //GALLERY
-export const galleryGetAll = async () => {
+export const galleryGetAll = async (url: string = "/gallery/") => {
   try {
-    const res = await privateRequest.get(`/gallery/`);
+    const res = await privateRequest.get(url);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -783,9 +784,9 @@ export const galleryCreate = async (payload: any) => {
   }
 };
 
-export const galleryRetrieve = async (id: number) => {
+export const galleryRetrieve = async (id: number, url?: string) => {
   try {
-    const res = await privateRequest.get(`/gallery/${id}`);
+    const res = await privateRequest.get(url || `/gallery/${id}`);
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -872,20 +873,163 @@ export const newLetterGetAll = async () => {
 };
 
 //PAYMENTS
-export const publicationPayments = async () => {
+
+export const publicationPayments = async (
+  filters: Record<string, any> = {}
+) => {
   try {
-    const res = await privateRequest.get(`/payments/publications`);
+    const searchParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") {
+        searchParams.append(key, value);
+      }
+    });
+
+    const queryString = searchParams.toString();
+    const res = await privateRequest.get(
+      `/payments/publication-payments/${queryString ? `?${queryString}` : ""}`
+    );
+
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
   }
 };
 
-export const eventTrainingPaymentRegistration = async () => {
+export const downloadPublicationPayments = async ({
+  format = "pdf",
+  payment_method = "",
+  status = "",
+  start_date = "",
+  end_date = "",
+}) => {
+  const params = new URLSearchParams();
+
+  // Default to past 1 month if dates are not provided
+  const today = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+
+  const finalStartDate = start_date || oneMonthAgo.toISOString().split("T")[0];
+  const finalEndDate = end_date || today.toISOString().split("T")[0];
+
+  params.append("format", format);
+  if (payment_method) params.append("payment_method", payment_method);
+  if (status) params.append("status", status);
+  params.append("start_date", finalStartDate);
+  params.append("end_date", finalEndDate);
+
   try {
-    const res = await privateRequest.get(
-      `/payments/event-training-registration`
+    const response = await privateRequest.get(
+      `/payments/publication-payments/download/?${params.toString()}`,
+      {
+        responseType: "blob", // Important to get binary data
+      }
     );
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+
+    const filename =
+      format === "csv"
+        ? "publication_payments.csv"
+        : "publication_payments.pdf";
+
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Download error:", error);
+    throw new Error("Failed to download file");
+  }
+};
+
+export const downloadEventAndTrainingPayments = async ({
+  format = "pdf",
+  options = "event",
+  payment_method = "",
+  status = "",
+  start_date = "",
+  end_date = "",
+}) => {
+  const params = new URLSearchParams();
+
+  // Default to past 1 month if dates are not provided
+  const today = new Date();
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+
+  const finalStartDate = start_date || oneMonthAgo.toISOString().split("T")[0];
+  const finalEndDate = end_date || today.toISOString().split("T")[0];
+
+  params.append("format", format);
+  params.append("options", options);
+  if (payment_method) params.append("payment_method", payment_method);
+  if (status) params.append("status", status);
+  params.append("start_date", finalStartDate);
+  params.append("end_date", finalEndDate);
+
+  try {
+    const response = await privateRequest.get(
+      `/payments/event-training-registrations/download/?${params.toString()}`,
+      {
+        responseType: "blob", // Important to get binary data
+      }
+    );
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+
+    const filename =
+      format === "csv"
+        ? "event-training-registrations.csv"
+        : "event-training-registrations.pdf";
+
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Download error:", error);
+    throw new Error("Failed to download file");
+  }
+};
+
+export const eventTrainingPaymentRegistration = async (
+  currentPage: number,
+  options: string = "event",
+  filters: Record<string, any> = {}
+) => {
+  try {
+    const params = new URLSearchParams();
+
+    // Handle pagination
+    params.append("page", currentPage.toString());
+
+    // Append option
+    params.append("options", options);
+
+    // Append filters
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+
+      // Support range filter format: { date: { from: '2024-01-01', to: '2024-02-01' } }
+      if (typeof value === "object" && value.from && value.to) {
+        params.append(`${key}_from`, value.from);
+        params.append(`${key}_to`, value.to);
+      } else {
+        params.append(key, String(value));
+      }
+    });
+
+    const res = await privateRequest.get(
+      `/payments/event-training-registrations/?${params.toString()}`
+    );
+
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -1089,7 +1233,7 @@ export const createService = async (
 ): Promise<ServiceResponseType> => {
   const form = new FormData();
   form.append("name", data.name);
-  form.append("type", data.type);
+  form.append("type", data.type || "CORE");
   form.append("description", data.description);
   form.append("image", data.image[0]);
 
@@ -1097,9 +1241,9 @@ export const createService = async (
   return res.data;
 };
 
-export const getServices = async (): Promise<ServiceResponseType[]> => {
-  const res = await privateRequest.get("/services/all-services");
-  return res.data.data;
+export const getServices = async (url: string): Promise<any> => {
+  const res = await privateRequest.get(url);
+  return res.data;
 };
 
 export const deleteServiceApi = async (id: number): Promise<any> => {
@@ -1116,7 +1260,7 @@ export const updateServiceApi = async ({
 }): Promise<ServiceResponseType> => {
   const form = new FormData();
   form.append("name", data.name);
-  form.append("type", data.type);
+  form.append("type", data.type || "CORE");
   form.append("description", data.description);
   if (typeof data.image !== "string") {
     form.append("image", data.image[0]);
@@ -1332,30 +1476,38 @@ type ExecutiveType = {
   type: string;
   created_at?: string;
   updated_at?: string;
+  order_position?: number;
 };
-export const getExecutiveApi = async (): Promise<ExecutiveType[]> => {
-  const resp = await privateRequest.get("aboutus/our-executives");
-  return resp.data.data;
+export const getExecutiveApi = async (url: string): Promise<any> => {
+  const resp = await privateRequest.get(url);
+  console.log({ resp });
+  return resp.data;
 };
 
 export const createExecutiveApi = async (data: ExecutiveType): Promise<any> => {
-  const form = new FormData();
-  form.append("name", data.name);
-  form.append("title", data.title);
-  form.append("type", data.type);
-  form.append("tenor", data.tenor!);
-  if (data.extra_title1) {
-    form.append("extra_title1", data.extra_title1);
+  try {
+    const form = new FormData();
+    form.append("name", data.name);
+    form.append("title", data.title);
+    form.append("type", data.type);
+    form.append("tenor", data.tenor!);
+    form.append("order_position", String(data.order_position!));
+    if (data.extra_title1) {
+      form.append("extra_title1", data.extra_title1);
+    }
+    if (data.extra_title2) {
+      form.append("extra_title2", data.extra_title2);
+    }
+    if (data.image) {
+      form.append("image", data.image[0]);
+    }
+    form.append("type", data.type);
+    const resp = await privateRequest.post("aboutus/our-executives", form);
+    return resp.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error creating executive");
   }
-  if (data.extra_title2) {
-    form.append("extra_title2", data.extra_title2);
-  }
-  if (data.image) {
-    form.append("image", data.image[0]);
-  }
-  form.append("type", data.type);
-  const resp = await privateRequest.post("aboutus/our-executives", form);
-  return resp.data;
 };
 
 export const updateExecutiveApi = async (data: ExecutiveType): Promise<any> => {
@@ -1506,7 +1658,7 @@ export const acknowledgeApplication = async (data: {
   id: number;
   email: string;
   content: string;
-  password?:string
+  password?: string;
 }) => {
   const resp = await rel8Request.post(
     `prospectivemember/admin_manage_prospective_member/acknowledgement_of_application/`,
@@ -1601,19 +1753,23 @@ export type HomePageContentServerResponse = {
   slider_welcome_message: string;
   slider_vision_message: string;
   slider_mission_message: string;
-  vision_intro: string[];
-  mission_intro: string[];
-  advocacy_intro: string[];
-  history_intro: string[];
-  why_join_intro: string[];
-  members_intro: string[];
+  vision_intro: string;
+  mission_intro: string;
+  advocacy_intro: string;
+  history_intro: string;
+  why_join_intro: string;
+  members_intro: string;
   slider_image1: string | null;
   slider_image2: string | null;
   slider_image3: string | null;
+  history_image: string | null;
+  join_man_image: string | null;
 };
 export const getHomePageContent =
   async (): Promise<HomePageContentServerResponse> => {
     const resp = await privateRequest.get(`membership/home-main/`);
+    console.log(resp.data);
+
     return resp.data.data;
   };
 
@@ -1634,71 +1790,140 @@ export const updateHomePageContent = async (
   if (typeof data.slider_image3 !== "string") {
     form.append("slider_image3", data.slider_image3[0]);
   }
+  if (typeof data.join_man_image !== "string") {
+    form.append("join_man_image", data.join_man_image[0]);
+  }
+  if (typeof data.history_image !== "string") {
+    form.append("history_image", data.history_image[0]);
+  }
   form.append("slider_welcome_message", data.slider_welcome_message);
   form.append("slider_vision_message", data.slider_vision_message);
   form.append("slider_mission_message", data.slider_mission_message);
 
-  form.append(
-    "vision_intro",
-    JSON.stringify(data.vision_intro?.map((d) => d.value))
-  );
-  form.append(
-    "mission_intro",
-    JSON.stringify(data.mission_intro?.map((d) => d.value))
-  );
-  form.append(
-    "advocacy_intro",
-    JSON.stringify(data.advocacy_intro?.map((d) => d.value))
-  );
-  form.append(
-    "history_intro",
-    JSON.stringify(data.history_intro?.map((d) => d.value))
-  );
-  form.append(
-    "why_join_intro",
-    JSON.stringify(data.why_join_intro?.map((d) => d.value))
-  );
-  form.append(
-    "members_intro",
-    JSON.stringify(data.members_intro?.map((d) => d.value))
-  );
+  if (containsActualText(data?.vision_intro))
+    form.append("vision_intro", data.vision_intro);
+  if (containsActualText(data?.mission_intro))
+    form.append("mission_intro", data.mission_intro);
+  if (containsActualText(data?.advocacy_intro))
+    form.append("advocacy_intro", data.advocacy_intro);
+  if (containsActualText(data?.history_intro))
+    form.append("history_intro", data.history_intro);
+  if (containsActualText(data?.why_join_intro))
+    form.append("why_join_intro", data.why_join_intro);
+  if (containsActualText(data?.members_intro))
+    form.append("members_intro", data.members_intro);
 
   const resp = await privateRequest.put(`membership/home-main/`, form);
   return resp.data.data;
 };
 // Home Page Slider
 
-export const getHomeSliderApi = async ()=>{
-  const resp = await privateRequest.get('homepage/add-slider/get_slider/')
-  return resp.data
-}
+export const getHomeSliderApi = async () => {
+  const resp = await privateRequest.get("homepage/add-slider/get_slider/");
+  return resp.data;
+};
 
-export const createHomeSliderApi = async (data:createSliderschemaType)=>{
-  const form = new FormData()
-  form.append('content',data.content)
-  form.append('title',data.title)
-  form.append('banner',data.banner)
-  const resp = await privateRequest.post('homepage/add-slider/',form)
-  return resp.data
-}
-export const editHomeSliderApi = async (data:createSliderschemaType)=>{
-  const form = new FormData()
-  form.append('content',data.content)
-  form.append('title',data.title)
-  if(data.banner){
+export const getHomeSliderWIthUrlApi = async (url: string) => {
+  const resp = await privateRequest.get(url);
+  return resp.data;
+};
 
-    console.log('loggin banner')
-    form.append('banner',data.banner)
+// export const createHomeSliderApi = async (data: createSliderschemaType) => {
+//   const form = new FormData();
+//   form.append("content", data.content);
+//   form.append("title", data.title);
+//   form.append("banner", data.banner);
+//   const resp = await privateRequest.post("homepage/add-slider/", form);
+//   return resp.data;
+// };
+
+export const createHomeSliderApi = async (data: createSliderschemaType) => {
+  const form = new FormData();
+  form.append("content", data.content);
+  form.append("title", data.title);
+  if (data.banner) {
+    form.append("banner", data.banner);
   }
-  const resp = await privateRequest.patch(`homepage/add-slider/${data?.id}/`,form)
-  return resp.data
-}
+  if (data.order_position !== undefined) {
+    form.append("order_position", data.order_position.toString());
+  }
+  const resp = await privateRequest.post("homepage/add-slider/", form);
+  return resp.data;
+};
 
-export const deleteHomeSliderApi = async(id:string|number)=>{
-  const resp = await privateRequest.delete(`homepage/add-slider/${id}/`,)
-  return resp.data
-}
+// export const editHomeSliderApi = async (data: createSliderschemaType) => {
+//   const form = new FormData();
+//   form.append("content", data.content);
+//   form.append("title", data.title);
+//   if (data.banner) {
+//     console.log("loggin banner");
+//     form.append("banner", data.banner);
+//   }
+//   const resp = await privateRequest.patch(
+//     `homepage/add-slider/${data?.id}/`,
+//     form,
+//     {
+//       timeout: 60000, // Increase timeout to 60 seconds
+//     }
+//   );
+//   return resp.data;
+// };
 
+export const editHomeSliderApi = async (data: createSliderschemaType) => {
+  const form = new FormData();
+  form.append("content", data.content);
+  form.append("title", data.title);
+  if (data.banner) {
+    form.append("banner", data.banner);
+  }
+  if (data.order_position !== undefined) {
+    form.append("order_position", data.order_position.toString());
+  }
+  const resp = await privateRequest.patch(
+    `homepage/add-slider/${data?.id}/`,
+    form,
+    {
+      timeout: 60000,
+    }
+  );
+  return resp.data;
+};
+
+export const getArchivedSliderApi = async () => {
+  const resp = await privateRequest.get(
+    "homepage/add-slider/get_slider/?archived=true"
+  );
+  return resp.data;
+};
+
+export const archiveHomeSliderApi = async (id: number) => {
+  const form = new FormData();
+  const resp = await privateRequest.post(
+    `homepage/add-slider/${id}/archive_slider/`,
+    form,
+    {
+      timeout: 60000,
+    }
+  );
+  return resp.data;
+};
+
+export const unArchiveHomeSliderApi = async (id: number) => {
+  const form = new FormData();
+  const resp = await privateRequest.post(
+    `homepage/add-slider/${id}/archive_slider/?archived=true`,
+    form,
+    {
+      timeout: 60000,
+    }
+  );
+  return resp.data;
+};
+
+export const deleteHomeSliderApi = async (id: string | number) => {
+  const resp = await privateRequest.delete(`homepage/add-slider/${id}/`);
+  return resp.data;
+};
 
 //REVAMPED AGM SECTION
 

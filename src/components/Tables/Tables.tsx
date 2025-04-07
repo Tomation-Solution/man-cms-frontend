@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react";
+import React, { FC, useMemo, useState } from "react";
 import { Column, PluginHook, useTable, useRowSelect } from "react-table";
 import {
   Table,
@@ -14,9 +14,15 @@ type Props = {
   tableData: any;
   tableColumn: any;
   customHooks: Array<PluginHook<{}>>;
+  dangerouslySetHtmlIndex?: number;
 };
 
-const Tables: FC<Props> = ({ tableData, tableColumn, customHooks }) => {
+const Tables: FC<Props> = ({
+  tableData,
+  tableColumn,
+  customHooks,
+  dangerouslySetHtmlIndex,
+}) => {
   const data = useMemo(() => tableData, [tableData]);
   const columns: Column<object>[] = useMemo(() => tableColumn, [tableColumn]);
 
@@ -46,11 +52,13 @@ const Tables: FC<Props> = ({ tableData, tableColumn, customHooks }) => {
           <TableHeader>
             {headerGroups.map((headerGroup) => (
               <TableRow {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <TableHead {...column.getHeaderProps()}>
-                    {column.render("Header")}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((column, index) => {
+                  return (
+                    <TableHead {...column.getHeaderProps()}>
+                      {column.render("Header")}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -61,11 +69,20 @@ const Tables: FC<Props> = ({ tableData, tableColumn, customHooks }) => {
 
               return (
                 <TableRow {...row.getRowProps()}>
-                  {row.cells.map((cell, index) => (
-                    <TableData {...cell.getCellProps()}>
-                      {cell.render("Cell")}
-                    </TableData>
-                  ))}
+                  {row.cells.map((cell, index) => {
+                    return (
+                      <TableData {...cell.getCellProps()}>
+                        {dangerouslySetHtmlIndex &&
+                        index === dangerouslySetHtmlIndex ? (
+                          <p
+                            dangerouslySetInnerHTML={{ __html: cell.value }}
+                          ></p>
+                        ) : (
+                          cell.render("Cell")
+                        )}
+                      </TableData>
+                    );
+                  })}
                 </TableRow>
               );
             })}

@@ -7,10 +7,11 @@ import { publicationDelete } from "../../../axios/api-calls";
 import { toast } from "react-toastify";
 import Loading from "../../Loading/Loading";
 
-const DeleteModal: React.FC<{ pubid: number; closefn: () => void }> = ({
-  pubid,
-  closefn,
-}) => {
+const DeleteModal: React.FC<{
+  publicationName: string;
+  pubid: number;
+  closefn: () => void;
+}> = ({ pubid, publicationName, closefn }) => {
   const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useMutation(
@@ -49,7 +50,8 @@ const DeleteModal: React.FC<{ pubid: number; closefn: () => void }> = ({
       ) : (
         <>
           <Header>
-            ARE YOU SURE YOU WANT TO DELETE PUBLICATION WITH THE ID OF {pubid}
+            ARE YOU SURE YOU WANT TO DELETE PUBLICATION WITH THE NAME "
+            {publicationName}"
           </Header>
           <CustomModalButton clickfn={deleteHandler}>DELETE</CustomModalButton>
         </>
