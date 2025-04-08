@@ -6,7 +6,9 @@ export interface NewLetterSubscriptionsType {
   id: number;
   ref: string;
   email: string;
+  name: string;
   created_at: string;
+  is_verified: boolean;
 }
 
 const NewLetterSubscriptionsItems: React.FC<{
