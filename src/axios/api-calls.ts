@@ -863,13 +863,37 @@ export const serviceRequestGetAll = async () => {
 };
 
 //NEWS LETTER SUBSCRIPTIONS
-export const newLetterGetAll = async () => {
-  try {
-    const res = await privateRequest.get(`/services/newsletter-subscription`);
-    return res.data;
-  } catch (e: any) {
-    throw new AxiosError(e);
-  }
+export const newLetterGetAll = async (params: {
+  page: number;
+  page_size: number;
+}) => {
+  const response = await privateRequest.get(
+    "/services/newsletter-subscription",
+    { params }
+  );
+  return response.data;
+};
+
+export const updateNewsletterUI = async ({
+  formData,
+}: {
+  formData: FormData;
+}) => {
+  const res = await privateRequest.put(
+    `/services/newsletter-ui/update/`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return res.data;
+};
+
+export const newsletterUIGet = async () => {
+  const res = await privateRequest.get("/services/newsletter-ui/");
+  return res.data;
 };
 
 //PAYMENTS

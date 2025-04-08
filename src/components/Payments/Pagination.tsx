@@ -35,6 +35,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.5,
     cursor: "not-allowed",
   },
+  ellipsis: {
+    padding: "6px 12px",
+    fontSize: "14px",
+    color: "#888",
+  },
 };
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -42,7 +47,36 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const generatePageNumbers = () => {
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+
+      if (currentPage > 4) {
+        pages.push("...");
+      }
+
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 3) {
+        pages.push("...");
+      }
+
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
 
   return (
     <div style={styles.container}>
@@ -57,18 +91,24 @@ const Pagination: React.FC<PaginationProps> = ({
         Prev
       </button>
 
-      {pageNumbers.map((page) => (
-        <button
-          key={page}
-          style={{
-            ...styles.button,
-            ...(currentPage === page ? styles.activeButton : {}),
-          }}
-          onClick={() => onPageChange(page)}
-        >
-          {page}
-        </button>
-      ))}
+      {generatePageNumbers().map((page, index) =>
+        page === "..." ? (
+          <span key={`ellipsis-${index}`} style={styles.ellipsis}>
+            ...
+          </span>
+        ) : (
+          <button
+            key={page}
+            style={{
+              ...styles.button,
+              ...(currentPage === page ? styles.activeButton : {}),
+            }}
+            onClick={() => onPageChange(Number(page))}
+          >
+            {page}
+          </button>
+        )
+      )}
 
       <button
         style={{
