@@ -37,6 +37,9 @@ import CreateSectoralGroupModal, {
 } from "../../components/Modals/SectoralGroupModal";
 import { useAuthStore } from "../../zustand/store";
 import { Navigate } from "react-router-dom";
+import AdvancedEditor from "../../components/TextEditor/AdvancedQuill";
+import SectoralGroupTab from "./_components/SectorialGroupTab";
+import MPDCLPageContent from "./_components/MDPCLPageContent";
 
 const StructurePage = () => {
   const [options, setOptions] = useState("MPDCL");
@@ -46,9 +49,7 @@ const StructurePage = () => {
     return <Navigate to="/unauthorized" />;
   }
 
-  useEffect(()=>{
-
-  },[])
+  useEffect(() => {}, []);
   return (
     <div>
       <div
@@ -287,16 +288,8 @@ const MrcPageContentTabschema = yup.object({
       description: yup.string().required(),
     })
   ),
-  who_we_are: yup.array().of(
-    yup.object({
-      value: yup.string(),
-    })
-  ),
-  objectives: yup.array().of(
-    yup.object({
-      value: yup.string(),
-    })
-  ),
+  who_we_are: yup.string().required(),
+  objectives: yup.string().required(),
 });
 export type MrcPageContentTabschemaType = yup.InferType<
   typeof MrcPageContentTabschema
@@ -306,6 +299,8 @@ const MrcPageContentTab = () => {
   const queryClient = useQueryClient();
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
 
+  const [whoWeAre, setWhoWeAre] = useState("");
+  const [objectives, setObjectives] = useState("");
   const [currentData, setCurrentData] = useState<any>();
   const {
     register,
@@ -326,37 +321,17 @@ const MrcPageContentTab = () => {
     control,
   });
 
-  const {
-    fields: whoWeAreFields,
-    append: whoWeAreappend,
-    remove: whoWeAreRemove,
-  } = useFieldArray({
-    name: "who_we_are",
-    control,
-  });
-  const {
-    fields: objectivesFields,
-    append: objectivesAppend,
-    remove: objectivesRemove,
-  } = useFieldArray({
-    name: "objectives",
-    control,
-  });
-
   const { isLoading } = useQuery("mrc-page", getMrcPage, {
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
       if (data) {
         console.log(data);
         setValue("objectives_card", data.objectives_card);
-        setValue(
-          "who_we_are",
-          data.who_we_are.map((d, index) => ({ value: d }))
-        );
-        setValue(
-          "objectives",
-          data.objectives.map((d, index) => ({ value: d }))
-        );
+        setValue("who_we_are", data?.who_we_are);
+        setValue("objectives", data?.objectives);
+
+        setWhoWeAre(data?.who_we_are);
+        setObjectives(data?.objectives);
       }
     },
   });
@@ -423,65 +398,26 @@ const MrcPageContentTab = () => {
         </BoxWithHeading>
 
         <BoxWithHeading heading="Who We Are">
-          {whoWeAreFields.map((d, index) => (
-            <>
-              <InputWithLabel
-                register={register(`who_we_are.${index}.value`)}
-                label="text"
-                key={index}
-              />
-              <Button
-                styleType={"whiteBg"}
-                onClick={() => {
-                  whoWeAreRemove(index);
-                }}
-              >
-                DELETE
-              </Button>
-              <br />
-            </>
-          ))}
+          <AdvancedEditor
+            value={whoWeAre}
+            onChange={(val: string) => {
+              setWhoWeAre(val);
+              setValue("who_we_are", val, { shouldValidate: true });
+            }}
+          />
         </BoxWithHeading>
-        <AddMoreButton
-          justify="center"
-          click={() => {
-            whoWeAreappend({ value: "." });
-          }}
-        >
-          Add More
-        </AddMoreButton>
 
         <BoxWithHeading heading="Objectives">
-          {objectivesFields.map((d, index) => (
-            <>
-              <InputWithLabel
-                //  register={}
-                label="Objective"
-                isTextArea={true}
-                register={register(`objectives.${index}.value`)}
-              />
-              <Button
-                styleType={"whiteBg"}
-                onClick={() => {
-                  objectivesRemove(index);
-                }}
-              >
-                DELETE
-              </Button>
-              <br />
-            </>
-          ))}
-          <AddMoreButton
-            justify="center"
-            click={() => {
-              objectivesAppend({ value: "." });
+          <AdvancedEditor
+            onlyList
+            value={objectives}
+            onChange={(val: string) => {
+              setObjectives(val);
+              setValue("objectives", val, { shouldValidate: true });
             }}
-          >
-            Add More
-          </AddMoreButton>
-          <br />
+          />
         </BoxWithHeading>
-        <Button style={{ width: "100%" }} styleType="pry">
+        <Button style={{ width: "100%", marginTop: "2rem" }} styleType="pry">
           EDIT
         </Button>
       </form>
@@ -627,381 +563,125 @@ const MPDCL = () => {
   );
 };
 
-const MPDCLPageContentSchema = yup.object({
-  id: yup.number(),
-  renewable_items: yup.array().of(
-    yup.object({
-      header: yup.string().required(),
-      description: yup.string().required(),
-    })
-  ),
-  who_we_are: yup.array().of(
-    yup.object({
-      value: yup.string().required(),
-    })
-  ),
-  our_objectives_header: yup.string(),
-  renewable_image: yup.mixed(),
-  renewable_desc: yup.array().of(
-    yup.object({
-      value: yup.string().required(),
-    })
-  ),
-  our_objectives_items: yup.array().of(
-    yup.object({
-      value: yup.string().required(),
-    })
-  ),
-});
+// const SectoralGroupTab = () => {
+//   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
+//   const queryClient = useQueryClient();
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+//   const [currentData, setCurrentData] = useState<SectoralGroupTabSchemaType>();
+//   const { isLoading, data } = useQuery("get-sectoral", getSectoralGroupApi, {
+//     // 'onSuccess':(data)=>{
 
-export type MPDCLPageContentSchemaFormType = yup.InferType<
-  typeof MPDCLPageContentSchema
->;
-const MPDCLPageContent = () => {
-  const { isLoading, data } = useQuery(
-    "MPDCL-page-content",
-    getMPDCLPageContentApi,
-    {
-      onSuccess: (data) => {
-        if (data) {
-          console.log({ "success data": data });
-          setValue("renewable_items", data.renewable_items);
-          setValue(
-            "who_we_are",
-            data.who_we_are.map((d, i) => ({ value: d }))
-          );
-          setValue("our_objectives_header", data.our_objectives_header);
-          setValue("renewable_image", data.renewable_image);
-          setValue(
-            "renewable_desc",
-            data.renewable_desc.map((d, i) => ({ value: d }))
-          );
-          setValue(
-            "our_objectives_items",
-            data.our_objectives_items.map((d, i) => ({ value: d }))
-          );
-        }
-      },
-      refetchOnWindowFocus: false,
-    }
-  );
+//     // }
+//     refetchOnWindowFocus: false,
+//   });
+//   console.log(data);
 
-  const { isLoading: updating, mutate: updateContent } = useMutation(
-    updateMPDCLPageContentApi,
-    {
-      onSuccess: (data) => {
-        toast.success("Update Success", {
-          progressClassName: "toastProgress",
-          icon: false,
-        });
-      },
-      onError: (error) => {
-        console.log("Error thing", error);
-      },
-    }
-  );
-  const {
-    register,
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<MPDCLPageContentSchemaFormType>({
-    resolver: yupResolver(MPDCLPageContentSchema),
-  });
+//   const { isLoading: deleting, mutate: deleteSectoralGroup } = useMutation(
+//     deleteSectoralGroupApi,
+//     {
+//       onSuccess: (data) => {
+//         toast.error(`Deleted Sectoral Group`, {
+//           progressClassName: "toastProgress",
+//           icon: false,
+//         });
+//         queryClient.invalidateQueries("get-sectoral");
+//       },
+//     }
+//   );
 
-  const { fields, append, remove } = useFieldArray({
-    name: "renewable_items",
-    control,
-  });
-  const {
-    fields: our_objectives_itemsfields,
-    append: our_objectives_items_append,
-    remove: our_objectives_items_remove,
-  } = useFieldArray({
-    name: "our_objectives_items",
-    control,
-  });
-  const {
-    fields: whoFields,
-    append: whoAppend,
-    remove: whoRemove,
-  } = useFieldArray({
-    name: "who_we_are",
-    control,
-  });
+//   // createUpdateSectoralGroupApi
 
-  const {
-    fields: descFields,
-    append: descAppend,
-    remove: descRemove,
-  } = useFieldArray({
-    name: "renewable_desc",
-    control,
-  });
+//   const columns = [
+//     {
+//       Header: "Header",
+//       accessor: "header",
+//     },
+//   ];
+//   const tableHooks = (hooks: Hooks) => {
+//     hooks.visibleColumns.push((columns) => [
+//       {
+//         id: "s/n",
+//         Header: "S/N",
+//         Cell: (tableProps: any) => {
+//           return <>{tableProps.row.index + 1}</>;
+//         },
+//       },
+//       ...columns,
+//       {
+//         id: "images",
+//         Header: "Image",
+//         Cell: (tableProp: any) => (
+//           <>
+//             <img
+//               style={{ width: "50px", height: "50px" }}
+//               src={tableProp.row.original.image}
+//             />
+//           </>
+//         ),
+//       },
+//       {
+//         id: "Click to Edit",
+//         Header: "Click to Edit",
+//         Cell: ({ row }: any) => (
+//           <TableView
+//             onClick={() => {
+//               setIsUpdateOpen(true);
+//               setCurrentData(row.original);
+//             }}
+//           >
+//             Edit
+//           </TableView>
+//         ),
+//       },
+//       {
+//         id: "Click to Delete",
+//         Header: "Click to Delete",
+//         Cell: ({ row }: any) => (
+//           <TableReject
+//             onClick={() => {
+//               if (row.original?.id) {
+//                 deleteSectoralGroup(row.original.id);
+//               }
+//             }}
+//           >
+//             Delete
+//           </TableReject>
+//         ),
+//       },
+//     ]);
+//   };
+//   return (
+//     <div>
+//       <OffCanvas
+//         size={isMobileScreen ? 100 : 50}
+//         btnClick={() => null}
+//         setIsOpen={setIsOpen}
+//         isOpen={isOpen}
+//       >
+//         <CreateSectoralGroupModal />
+//       </OffCanvas>
 
-  const onSubmitHandler = (data: MPDCLPageContentSchemaFormType) => {
-    console.log({ submited: data });
-    updateContent(data);
-  };
-  return (
-    <div>
-      <Loading loading={isLoading || updating} />
-      <h1>MPDCL page Content</h1>
-      <br />
-      <br />
+//       <OffCanvas
+//         size={isMobileScreen ? 100 : 50}
+//         btnClick={() => null}
+//         setIsOpen={setIsUpdateOpen}
+//         isOpen={isUpdateOpen}
+//       >
+//         <UpdateGroupModal data={currentData} />
+//       </OffCanvas>
 
-      <form onSubmit={handleSubmit(onSubmitHandler)}>
-        {fields.map((d, index) => (
-          <BoxWithHeading heading="Renewable Items" key={index}>
-            <div>
-              <InputWithLabel
-                label="header"
-                register={register(`renewable_items.${index}.header`)}
-              />
-              <InputWithLabel
-                register={register(`renewable_items.${index}.description`)}
-                label="description"
-                isTextArea={true}
-              />
-              <Button
-                styleType={"whiteBg"}
-                onClick={() => {
-                  remove(index);
-                }}
-              >
-                DELETE
-              </Button>
-            </div>
-          </BoxWithHeading>
-        ))}
-        <AddMoreButton
-          justify="center"
-          click={() => {
-            append({ description: "", header: "heading" });
-          }}
-        >
-          Add More
-        </AddMoreButton>
+//       {/* <p>jdjd</p> */}
+//       <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
+//         Create Sectoral Group
+//       </Button>
+//       <Loading loading={isLoading || deleting} />
 
-        {whoFields.map((d, index) => (
-          <BoxWithHeading heading="Who we are" key={index}>
-            <div>
-              <InputWithLabel
-                label="who we are content"
-                isTextArea={true}
-                register={register(`who_we_are.${index}.value`)}
-              />
-            </div>
-            <Button
-              styleType={"whiteBg"}
-              onClick={() => {
-                whoRemove(index);
-              }}
-            >
-              DELETE
-            </Button>
-          </BoxWithHeading>
-        ))}
-        <AddMoreButton
-          justify="center"
-          click={() => {
-            whoAppend({ value: ".." });
-          }}
-        >
-          Add More
-        </AddMoreButton>
-
-        <BoxWithHeading heading="">
-          <InputWithLabel
-            label="our_objectives_header"
-            register={register(`our_objectives_header`)}
-          />
-          <InputWithLabel
-            label="renewable_image"
-            register={register("renewable_image")}
-            type="file"
-          />
-        </BoxWithHeading>
-
-        <BoxWithHeading heading="Our Objectives Items">
-          {our_objectives_itemsfields.map((d, index) => (
-            <div>
-              <InputWithLabel
-                label="Objective Content"
-                register={register(`our_objectives_items.${index}.value`)}
-              />
-
-              <Button
-                styleType={"whiteBg"}
-                onClick={() => {
-                  our_objectives_items_remove(index);
-                }}
-              >
-                DELETE
-              </Button>
-            </div>
-          ))}
-          <AddMoreButton
-            justify="center"
-            click={() => {
-              our_objectives_items_append({ value: ".." });
-            }}
-          >
-            Add More
-          </AddMoreButton>
-        </BoxWithHeading>
-
-        {descFields.map((d, index) => (
-          <BoxWithHeading heading="Renewable Desc" key={index}>
-            <div>
-              <InputWithLabel
-                label="Content"
-                register={register(`renewable_desc.${index}.value`)}
-                isTextArea={true}
-              />
-            </div>
-            <Button
-              styleType={"whiteBg"}
-              onClick={() => {
-                descRemove(index);
-              }}
-            >
-              DELETE
-            </Button>
-          </BoxWithHeading>
-        ))}
-        <AddMoreButton
-          justify="center"
-          click={() => {
-            descAppend({ value: "" });
-          }}
-        >
-          Add More
-        </AddMoreButton>
-        <Button style={{ width: "100%" }}>Update</Button>
-      </form>
-    </div>
-  );
-};
-
-const SectoralGroupTab = () => {
-  const isMobileScreen = useMediaQuery({ maxWidth: 600 });
-  const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-  const [currentData, setCurrentData] = useState<SectoralGroupTabSchemaType>();
-  const { isLoading, data } = useQuery("get-sectoral", getSectoralGroupApi, {
-    // 'onSuccess':(data)=>{
-
-    // }
-    refetchOnWindowFocus: false,
-  });
-  const { isLoading: deleting, mutate: deleteSectoralGroup } = useMutation(
-    deleteSectoralGroupApi,
-    {
-      onSuccess: (data) => {
-        toast.error(`Deleted Sectoral Group`, {
-          progressClassName: "toastProgress",
-          icon: false,
-        });
-        queryClient.invalidateQueries("get-sectoral");
-      },
-    }
-  );
-
-  // createUpdateSectoralGroupApi
-
-  const columns = [
-    {
-      Header: "Header",
-      accessor: "header",
-    },
-  ];
-  const tableHooks = (hooks: Hooks) => {
-    hooks.visibleColumns.push((columns) => [
-      {
-        id: "s/n",
-        Header: "S/N",
-        Cell: (tableProps: any) => {
-          return <>{tableProps.row.index + 1}</>;
-        },
-      },
-      ...columns,
-      {
-        id: "images",
-        Header: "Image",
-        Cell: (tableProp: any) => (
-          <>
-            <img
-              style={{ width: "50px", height: "50px" }}
-              src={tableProp.row.original.image}
-            />
-          </>
-        ),
-      },
-      {
-        id: "Click to Edit",
-        Header: "Click to Edit",
-        Cell: ({ row }: any) => (
-          <TableView
-            onClick={() => {
-              setIsUpdateOpen(true);
-              setCurrentData(row.original);
-            }}
-          >
-            Edit
-          </TableView>
-        ),
-      },
-      {
-        id: "Click to Delete",
-        Header: "Click to Delete",
-        Cell: ({ row }: any) => (
-          <TableReject
-            onClick={() => {
-              if (row.original?.id) {
-                deleteSectoralGroup(row.original.id);
-              }
-            }}
-          >
-            Delete
-          </TableReject>
-        ),
-      },
-    ]);
-  };
-  return (
-    <div>
-      <OffCanvas
-        size={isMobileScreen ? 100 : 50}
-        btnClick={() => null}
-        setIsOpen={setIsOpen}
-        isOpen={isOpen}
-      >
-        <CreateSectoralGroupModal />
-      </OffCanvas>
-
-      <OffCanvas
-        size={isMobileScreen ? 100 : 50}
-        btnClick={() => null}
-        setIsOpen={setIsUpdateOpen}
-        isOpen={isUpdateOpen}
-      >
-        <UpdateGroupModal data={currentData} />
-      </OffCanvas>
-
-      {/* <p>jdjd</p> */}
-      <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
-        Create Sectoral Group
-      </Button>
-      <Loading loading={isLoading || deleting} />
-
-      <Tables
-        tableColumn={columns}
-        tableData={data ? data : []}
-        customHooks={[tableHooks]}
-      />
-    </div>
-  );
-};
+//       <Tables
+//         tableColumn={columns}
+//         tableData={data ? data : []}
+//         customHooks={[tableHooks]}
+//       />
+//     </div>
+//   );
+// };

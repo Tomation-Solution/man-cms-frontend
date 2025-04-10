@@ -3,10 +3,7 @@ import { User } from "../zustand/store";
 import privateRequest, { BASE_URL, rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
-import {
-  MPDCLPageContentSchemaFormType,
-  MrcPageContentTabschemaType,
-} from "../pages/Structure/StructurePage";
+import { MrcPageContentTabschemaType } from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
 import { HomePageContentType } from "../pages/HomePageManagement/_components/HomePageContent";
@@ -14,6 +11,7 @@ import rel8PrivateRequest from "./rel8-axios-utils";
 import { tryCatch } from "../utils/extraFunction";
 import { createSliderschemaType } from "../components/HomePageSlider/_components/CreateSlider";
 import { containsActualText } from "../utils";
+import { MPDCLPageContentSchemaFormType } from "../pages/Structure/_components/MDPCLPageContent";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -1321,7 +1319,7 @@ export const updateMrcApi = async (data: createMrcApiProp): Promise<any> => {
     `/structure/mrc-service/${data.id}`,
     data
   );
-  return res.data;
+  return res.data.data;
 };
 
 //get MPDCL
@@ -1379,20 +1377,9 @@ export const deleteMpdclApi = async (id: number): Promise<any> => {
 };
 
 //MPDCLPageContent
-type MPDCLPageContent = {
-  renewable_items: {
-    header: string;
-    description: string;
-  }[];
-  who_we_are: string[];
-  our_objectives_header: string;
-  renewable_image: string;
-  renewable_desc: string[];
-  our_objectives_items: string[];
-};
-export const getMPDCLPageContentApi = async (): Promise<MPDCLPageContent> => {
+export const getMPDCLPageContentApi = async (): Promise<any> => {
   const resp = await privateRequest.get(`/structure/mpdcl`);
-  return resp.data.data;
+  return resp.data;
 };
 
 export const updateMPDCLPageContentApi = async (
@@ -1401,22 +1388,13 @@ export const updateMPDCLPageContentApi = async (
   const form = new FormData();
   form.append("renewable_items", JSON.stringify(data.renewable_items));
   if (data.who_we_are) {
-    form.append(
-      "who_we_are",
-      JSON.stringify(data.who_we_are.map((d) => d.value))
-    );
+    form.append("who_we_are", data.who_we_are);
   }
   if (data.our_objectives_header) {
     form.append("our_objectives_header", data.our_objectives_header);
   }
-  form.append(
-    "our_objectives_items",
-    JSON.stringify(data.our_objectives_items?.map((d) => d.value))
-  );
-  form.append(
-    "renewable_desc",
-    JSON.stringify(data.renewable_desc?.map((d) => d.value))
-  );
+  form.append("our_objectives_items", data.our_objectives_items);
+  form.append("renewable_desc", data.renewable_desc);
   if (typeof data.renewable_image != "string") {
     form.append("renewable_image", data.renewable_image[0]);
   }
@@ -1429,8 +1407,8 @@ type MrcPageResponse = {
     header: string;
     description: string;
   }[];
-  who_we_are: string[];
-  objectives: string[];
+  who_we_are: string;
+  objectives: string;
 };
 export const getMrcPage = async (): Promise<MrcPageResponse> => {
   const resp = await privateRequest.get(`structure/mrc`);
@@ -1440,25 +1418,19 @@ export const getMrcPage = async (): Promise<MrcPageResponse> => {
 export const updateMrcPageApi = async (data: MrcPageContentTabschemaType) => {
   const newData = {
     objectives_card: data.objectives_card,
-    who_we_are: data.who_we_are?.map((d) => d.value),
-    objectives: data.objectives?.map((d) => d.value),
+    who_we_are: data.who_we_are,
+    objectives: data.objectives,
   };
 
   const resp = await privateRequest.put("structure/mrc", newData);
   return resp.data;
 };
 
-type getSectoralGroupApiResponseType = {
-  id?: number;
-  image: any;
-  header: string;
+export const getSectoralGroupApi = async (page: number = 1) => {
+  const res = await privateRequest.get(`structure/sectoral-group?page=${page}`);
+  return res.data;
 };
-export const getSectoralGroupApi = async (): Promise<
-  getSectoralGroupApiResponseType[]
-> => {
-  const resp = await privateRequest.get("structure/sectoral-group");
-  return resp.data.data;
-};
+
 export const deleteSectoralGroupApi = async (id: number) => {
   const resp = await privateRequest.delete(`structure/sectoral-group/${id}`);
   return resp.data;
@@ -1468,12 +1440,16 @@ export const createUpdateSectoralGroupApi = async (
 ) => {
   let resp: any;
   let submit = new FormData();
+
   submit.append("header", data.header);
+  submit.append("description", data.description);
+
   if (typeof data.image !== "string") {
     if (data.image) {
       submit.append("image", data.image[0]);
     }
   }
+
   console.log({ submit });
   if (data.id === undefined) {
     resp = await privateRequest.post("structure/sectoral-group", submit);
@@ -1485,6 +1461,7 @@ export const createUpdateSectoralGroupApi = async (
     `structure/sectoral-group/${data.id}`,
     submit
   );
+
   return resp.data;
 };
 

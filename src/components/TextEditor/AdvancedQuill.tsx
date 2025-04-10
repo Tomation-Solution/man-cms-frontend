@@ -26,7 +26,7 @@ const listModules = {
   },
 };
 
-const listFormats = ["list"]; // Only allow bullet lists
+const listFormats = ["list", "bold", "italic", "underline", "strike"]; // Only allow bullet lists
 
 const modules = {
   toolbar: {
