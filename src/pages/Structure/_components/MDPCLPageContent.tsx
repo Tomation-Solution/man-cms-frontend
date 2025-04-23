@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 
 const MPDCLPageContentSchema = yup.object({
   id: yup.number(),
+  banner_image: yup.mixed(),
   renewable_items: yup
     .array()
     .of(
@@ -40,6 +41,7 @@ const MPDCLPageContent = () => {
   const [whoAreWe, setWhoAreWe] = useState("");
   const [renewableDesc, setRenewableDesc] = useState("");
   const [ourObjectiveItems, setOurObjectiveItems] = useState("");
+  const [previewImage, setPreviewImage] = useState<string>("");
 
   const { isLoading, data } = useQuery(
     "MPDCL-page-content",
@@ -54,10 +56,12 @@ const MPDCLPageContent = () => {
           setValue("renewable_image", data.data.renewable_image);
           setValue("renewable_desc", data.data.renewable_desc);
           setValue("our_objectives_items", data.data.our_objectives_items);
+          setValue("banner_image", data.data.banner_image);
 
           setWhoAreWe(data.data.who_we_are || "");
           setOurObjectiveItems(data.data.our_objectives_items || "");
           setRenewableDesc(data.data.renewable_desc || "");
+          setPreviewImage(data.data.banner_image || "");
         }
       },
       refetchOnWindowFocus: false,
@@ -106,6 +110,19 @@ const MPDCLPageContent = () => {
       <br />
 
       <form onSubmit={handleSubmit(onSubmitHandler)}>
+        <div style={{ margin: "0 10px" }}>
+          <img
+            src={previewImage}
+            style={{ width: "75px", aspectRatio: "16/7" }}
+            alt=""
+          />
+          <InputWithLabel
+            register={register("banner_image")}
+            label="Banner Images (Aspect Ratio 16:7)"
+            type="file"
+          />
+        </div>
+
         {fields.map((d, index) => (
           <BoxWithHeading heading="Renewable Items" key={index}>
             <div>

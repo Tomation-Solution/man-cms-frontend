@@ -92,6 +92,11 @@ const SideBar: FC<Props> = ({ show }) => {
             Prospective Members
           </CustomSideBarNavLinks>
 
+          <CustomSideBarNavLinks where="/events-and-media">
+            <MdEmojiEvents />
+            Events & Media Page
+          </CustomSideBarNavLinks>
+
           {/* <CustomSideBarNavLinks where="/certificate-issuing">
             <MdCardMembership />
             Certificate Issuing

@@ -1,45 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { TableReject, TableView } from "../Tables.styles";
-import { Hooks } from "react-table";
 import Tables from "../Tables";
 import { useQuery } from "react-query";
 import { trainingsGetAll } from "../../../axios/api-calls";
 import Loading from "../../Loading/Loading";
 import { FormError } from "../../../globals/styles/forms.styles";
 import OffCanvas from "../../OffCanvas/OffCanvas";
-import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import EditTrainingsModal from "../../Modals/TrainingsModal/EditTrainingsModal";
 import DeleteTrainingsModal from "../../Modals/TrainingsModal/DeleteTrainingsModal";
 import { formatMoney } from "../../../utils/moneyFormatter";
+import Pagination from "../../Payments/Pagination";
 
-const TrainingTable = () => {
+const TrainingTable = ({ isPastTrainings }: { isPastTrainings: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [id, setId] = useState(0);
   const [delId, setDelId] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
 
-  const closeSlider = () => {
-    setIsOpen(!isOpen);
-  };
-  const closeDeleteSlider = () => {
-    setIsDeleteOpen(!isDeleteOpen);
-  };
+  const closeSlider = () => setIsOpen(false);
+  const closeDeleteSlider = () => setIsDeleteOpen(false);
 
   const { isLoading, isError, data, isFetching } = useQuery(
-    "all-trainings",
-    trainingsGetAll,
+    ["trainings", page, isPastTrainings],
+    () => trainingsGetAll({ page, is_concluded: isPastTrainings }),
     {
-      select: (data) => data.data,
-      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      // select: (data) => data.data,
     }
   );
 
+  const totalPages = Math.ceil((data?.count || 0) / pageSize);
   const columns = [
     {
       Header: "S/N",
       accessor: "id",
+      Cell: ({ row }: { row: any }) => (page - 1) * pageSize + row.index + 1,
     },
     {
       Header: "Name",
@@ -55,8 +54,8 @@ const TrainingTable = () => {
     },
   ];
 
-  const tableHooks = (hooks: Hooks) => {
-    hooks.visibleColumns.push((columns) => [
+  const tableHooks = (hooks: any) => {
+    hooks.visibleColumns.push((columns: any[]) => [
       ...columns,
       {
         id: "Price",
@@ -66,13 +65,13 @@ const TrainingTable = () => {
         ),
       },
       {
-        id: "Click to Edit",
-        Header: "Click to Edit",
-        Cell: ({ row }) => (
+        id: "Edit",
+        Header: "Edit",
+        Cell: ({ row }: { row: any }) => (
           <TableView
             onClick={() => {
-              setId(row.values.id);
-              closeSlider();
+              setId(row.original.id);
+              setIsOpen(true);
             }}
           >
             Edit
@@ -80,13 +79,13 @@ const TrainingTable = () => {
         ),
       },
       {
-        id: "Click to Delete",
-        Header: "Click to Delete",
-        Cell: ({ row }) => (
+        id: "Delete",
+        Header: "Delete",
+        Cell: ({ row }: { row: any }) => (
           <TableReject
             onClick={() => {
-              setDelId(row.values.id);
-              closeDeleteSlider();
+              setDelId(row.original.id);
+              setIsDeleteOpen(true);
             }}
           >
             Delete
@@ -115,16 +114,23 @@ const TrainingTable = () => {
         <DeleteTrainingsModal trainingsId={delId} closefn={closeDeleteSlider} />
       </OffCanvas>
 
-      {isFetching || isLoading ? (
-        <Loading loading={isFetching || isLoading} />
-      ) : !isError ? (
-        <Tables
-          tableColumn={columns}
-          tableData={data}
-          customHooks={[tableHooks]}
-        />
-      ) : (
+      {isLoading || isFetching ? (
+        <Loading loading={true} />
+      ) : isError ? (
         <FormError>Can't Fetch Trainings</FormError>
+      ) : (
+        <>
+          <Tables
+            tableColumn={columns}
+            tableData={data?.results || []}
+            customHooks={[tableHooks]}
+          />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );

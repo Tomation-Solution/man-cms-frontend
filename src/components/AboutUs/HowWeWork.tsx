@@ -17,17 +17,25 @@ import { toast } from "react-toastify";
 import { validateUnorderedListOnly } from "../../utils";
 import BoxWithHeading from "../BoxWithHeading";
 import AdvancedEditor from "../TextEditor/AdvancedQuill";
+import InputWithLabel from "../InputWithLabel/InputWithLabel";
 
 const schema = yup.object({
-  how_we_work: yup.string().required(),
-  how_we_work_details: yup.string().required(),
-  committees: yup.string().required(),
-  committee_details: yup.string().required(),
-  adhoc: yup.string().required(),
-  spvehicles: yup.string().required(),
-  spgroups: yup.string().required(),
-  conduct: yup.string().required(),
-  conduct_listing: yup.string().required(),
+  how_we_work_header: yup.string(),
+  how_we_work: yup.string(),
+  how_we_work_details: yup.string(),
+  committees_header: yup.string(),
+  committees: yup.string(),
+  committee_details: yup.string(),
+  adhoc_header: yup.string(),
+  adhoc: yup.string(),
+  spvehicles_header: yup.string(),
+  spvehicles: yup.string(),
+  spgroups_header: yup.string(),
+  spgroups: yup.string(),
+  conduct_header: yup.string(),
+  conduct: yup.string(),
+  conduct_listing_header: yup.string(),
+  conduct_listing: yup.string(),
 });
 
 const HowWeWork = () => {
@@ -56,14 +64,21 @@ const HowWeWork = () => {
     resolver: yupResolver(schema),
     defaultValues: {
       main_image: null,
+      how_we_work_header: "",
       how_we_work: "",
       how_we_work_details: "",
+      committees_header: "",
       committees: "",
       committee_details: "",
+      adhoc_header: "",
       adhoc: "",
+      spvehicles_header: "",
       spvehicles: "",
+      spgroups_header: "",
       spgroups: "",
+      conduct_header: "",
       conduct: "",
+      conduct_listing_header: "",
       conduct_listing: "",
     },
   });
@@ -82,14 +97,27 @@ const HowWeWork = () => {
     if (data) {
       const main_data = {
         main_image: data.main_image,
+        how_we_work_header: data.how_we_work_header,
         how_we_work: data.how_we_work,
         how_we_work_details: data.how_we_work_details,
+
+        committees_header: data.committees_header,
         committees: data.committees,
         committee_details: data.committee_details,
+
+        adhoc_header: data.adhoc_header,
         adhoc: data.adhoc,
+
+        spvehicles_header: data.spvehicles_header,
         spvehicles: data.spvehicles,
+
+        spgroups_header: data.spgroups_header,
         spgroups: data.spgroups,
+
+        conduct_header: data.conduct_header,
         conduct: data.conduct,
+
+        conduct_listing_header: data.conduct_listing_header,
         conduct_listing: data.conduct_listing,
       };
 
@@ -149,17 +177,6 @@ const HowWeWork = () => {
 
     let errorThrown = false;
     Object.keys(payload)?.forEach((key) => {
-      if (
-        (key === "committees" || key === "conduct_listing") &&
-        !validateUnorderedListOnly(payload[key])
-      ) {
-        setError(key as "committees" | "conduct_listing", {
-          type: "manual",
-          message: "Must be an unordered list.",
-        });
-        errorThrown = true;
-        return;
-      }
       //@ts-ignore
       return FormDataHandler.append(key, payload[key]);
     });
@@ -176,6 +193,10 @@ const HowWeWork = () => {
         {!isError ? (
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <h2>Edit How We Work Data</h2>
+            <small>
+              PS: If a section's header is not filled it will be omited from the
+              website
+            </small>
             <br />
             <FormInput>
               <SelectImage image={`${previousMainCoreImage}`} />
@@ -189,8 +210,12 @@ const HowWeWork = () => {
                 />
               </label>
             </FormInput>
-
             <BoxWithHeading heading="How We Work Paragraphs*">
+              <InputWithLabel
+                label="Header"
+                register={register("how_we_work_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={howWeWork}
                 onChange={(newContent: string) => {
@@ -215,6 +240,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Committees*">
+              <InputWithLabel
+                label="Header"
+                register={register("committees_header")}
+              />
+              <br />
               <AdvancedEditor
                 onlyList
                 value={committees}
@@ -240,6 +270,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Adhoc*">
+              <InputWithLabel
+                label="Header"
+                register={register("adhoc_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={adhoc}
                 onChange={(newContent: string) => {
@@ -251,6 +286,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="SP Vehicles*">
+              <InputWithLabel
+                label="Header"
+                register={register("spvehicles_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={spVehicles}
                 onChange={(newContent: string) => {
@@ -262,6 +302,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="SP Groups*">
+              <InputWithLabel
+                label="Header"
+                register={register("spgroups_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={spGroups}
                 onChange={(newContent: string) => {
@@ -273,6 +318,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Conduct*">
+              <InputWithLabel
+                label="Header"
+                register={register("conduct_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={conduct}
                 onChange={(newContent: string) => {
@@ -284,6 +334,11 @@ const HowWeWork = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Conduct Listing*">
+              <InputWithLabel
+                label="Header"
+                register={register("conduct_listing_header")}
+              />
+              <br />
               <AdvancedEditor
                 onlyList
                 value={conductListing}
@@ -297,6 +352,16 @@ const HowWeWork = () => {
               <FormError>{errors?.conduct_listing?.message}</FormError>
             </BoxWithHeading>
 
+            {Object.keys(errors).length > 0 && (
+              <FormError>
+                {Object.entries(errors).map(([key, error]) => (
+                  <div key={key}>
+                    <br />
+                    {error?.message}
+                  </div>
+                ))}
+              </FormError>
+            )}
             <br />
             <Button styleType="pry">EDIT</Button>
           </Form>

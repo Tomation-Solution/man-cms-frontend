@@ -16,11 +16,13 @@ import { Navigate } from "react-router-dom";
 import { useAuthStore } from "../../zustand/store";
 import { toast } from "react-toastify";
 import { TableReject, TableView } from "../../components/Tables/Tables.styles";
+import ServiceUpdateBanner from "../../components/Modals/ServicePageModals/Updatebanner";
 
 const ServicePage = (): React.ReactElement => {
   const userData = useAuthStore.getState().user;
   const queryClient = useQueryClient();
   const [currentData, setCurrentData] = useState();
+  const [isBannerOpen, setIsBannerOpen] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
@@ -185,9 +187,32 @@ const ServicePage = (): React.ReactElement => {
         {currentData ? <ServicePageModalsUpdate data={currentData} /> : ""}
       </OffCanvas>
 
-      <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
-        Create Service
-      </Button>
+      <OffCanvas
+        size={isMobileScreen ? 100 : 50}
+        btnClick={() => null}
+        setIsOpen={setIsBannerOpen}
+        isOpen={isBannerOpen}
+      >
+        <ServiceUpdateBanner closefn={() => setIsBannerOpen(!isBannerOpen)} />
+      </OffCanvas>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "20px",
+          gap: "15px",
+        }}
+      >
+        <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
+          Create Service
+        </Button>
+
+        <Button styleType={"sec"} onClick={() => setIsBannerOpen(true)}>
+          Update Page Content
+        </Button>
+      </div>
 
       <br />
       <Tables

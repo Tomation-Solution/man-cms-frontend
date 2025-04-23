@@ -28,6 +28,7 @@ import HomePageManagement from "./pages/HomePageManagement/NewHomePageManagement
 import Unauthorized from "./components/Unauthorized/Unauthorized";
 import ExecutiveMemberViewPage from "./components/ProspectiveMembers/ExecutiveMember";
 import AGMSectionPage from "./pages/AGMSectionPage";
+import EventsAndMediaPage from "./pages/events&media";
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
             />
 
             <Route path="/agm-section" element={<AGMSectionPage />} />
+            <Route path="/events-and-media" element={<EventsAndMediaPage />} />
 
             <Route
               path="/approval-message"
