@@ -88,7 +88,9 @@ const FAQTable = () => {
         Cell: ({ row }) => (
           <TableView
             onClick={() => {
-              setId(row.values.id);
+              console.log("row", row);
+
+              setId((row.original as any).id);
               closeSlider();
             }}
           >
@@ -102,7 +104,7 @@ const FAQTable = () => {
         Cell: ({ row }) => (
           <TableReject
             onClick={() => {
-              setDelId(row.values.id);
+              setDelId((row.original as any).id);
               closeDeleteSlider();
             }}
           >

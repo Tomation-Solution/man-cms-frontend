@@ -26,7 +26,7 @@ const listModules = {
   },
 };
 
-const listFormats = ["list"]; // Only allow bullet lists
+const listFormats = ["list", "bold", "italic", "underline", "strike"]; // Only allow bullet lists
 
 const modules = {
   toolbar: {
@@ -92,14 +92,25 @@ export default function AdvancedEditor({ value, onChange, onlyList }: any) {
   const quillRef = useRef<ReactQuill | null>(null); // Store Quill instance
 
   return (
-    <ReactQuill
-      ref={quillRef}
-      theme="snow"
-      value={value}
-      onChange={onChange}
-      modules={onlyList ? listModules : modules}
-      formats={onlyList ? listFormats : formats}
-      style={{ background: "white", color: "black" }}
-    />
+    <>
+      {onlyList && (
+        <small>
+          ⚠️ Important:
+          <br />
+          Please enable the list mode by clicking the <b>list icon ( • )</b> in
+          the editor toolbar before typing. This ensures your content displays
+          correctly.
+        </small>
+      )}
+      <ReactQuill
+        ref={quillRef}
+        theme="snow"
+        value={value}
+        onChange={onChange}
+        modules={onlyList ? listModules : modules}
+        formats={onlyList ? listFormats : formats}
+        style={{ background: "white", color: "black" }}
+      />
+    </>
   );
 }

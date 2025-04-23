@@ -20,11 +20,15 @@ import { toast } from "react-toastify";
 import { containsActualText, validateUnorderedListOnly } from "../../utils";
 import BoxWithHeading from "../BoxWithHeading";
 import AdvancedEditor from "../TextEditor/AdvancedQuill";
+import InputWithLabel from "../InputWithLabel/InputWithLabel";
 
 const schema = yup.object({
-  national_secretariat: yup.string().required(),
-  coorprate_office: yup.string().required(),
-  branch_text: yup.string().required(),
+  national_secretariat_header: yup.string(),
+  national_secretariat: yup.string(),
+  coorprate_office_header: yup.string(),
+  coorprate_office: yup.string(),
+  branch_text_header: yup.string(),
+  branch_text: yup.string(),
 });
 
 const HowWeOperate = () => {
@@ -45,8 +49,11 @@ const HowWeOperate = () => {
     resolver: yupResolver(schema),
     defaultValues: {
       main_image: null,
+      national_secretariat_header: "",
       national_secretariat: "",
+      coorprate_office_header: "",
       coorprate_office: "",
+      branch_text_header: "",
       branch_text: "",
     },
   });
@@ -65,8 +72,11 @@ const HowWeOperate = () => {
     if (data) {
       const main_data = {
         main_image: data.main_image,
+        national_secretariat_header: data.national_secretariat_header,
         national_secretariat: data.national_secretariat,
+        coorprate_office_header: data.coorprate_office_header,
         coorprate_office: data.coorprate_office,
+        branch_text_header: data.branch_text_header,
         branch_text: data.branch_text,
       };
 
@@ -117,17 +127,17 @@ const HowWeOperate = () => {
 
     let errorThrown = false;
     Object.keys(payload)?.forEach((key) => {
-      if (!containsActualText(payload[key])) {
-        setError(
-          key as "national_secretariat" | "coorprate_office" | "branch_text",
-          {
-            type: "manual",
-            message: "This field must not be empty.",
-          }
-        );
-        errorThrown = true;
-        return;
-      }
+      // if (!containsActualText(payload[key])) {
+      //   setError(
+      //     key as "national_secretariat" | "coorprate_office" | "branch_text",
+      //     {
+      //       type: "manual",
+      //       message: "This field must not be empty.",
+      //     }
+      //   );
+      //   errorThrown = true;
+      //   return;
+      // }
       //@ts-ignore
       return FormDataHandler.append(key, payload[key]);
     });
@@ -144,6 +154,10 @@ const HowWeOperate = () => {
         {!isError ? (
           <Form onSubmit={handleSubmit(onSubmitHandler)}>
             <h2>Edit Where We Operate Data</h2>
+            <small>
+              PS: If a section's header is not filled it will be omited from the
+              website
+            </small>
             <br />
             <FormInput>
               <SelectImage image={`${previousMainCoreImage}`} />
@@ -159,6 +173,11 @@ const HowWeOperate = () => {
             </FormInput>
 
             <BoxWithHeading heading="National Secretariat*">
+              <InputWithLabel
+                label={"Header"}
+                register={register("national_secretariat_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={nationalSecretariat}
                 onChange={(newContent: string) => {
@@ -172,6 +191,11 @@ const HowWeOperate = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Corporate Office*">
+              <InputWithLabel
+                label={"Header"}
+                register={register("coorprate_office_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={corporateOffice}
                 onChange={(newContent: string) => {
@@ -185,6 +209,11 @@ const HowWeOperate = () => {
             </BoxWithHeading>
 
             <BoxWithHeading heading="Branch Office*">
+              <InputWithLabel
+                label={"Header"}
+                register={register("branch_text_header")}
+              />
+              <br />
               <AdvancedEditor
                 value={branchText}
                 onChange={(newContent: string) => {
@@ -196,6 +225,13 @@ const HowWeOperate = () => {
             </BoxWithHeading>
 
             <br />
+            {Object.keys(errors).length > 0 && (
+              <FormError>
+                {Object.entries(errors).map(([key, error]) => (
+                  <div key={key}>{error?.message}</div>
+                ))}
+              </FormError>
+            )}
             <Button styleType="pry">EDIT</Button>
           </Form>
         ) : (

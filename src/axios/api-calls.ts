@@ -3,10 +3,6 @@ import { User } from "../zustand/store";
 import privateRequest, { BASE_URL, rel8Request } from "./axios-utils";
 import { ServicePageCreationType } from "../components/Modals/ServicePageModals/ServicePageModals";
 import { MPDCLType } from "../components/Modals/MPDCLModal";
-import {
-  MPDCLPageContentSchemaFormType,
-  MrcPageContentTabschemaType,
-} from "../pages/Structure/StructurePage";
 import { SectoralGroupTabSchemaType } from "../components/Modals/SectoralGroupModal";
 import { WhyChooseUsType } from "../components/Modals/HomePageManagement/WhyChooseUse";
 import { HomePageContentType } from "../pages/HomePageManagement/_components/HomePageContent";
@@ -14,6 +10,10 @@ import rel8PrivateRequest from "./rel8-axios-utils";
 import { tryCatch } from "../utils/extraFunction";
 import { createSliderschemaType } from "../components/HomePageSlider/_components/CreateSlider";
 import { containsActualText } from "../utils";
+import { MPDCLPageContentSchemaFormType } from "../pages/Structure/_components/MDPCLPageContent";
+import { MrcPageContentTabschemaType } from "../pages/Structure/_components/MRCPageContent";
+import { EventAndMediaContentType } from "../pages/events&media";
+import { MrcContactPageSchemaType } from "../pages/Structure/_components/MRCContact";
 
 //LOGIN
 export const loginUser = async (user: { email: string; password: string }) => {
@@ -247,7 +247,59 @@ export const reportsDelete = async (reportsId: number) => {
   }
 };
 
+// MEDIA AND EVENTS
+export const getMediaAndEventContent =
+  async (): Promise<EventAndMediaContentType> => {
+    try {
+      const res = await privateRequest.get("/events/event-media/");
+      return res.data;
+    } catch (e: any) {
+      throw new AxiosError(e);
+    }
+  };
+
+export const updateMediaAndEventContent = async (
+  payload: FormData
+): Promise<EventAndMediaContentType> => {
+  try {
+    const res = await privateRequest.put(
+      "/events/event-media/update/",
+      payload
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 //EVENTS
+export const getEventBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/events/event-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateEventBanner = async (payload: { banner_image?: any }) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/events/event-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const eventsCreate = async (payload: any) => {
   try {
     const res = await privateRequest.post(`/events/`, payload);
@@ -257,9 +309,11 @@ export const eventsCreate = async (payload: any) => {
   }
 };
 
-export const eventsGetAll = async () => {
+export const eventsGetAll = async (params?: Record<string, any>) => {
   try {
-    const res = await privateRequest.get(`/events/`);
+    const res = await privateRequest.get(`/events/`, { params });
+    console.log({ res });
+
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -298,6 +352,35 @@ export const eventsDelete = async (eventsId: number) => {
 };
 
 //TRAININGS
+export const getTrainingsBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/trainings/training-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateTrainingsBanner = async (payload: {
+  banner_image?: any;
+}) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/trainings/training-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const trainingsCreate = async (payload: any) => {
   try {
     const res = await privateRequest.post(`/trainings/`, payload);
@@ -307,9 +390,9 @@ export const trainingsCreate = async (payload: any) => {
   }
 };
 
-export const trainingsGetAll = async () => {
+export const trainingsGetAll = async (params?: Record<string, any>) => {
   try {
-    const res = await privateRequest.get(`/trainings/`);
+    const res = await privateRequest.get(`/trainings/`, { params });
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
@@ -559,14 +642,49 @@ export const operateBranchDelete = async (id: any) => {
 };
 
 //CONTACT
-export const contactGetAll = async () => {
+export const contactGetAll = async (params?: Record<string, any>) => {
   try {
-    const res = await privateRequest.get(`/aboutus/contact`);
+    const res = await privateRequest.get(`/aboutus/contact`, { params });
+    console.log({ res });
+
     return res.data;
   } catch (e: any) {
     throw new AxiosError(e);
   }
 };
+
+export const contactGetDownload = async (params?: {
+  format: "pdf" | "csv";
+  [key: string]: any;
+}) => {
+  try {
+    const res = await privateRequest.post(
+      `/aboutus/contact/download/`,
+      params,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const format = params?.format.toLowerCase();
+    const contentType = format === "csv" ? "text/csv" : "application/pdf";
+    const fileExtension = format === "csv" ? "csv" : "pdf";
+    const filename = `aboutus_contacts.${fileExtension}`;
+
+    const blob = new Blob([res.data], { type: contentType });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(link.href);
+    return true;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const contactDelete = async (id: any) => {
   try {
     const res = await privateRequest.delete(`/aboutus/contact/${id}`);
@@ -718,6 +836,89 @@ export const faqDelete = async (id: any) => {
 };
 
 //OUR MEMBERS
+export const getOurMembersBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/our-members-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateOurMembersBanner = async (payload: {
+  banner_image?: any;
+}) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/membership/our-members-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const getJoinStepBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/join-step-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateJoinStepBanner = async (payload: { banner_image?: any }) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/membership/join-step-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const getWhyJoinBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/membership/why-join-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateWhyJoinBanner = async (payload: { banner_image?: any }) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/membership/why-join-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const ourMembersCreate = async (payload: any) => {
   try {
     const res = await privateRequest.post(`/membership/our-members`, payload);
@@ -853,10 +1054,46 @@ export const galleryRename = async (payload: any) => {
 };
 
 //SERVICE REQUEST
-export const serviceRequestGetAll = async () => {
+export const serviceRequestGetAll = async (params: object = {}) => {
   try {
-    const res = await privateRequest.get(`/services/request-service`);
+    const res = await privateRequest.get("/services/request-service", {
+      params,
+    });
+    console.log({ res });
+
     return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const serviceRequestDownload = async (params: {
+  format: "pdf" | "csv";
+  [key: string]: any;
+}) => {
+  try {
+    const res = await privateRequest.post(
+      "/services/request-services/download",
+      params,
+      {
+        responseType: "blob", // Important for both CSV and PDF
+      }
+    );
+
+    const format = params.format.toLowerCase();
+    const contentType = format === "csv" ? "text/csv" : "application/pdf";
+    const fileExtension = format === "csv" ? "csv" : "pdf";
+    const filename = `request_services.${fileExtension}`;
+
+    const blob = new Blob([res.data], { type: contentType });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(link.href);
+    return true;
   } catch (e: any) {
     throw new AxiosError(e);
   }
@@ -1242,6 +1479,35 @@ export const rel8Event = async (payload: any) => {
 };
 
 // service
+export const getServiceBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/services/service-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateServiceBanner = async (payload: any) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+    formData.append("mrc_desc", payload.mrc_desc);
+    formData.append("mpdcl_desc", payload.mpdcl_desc);
+    formData.append("core_desc", payload.core_desc);
+    const res = await privateRequest.patch(
+      `/services/service-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 type ServiceResponseType = {
   id: number;
   image: any;
@@ -1321,7 +1587,7 @@ export const updateMrcApi = async (data: createMrcApiProp): Promise<any> => {
     `/structure/mrc-service/${data.id}`,
     data
   );
-  return res.data;
+  return res.data.data;
 };
 
 //get MPDCL
@@ -1378,59 +1644,56 @@ export const deleteMpdclApi = async (id: number): Promise<any> => {
   return res.data.data;
 };
 
-//MPDCLPageContent
-type MPDCLPageContent = {
-  renewable_items: {
-    header: string;
-    description: string;
-  }[];
-  who_we_are: string[];
-  our_objectives_header: string;
-  renewable_image: string;
-  renewable_desc: string[];
-  our_objectives_items: string[];
+// MRC Contact Page
+export const getMrcContactPage = async (): Promise<any> => {
+  const resp = await privateRequest.get(`/structure/mrc-contact`);
+  return resp.data;
 };
-export const getMPDCLPageContentApi = async (): Promise<MPDCLPageContent> => {
+
+export const updateMrcContactPageApi = async (
+  data: MrcContactPageSchemaType
+): Promise<any> => {
+  const resp = await privateRequest.patch(`/structure/mrc-contact`, data);
+  return resp.data;
+};
+
+//MPDCLPageContent
+export const getMPDCLPageContentApi = async (): Promise<any> => {
   const resp = await privateRequest.get(`/structure/mpdcl`);
-  return resp.data.data;
+  return resp.data;
 };
 
 export const updateMPDCLPageContentApi = async (
   data: MPDCLPageContentSchemaFormType
 ): Promise<any> => {
   const form = new FormData();
+  if (typeof data.banner_image !== "string") {
+    form.append("banner_image", data.banner_image[0]);
+  }
   form.append("renewable_items", JSON.stringify(data.renewable_items));
   if (data.who_we_are) {
-    form.append(
-      "who_we_are",
-      JSON.stringify(data.who_we_are.map((d) => d.value))
-    );
+    form.append("who_we_are", data.who_we_are);
   }
   if (data.our_objectives_header) {
     form.append("our_objectives_header", data.our_objectives_header);
   }
-  form.append(
-    "our_objectives_items",
-    JSON.stringify(data.our_objectives_items?.map((d) => d.value))
-  );
-  form.append(
-    "renewable_desc",
-    JSON.stringify(data.renewable_desc?.map((d) => d.value))
-  );
+  form.append("our_objectives_items", data.our_objectives_items);
+  form.append("renewable_desc", data.renewable_desc);
   if (typeof data.renewable_image != "string") {
     form.append("renewable_image", data.renewable_image[0]);
   }
-  const resp = await privateRequest.put(`/structure/mpdcl`, form);
+  const resp = await privateRequest.patch(`/structure/mpdcl`, form);
   return resp.data;
 };
 
 type MrcPageResponse = {
+  banner_image?: any;
   objectives_card: {
     header: string;
     description: string;
   }[];
-  who_we_are: string[];
-  objectives: string[];
+  who_we_are: string;
+  objectives: string;
 };
 export const getMrcPage = async (): Promise<MrcPageResponse> => {
   const resp = await privateRequest.get(`structure/mrc`);
@@ -1438,27 +1701,29 @@ export const getMrcPage = async (): Promise<MrcPageResponse> => {
 };
 
 export const updateMrcPageApi = async (data: MrcPageContentTabschemaType) => {
-  const newData = {
-    objectives_card: data.objectives_card,
-    who_we_are: data.who_we_are?.map((d) => d.value),
-    objectives: data.objectives?.map((d) => d.value),
-  };
+  const formData = new FormData();
 
-  const resp = await privateRequest.put("structure/mrc", newData);
+  // Append banner_image if it exists and is a file
+  if (typeof data.banner_image !== "string") {
+    formData.append("banner_image", data.banner_image[0]);
+  }
+
+  // Append simple text fields
+  formData.append("who_we_are", data.who_we_are);
+  formData.append("objectives", data.objectives);
+
+  // Append the objectives_card array as JSON
+  formData.append("objectives_card", JSON.stringify(data.objectives_card));
+
+  const resp = await privateRequest.patch("structure/mrc", formData);
   return resp.data;
 };
 
-type getSectoralGroupApiResponseType = {
-  id?: number;
-  image: any;
-  header: string;
+export const getSectoralGroupApi = async (page: number = 1) => {
+  const res = await privateRequest.get(`structure/sectoral-group?page=${page}`);
+  return res.data;
 };
-export const getSectoralGroupApi = async (): Promise<
-  getSectoralGroupApiResponseType[]
-> => {
-  const resp = await privateRequest.get("structure/sectoral-group");
-  return resp.data.data;
-};
+
 export const deleteSectoralGroupApi = async (id: number) => {
   const resp = await privateRequest.delete(`structure/sectoral-group/${id}`);
   return resp.data;
@@ -1468,12 +1733,16 @@ export const createUpdateSectoralGroupApi = async (
 ) => {
   let resp: any;
   let submit = new FormData();
+
   submit.append("header", data.header);
+  submit.append("description", data.description);
+
   if (typeof data.image !== "string") {
     if (data.image) {
       submit.append("image", data.image[0]);
     }
   }
+
   console.log({ submit });
   if (data.id === undefined) {
     resp = await privateRequest.post("structure/sectoral-group", submit);
@@ -1485,6 +1754,7 @@ export const createUpdateSectoralGroupApi = async (
     `structure/sectoral-group/${data.id}`,
     submit
   );
+
   return resp.data;
 };
 
