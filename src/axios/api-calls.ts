@@ -1719,6 +1719,35 @@ export const updateMrcPageApi = async (data: MrcPageContentTabschemaType) => {
   return resp.data;
 };
 
+export const getSectorialBanner = async () => {
+  try {
+    const res = await privateRequest.get(`/structure/sectorial-banner/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateSectorialBanner = async (payload: {
+  banner_image?: any;
+}) => {
+  try {
+    const formData = new FormData();
+    if (typeof payload.banner_image !== "string") {
+      formData.append("banner_image", payload.banner_image[0]);
+    }
+
+    const res = await privateRequest.patch(
+      `/structure/sectorial-banner/update/`,
+      formData
+    );
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const getSectoralGroupApi = async (page: number = 1) => {
   const res = await privateRequest.get(`structure/sectoral-group?page=${page}`);
   return res.data;

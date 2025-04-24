@@ -18,6 +18,7 @@ import Pagination from "../../../components/Payments/Pagination";
 import Tables from "../../../components/Tables/Tables";
 import Button from "../../../components/Button/Button";
 import Loading from "../../../components/Loading/Loading";
+import SectorialUpdateBanner from "../../../components/Modals/SectorialModals/sectorialUpdateBanner";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,6 +26,8 @@ const SectoralGroupTab = () => {
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
+  const [isBannerOpen, setIsBannerOpen] = useState(false);
+
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [currentData, setCurrentData] = useState<any>();
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,9 +136,34 @@ const SectoralGroupTab = () => {
         <UpdateGroupModal data={currentData} />
       </OffCanvas>
 
-      <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
-        Create Sectoral Group
-      </Button>
+      <OffCanvas
+        size={isMobileScreen ? 100 : 50}
+        btnClick={() => null}
+        setIsOpen={setIsBannerOpen}
+        isOpen={isBannerOpen}
+      >
+        <SectorialUpdateBanner closefn={() => setIsBannerOpen(!isBannerOpen)} />
+      </OffCanvas>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "20px",
+          gap: "15px",
+        }}
+      >
+        <Button styleType={"sec"} onClick={() => setIsOpen(true)}>
+          Create Sectoral Group
+        </Button>
+        <Button
+          styleType={"sec"}
+          onClick={() => setIsBannerOpen(!isBannerOpen)}
+        >
+          Update Banner
+        </Button>
+      </div>
 
       <Loading loading={isLoading || deleting} />
 
