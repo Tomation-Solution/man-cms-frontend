@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 
 // const BASE_URL = `https://web-production-9688.up.railway.app/api`;
 
-// export const BASE_URL = "https://api.manufacturersnigeria.org/api";
-export const BASE_URL = "http://localhost:8000/api";
+export const BASE_URL = "https://api.manufacturersnigeria.org/api";
+// export const BASE_URL = "http://localhost:8000/api";
 
 export const REL8_URL =
   "https://rel8corporate.watchdoglogisticsng.com/tenant/man/tenant/";
