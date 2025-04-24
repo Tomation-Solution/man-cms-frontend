@@ -1,3 +1,4 @@
+import { useQuery } from "react-query";
 import { getAllAgmPrograms } from "../../../axios/api-calls";
 import TableWithDrawers from "../../../globals/TableWithDrawers";
 import { customFetcher } from "../../../utils/customFetcher";
@@ -6,11 +7,16 @@ import EmptyState from "../../EmptyState/EmptyState";
 import DeleteAGMProgram from "../../Modals/AGMProgramModals/DeleteAGMProgram";
 import EditAGMProgram from "../../Modals/AGMProgramModals/EditAGMProgram";
 
-function AGMProgramTable() {
-  const { loadingState, isError, data } = customFetcher<AGMProgrmType[]>(
-    "all-programs",
-    getAllAgmPrograms
-  );
+function AGMProgramTable({ id }: { id?: string }) {
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery([`all-programs`, id || ""], () => getAllAgmPrograms({ id }), {
+    select(data) {
+      return data?.data;
+    },
+  });
 
   if (loadingState) {
     return <EmptyState header="loading data" />;

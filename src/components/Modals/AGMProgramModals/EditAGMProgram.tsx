@@ -28,6 +28,8 @@ function EditAGMProgram({ itemId, closefn }: Props) {
     (data) => data
   );
 
+  console.log({ data, itemId });
+
   const {
     register,
     handleSubmit,

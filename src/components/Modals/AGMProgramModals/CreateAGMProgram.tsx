@@ -14,9 +14,10 @@ import { isFileListValidator } from "../../../utils/extraFunction";
 
 type Props = {
   closefn: () => void;
+  id?: string;
 };
 
-function CreateAGMProgram({ closefn }: Props) {
+function CreateAGMProgram({ closefn, id }: Props) {
   const {
     register,
     handleSubmit,
@@ -28,23 +29,27 @@ function CreateAGMProgram({ closefn }: Props) {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(createAgmProgram, {
-    onSuccess: () => {
-      queryClient.invalidateQueries("all-programs");
-      reset();
-      toast.success("created successfully");
-      closefn();
-    },
-    onError: () => {
-      toast.error("failed to create");
-    },
-  });
+  const { isLoading, mutate, error } = useMutation(
+    (data: any) => createAgmProgram({ id }, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("all-programs");
+        reset();
+        toast.success("created successfully");
+        closefn();
+      },
+      onError: () => {
+        toast.error("failed to create");
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: AGMProgramValidatorType) => {
     const { program_attached_file1, program_attached_file2, ...payload } =
       inputData;
 
     const formData = new FormData();
+    formData.append("event_id", id || "");
 
     if (isFileListValidator(program_attached_file1)) {
       //@ts-ignore
@@ -67,6 +72,7 @@ function CreateAGMProgram({ closefn }: Props) {
       <Loading loading={isLoading} />
       <InputWithLabel
         label="Program Title"
+        small_text="Must be diffrent from other existing programs in this event"
         register={register("program_title")}
         errorMessage={errors.program_title?.message}
       />

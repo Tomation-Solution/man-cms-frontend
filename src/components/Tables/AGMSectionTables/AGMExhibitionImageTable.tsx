@@ -1,14 +1,28 @@
+import { useQuery } from "react-query";
 import { getAllAgmExhibitionImages } from "../../../axios/api-calls";
 import TableWithDrawers from "../../../globals/TableWithDrawers";
 import { SelectImage } from "../../../globals/styles/CustomFormComponents";
-import { customFetcher } from "../../../utils/customFetcher";
 import EmptyState from "../../EmptyState/EmptyState";
 import DeleteExhibitionImage from "../../Modals/AGMExhibitionImageSection/DeleteExhibitionImage";
 
-function AGMExhibitionImageTable() {
-  const { loadingState, isError, data } = customFetcher<any[]>(
-    "all-previous-exhibition",
-    getAllAgmExhibitionImages
+function AGMExhibitionImageTable({ id }: { id?: string }) {
+  // const { loadingState, isError, data } = customFetcher<any[]>(
+  //   "all-previous-exhibition",
+  //   getAllAgmExhibitionImages
+  // );
+
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery(
+    [`all-previous-exhibition`, id || ""],
+    () => getAllAgmExhibitionImages({ id }),
+    {
+      select(data) {
+        return data?.data;
+      },
+    }
   );
 
   if (loadingState) {

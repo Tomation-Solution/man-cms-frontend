@@ -30,6 +30,7 @@ const ServiceRequest = () => {
       serviceRequestGetAll({
         page: currentPage,
         page_size: pageSize,
+        is_verified: "true",
       }),
     {
       refetchOnWindowFocus: false,

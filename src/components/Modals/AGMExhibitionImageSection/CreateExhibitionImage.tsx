@@ -15,9 +15,10 @@ import { FormError, FormSelect } from "../../../globals/styles/forms.styles";
 
 type Props = {
   closefn: () => void;
+  id?: string;
 };
 
-function CreateExhibitionImage({ closefn }: Props) {
+function CreateExhibitionImage({ closefn, id }: Props) {
   const {
     register,
     handleSubmit,
@@ -29,23 +30,26 @@ function CreateExhibitionImage({ closefn }: Props) {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(createAgmExhibitionImage, {
-    onSuccess: () => {
-      queryClient.invalidateQueries("all-previous-exhibition");
-      toast.success("creation successful");
-      reset();
-      closefn();
-    },
-    onError: () => {
-      toast.error("failed to create");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => createAgmExhibitionImage({ params: { id }, data }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("all-previous-exhibition");
+        toast.success("creation successful");
+        reset();
+        closefn();
+      },
+      onError: () => {
+        toast.error("failed to create");
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: AGMExhibitionValidatorType) => {
     const { image, type } = inputData;
 
     const formData = new FormData();
-
+    formData.append("event_id", id || "");
     if (isFileListValidator(image)) {
       //@ts-ignore
       formData.append("image", image[0]);
