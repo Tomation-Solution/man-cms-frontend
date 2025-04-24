@@ -10,16 +10,21 @@ import { useEffect, useState } from "react";
 import Button from "../Button/Button";
 import { SelectImage } from "../../globals/styles/CustomFormComponents";
 import { isFileListValidator } from "../../utils/extraFunction";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import Loading from "../Loading/Loading";
 import TextRichEditor from "../../globals/TextRichEditor/TextRichEditor";
 
-function AGMHomepage() {
-  const { loadingState, isError, data } = customFetcher<AGMHomepageType>(
-    `agm-homepage`,
-    getAgmHomepage
-  );
+function AGMHomepage({ id }: { id?: string }) {
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery([`agm-homepage`, id || ""], () => getAgmHomepage({ id }), {
+    select(data) {
+      return data?.data;
+    },
+  });
 
   const {
     handleSubmit,
@@ -56,15 +61,18 @@ function AGMHomepage() {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(updateAgmHomepage, {
-    onSuccess: () => {
-      queryClient.invalidateQueries("agm-homepage");
-      toast.success("updated successfully");
-    },
-    onError: () => {
-      toast.error("update failed");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => updateAgmHomepage({ id }, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("agm-homepage");
+        toast.success("updated successfully");
+      },
+      onError: () => {
+        toast.error("update failed");
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: AGMHomepageValidatorType) => {
     const {

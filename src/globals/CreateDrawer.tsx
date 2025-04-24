@@ -7,12 +7,14 @@ type Props = {
   btnName?: string;
   createModalComponent: any;
   tableComponent: any;
+  id?: string;
 };
 
 function CreateDrawer({
   createModalComponent: CreateModalComponent,
   tableComponent: TableComponent,
   btnName = "Create New",
+  id,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const isMobileScreen = useMediaQuery({ maxWidth: 600 });
@@ -25,7 +27,7 @@ function CreateDrawer({
         setIsOpen={setIsOpen}
         isOpen={isOpen}
       >
-        <CreateModalComponent closefn={() => setIsOpen(!isOpen)} />
+        <CreateModalComponent closefn={() => setIsOpen(!isOpen)} id={id} />
       </OffCanvas>
 
       <div
@@ -41,7 +43,7 @@ function CreateDrawer({
         </Button>
       </div>
 
-      <TableComponent />
+      <TableComponent id={id} />
     </>
   );
 }

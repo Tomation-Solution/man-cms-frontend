@@ -320,6 +320,19 @@ export const eventsGetAll = async (params?: Record<string, any>) => {
   }
 };
 
+export const getCurrentAgmEvent = async () => {
+  try {
+    const res = await privateRequest.get(
+      `/events/?is_agm=true&is_current_agm=true`
+    );
+    console.log({ res });
+
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 export const eventsRetrieve = async (eventsId: number) => {
   try {
     const res = await privateRequest.get(`/events/${eventsId}`);
@@ -333,6 +346,21 @@ export const eventsUpdate = async (payload: any) => {
   const { eventsId, FormDataHandler } = payload;
   try {
     const res = await privateRequest.put(
+      `/events/${eventsId}`,
+      FormDataHandler
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const eventsPartialUpdate = async (payload: any) => {
+  const { eventsId, FormDataHandler } = payload;
+  console.log(payload);
+
+  try {
+    const res = await privateRequest.patch(
       `/events/${eventsId}`,
       FormDataHandler
     );
@@ -2250,9 +2278,9 @@ export const deleteHomeSliderApi = async (id: string | number) => {
 
 //REVAMPED AGM SECTION
 
-export const getAgmHomepage = async () => {
+export const getAgmHomepage = async (params: any) => {
   try {
-    const res = await privateRequest.get(`/agmcms/homepage`);
+    const res = await privateRequest.get(`/agmcms/homepage`, { params });
 
     return res.data;
   } catch (error: any) {
@@ -2260,18 +2288,20 @@ export const getAgmHomepage = async () => {
   }
 };
 
-export const updateAgmHomepage = async (payload: any) => {
+export const updateAgmHomepage = async (params: any, payload: any) => {
   try {
-    const res = await privateRequest.patch(`/agmcms/homepage`, payload);
+    const res = await privateRequest.patch(`/agmcms/homepage`, payload, {
+      params,
+    });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
 
-export const getAgmProgramme = async () => {
+export const getAgmProgramme = async (params: any) => {
   try {
-    const res = await privateRequest.get(`/agmcms/programme`);
+    const res = await privateRequest.get(`/agmcms/programme`, { params });
 
     return res.data;
   } catch (error: any) {
@@ -2279,27 +2309,31 @@ export const getAgmProgramme = async () => {
   }
 };
 
-export const updateAgmProgramme = async (payload: any) => {
+export const updateAgmProgramme = async (params: any, payload: any) => {
   try {
-    const res = await privateRequest.patch(`/agmcms/programme`, payload);
+    const res = await privateRequest.patch(`/agmcms/programme`, payload, {
+      params,
+    });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
 
-export const getAllAgmPrograms = async () => {
+export const getAllAgmPrograms = async (params: any) => {
   try {
-    const res = await privateRequest.get(`/agmcms/program`);
+    const res = await privateRequest.get(`/agmcms/program`, { params });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
 
-export const createAgmProgram = async (payload: any) => {
+export const createAgmProgram = async (params: any, payload: any) => {
   try {
-    const res = await privateRequest.post(`/agmcms/program`, payload);
+    const res = await privateRequest.post(`/agmcms/program`, payload, {
+      params,
+    });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
@@ -2343,18 +2377,20 @@ export const deleteAgmProgram = async (id: any) => {
   }
 };
 
-export const getAllAgmSpeakers = async () => {
+export const getAllAgmSpeakers = async (params: any) => {
   try {
-    const res = await privateRequest.get(`/agmcms/speakers`);
+    const res = await privateRequest.get(`/agmcms/speakers`, { params });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
 
-export const createAgmSpeaker = async (payload: any) => {
+export const createAgmSpeaker = async (params: any, payload: any) => {
   try {
-    const res = await privateRequest.post(`/agmcms/speakers`, payload);
+    const res = await privateRequest.post(`/agmcms/speakers`, payload, {
+      params,
+    });
     return res.data;
   } catch (error: any) {
     throw new AxiosError(error);
@@ -2398,15 +2434,18 @@ export const deleteAgmSpeaker = async (id: any) => {
   }
 };
 
-export const getAllAgmExhibitionImages = tryCatch(async () => {
-  const res = await privateRequest.get(`/agmcms/previous-exhibition-images`);
+export const getAllAgmExhibitionImages = tryCatch(async (params: any) => {
+  const res = await privateRequest.get(`/agmcms/previous-exhibition-images`, {
+    params,
+  });
   return res.data;
 });
 
 export const createAgmExhibitionImage = tryCatch(async (payload: any) => {
   const res = await privateRequest.post(
     `/agmcms/previous-exhibition-images`,
-    payload
+    payload.data,
+    { params: payload.params }
   );
   return res.data;
 });
@@ -2418,33 +2457,39 @@ export const deleteAgmExhibitionImage = tryCatch(async (id: any) => {
   return res.data;
 });
 
-export const getVenuePageContent = tryCatch(async () => {
-  const res = await privateRequest.get(`/agmcms/venue`);
+export const getVenuePageContent = tryCatch(async (params: any) => {
+  const res = await privateRequest.get(`/agmcms/venue`, { params });
   return res.data;
 });
 
 export const updateVenuePageContent = tryCatch(async (payload: any) => {
-  const res = await privateRequest.patch(`/agmcms/venue`, payload);
+  const res = await privateRequest.patch(`/agmcms/venue`, payload.data, {
+    params: payload.params,
+  });
   return res.data;
 });
 
-export const getExhibitionPageContent = tryCatch(async () => {
-  const res = await privateRequest.get(`/agmcms/exhibition`);
+export const getExhibitionPageContent = tryCatch(async (params: any) => {
+  const res = await privateRequest.get(`/agmcms/exhibition`, { params });
   return res.data;
 });
 
 export const updateExhibtionPageContent = tryCatch(async (payload: any) => {
-  const res = await privateRequest.patch(`/agmcms/exhibition`, payload);
+  const res = await privateRequest.patch(`/agmcms/exhibition`, payload.data, {
+    params: payload.params,
+  });
   return res.data;
 });
 
-export const getAllAgmFaq = tryCatch(async () => {
-  const res = await privateRequest.get(`/agmcms/faq`);
+export const getAllAgmFaq = tryCatch(async (params: any) => {
+  const res = await privateRequest.get(`/agmcms/faq`, { params });
   return res.data;
 });
 
 export const createAgmFaq = tryCatch(async (payload: any) => {
-  const res = await privateRequest.post(`/agmcms/faq`, payload);
+  console.log(payload.data);
+
+  const res = await privateRequest.post(`/agmcms/faq`, payload.data);
   return res.data;
 });
 

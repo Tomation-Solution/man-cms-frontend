@@ -13,6 +13,7 @@ type Prop = {
   accept?: string;
   type?: "password" | "text" | "file" | "date" | "time" | "number";
   containerStyle?: React.CSSProperties;
+  small_text?: string;
   // containerStyle:
 };
 
@@ -25,6 +26,7 @@ const InputWithLabel = ({
   accept,
   errorMessage,
   containerStyle = {},
+  small_text,
 }: Prop) => {
   return (
     <div
@@ -33,6 +35,8 @@ const InputWithLabel = ({
       <FormInput>
         <label>
           {label}
+          {small_text && <br />}
+          <small>{small_text}</small>
           <br />
           {!isTextArea ? (
             <input

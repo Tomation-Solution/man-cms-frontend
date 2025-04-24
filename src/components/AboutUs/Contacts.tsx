@@ -26,7 +26,7 @@ const Contacts = () => {
 
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["all-contacts", currentPage],
-    queryFn: () => contactGetAll({ page: currentPage }),
+    queryFn: () => contactGetAll({ page: currentPage, verified: true }),
     keepPreviousData: true,
   });
 

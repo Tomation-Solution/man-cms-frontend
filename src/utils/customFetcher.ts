@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 
 export const customFetcher = <T>(
-  key: string,
+  key: string | string[],
   fetcherfn: (data?: any) => Promise<any>,
   select?: (data: any) => any
 ) => {

@@ -10,9 +10,10 @@ import Loading from "../../Loading/Loading";
 
 type Props = {
   closefn: () => void;
+  id?: string;
 };
 
-function CreateAGMFaq({ closefn }: Props) {
+function CreateAGMFaq({ closefn, id }: Props) {
   const {
     register,
     handleSubmit,
@@ -28,20 +29,23 @@ function CreateAGMFaq({ closefn }: Props) {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(createAgmFaq, {
-    onSuccess: () => {
-      toast.success("creation successful");
-      queryClient.invalidateQueries("all-agm-faqs");
-      reset();
-      closefn();
-    },
-    onError: () => {
-      toast.error("creation failed");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => createAgmFaq({ params: id, data }),
+    {
+      onSuccess: () => {
+        toast.success("creation successful");
+        queryClient.invalidateQueries("all-agm-faqs");
+        reset();
+        closefn();
+      },
+      onError: () => {
+        toast.error("creation failed");
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: AGMFaqType) => {
-    mutate(inputData);
+    mutate({ ...inputData, event_id: id });
   };
 
   return (

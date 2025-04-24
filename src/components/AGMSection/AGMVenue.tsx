@@ -11,18 +11,28 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AGMVenueValidator, AGMVenueValidatorType } from "./validation";
 import Loading from "../Loading/Loading";
 import Button from "../Button/Button";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { isFileListValidator } from "../../utils/extraFunction";
 import InputWithLabel from "../InputWithLabel/InputWithLabel";
 import { SelectImage } from "../../globals/styles/CustomFormComponents";
 import { useEffect } from "react";
 
-function AGMVenue() {
-  const { loadingState, isError, data } = customFetcher<AGMVenueType>(
-    "venue-details",
-    getVenuePageContent
-  );
+function AGMVenue({ id }: { id?: string }) {
+  // const { loadingState, isError, data } = customFetcher<AGMVenueType>(
+  //   "venue-details",
+  //   getVenuePageContent
+  // );
+
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery([`venue-details`, id || ""], () => getVenuePageContent({ id }), {
+    select(data) {
+      return data?.data;
+    },
+  });
 
   const {
     register,
@@ -35,15 +45,18 @@ function AGMVenue() {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(updateVenuePageContent, {
-    onSuccess: () => {
-      queryClient.invalidateQueries("venue-details");
-      toast.success("update sucessful");
-    },
-    onError: () => {
-      toast.error("update failed");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => updateVenuePageContent({ params: { id }, data }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("venue-details");
+        toast.success("update sucessful");
+      },
+      onError: () => {
+        toast.error("update failed");
+      },
+    }
+  );
 
   useEffect(() => {
     if (data) {

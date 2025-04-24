@@ -15,9 +15,10 @@ import TextRichEditor from "../../../globals/TextRichEditor/TextRichEditor";
 
 type Props = {
   closefn: () => void;
+  id?: string;
 };
 
-function CreateAGMSpeaker({ closefn }: Props) {
+function CreateAGMSpeaker({ closefn, id }: Props) {
   const {
     register,
     handleSubmit,
@@ -32,19 +33,23 @@ function CreateAGMSpeaker({ closefn }: Props) {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(createAgmSpeaker, {
-    onSuccess: () => {
-      toast.success("created successfully");
-      queryClient.invalidateQueries("all-speaker");
-      reset();
-      closefn();
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => createAgmSpeaker({ id }, data),
+    {
+      onSuccess: () => {
+        toast.success("created successfully");
+        queryClient.invalidateQueries("all-speaker");
+        reset();
+        closefn();
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: AGMSpeakerValidatorType) => {
     const { speaker_image, ...payload } = inputData;
 
     const formData = new FormData();
+    formData.append("event_id", id || "");
 
     if (isFileListValidator(speaker_image)) {
       //@ts-ignore

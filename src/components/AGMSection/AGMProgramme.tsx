@@ -7,17 +7,22 @@ import InputWithLabel from "../InputWithLabel/InputWithLabel";
 import Loading from "../Loading/Loading";
 import Button from "../Button/Button";
 import { isFileListValidator } from "../../utils/extraFunction";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 
 type Props = {};
 
-function AGMProgramme({}: Props) {
-  const { loadingState, isError, data } = customFetcher<{
-    main_text: string;
-    main_image: string;
-  }>("programme-content", getAgmProgramme);
+function AGMProgramme({ id }: { id?: string }) {
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery([`programme-content`, id || ""], () => getAgmProgramme({ id }), {
+    select(data) {
+      return data?.data;
+    },
+  });
 
   const {
     register,
@@ -40,14 +45,17 @@ function AGMProgramme({}: Props) {
     }
   }, [reset, data]);
 
-  const { isLoading, mutate } = useMutation(updateAgmProgramme, {
-    onSuccess: () => {
-      toast.success("update successful");
-    },
-    onError: () => {
-      toast.error("update failed");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => updateAgmProgramme({ id }, data),
+    {
+      onSuccess: () => {
+        toast.success("update successful");
+      },
+      onError: () => {
+        toast.error("update failed");
+      },
+    }
+  );
 
   const onSubmitHandler = (inputData: {
     main_text: string;

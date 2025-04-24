@@ -26,6 +26,7 @@ type InputDataType = {
   image: string;
   name: string;
   is_agm: boolean | string;
+  is_current_agm: boolean | string;
   group_type: string;
   location: string;
   to_rel8: string;
@@ -39,6 +40,7 @@ const schema = yup.object({
   image: yup.mixed().required(),
   name: yup.string().required(),
   is_agm: yup.string().required(),
+  is_current_agm: yup.string(),
   group_type: yup.string().required(),
   location: yup.string().required(),
   to_rel8: yup.string().required("please select an option"),
@@ -56,6 +58,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -63,6 +66,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
       image: "",
       name: "",
       is_agm: "",
+      is_current_agm: "",
       group_type: "",
       location: "",
       start_date: "",
@@ -141,10 +145,15 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     if (data.is_paid == "true") {
       data.end_date = datefromatter(data.end_date as Date);
       data.start_date = datefromatter(data.start_date as Date);
-      let { image, ...payload } = data;
+      let { image, is_current_agm, ...payload } = data;
       image = image[0];
       const FormDataHandler = new FormData();
       FormDataHandler.append("image", image);
+      if (data?.is_agm === "true") {
+        FormDataHandler.append("is_current_agm", is_current_agm as string);
+      } else {
+        FormDataHandler.append("is_current_agm", "false");
+      }
       Object.keys(payload)?.forEach((key) =>
         //@ts-ignore
         FormDataHandler.append(key, payload[key])
@@ -153,10 +162,15 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     } else {
       data.end_date = datefromatter(data.end_date as Date);
       data.start_date = datefromatter(data.start_date as Date);
-      let { image, price, ...payload } = data;
+      let { image, price, is_current_agm, ...payload } = data;
       image = image[0];
       const FormDataHandler = new FormData();
       FormDataHandler.append("image", image);
+      if (data?.is_agm === "true") {
+        FormDataHandler.append("is_current_agm", is_current_agm as string);
+      } else {
+        FormDataHandler.append("is_current_agm", "false");
+      }
       Object.keys(payload)?.forEach((key) =>
         //@ts-ignore
         FormDataHandler.append(key, payload[key])
@@ -264,6 +278,24 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                   </select>
                 </label>
               </FormSelect>
+
+              <FormSelect>
+                <label>
+                  Should this be set as the current Annual General Meeting
+                  <br />
+                  <small>
+                    Note that this can still be set as the current AGM Event
+                    later from the AGM Section
+                  </small>
+                  <br />
+                  <select defaultValue={""} {...register("is_current_agm")}>
+                    <option disabled>select an option</option>
+                    <option value={"true"}>Yes</option>
+                    <option value={"false"}>No</option>
+                  </select>
+                </label>
+              </FormSelect>
+
               <FormError>
                 {errors?.start_date?.message ? "invalid start date" : null}
               </FormError>

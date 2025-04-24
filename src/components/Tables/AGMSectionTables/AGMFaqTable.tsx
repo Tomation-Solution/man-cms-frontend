@@ -1,3 +1,4 @@
+import { useQuery } from "react-query";
 import { getAllAgmFaq } from "../../../axios/api-calls";
 import TableWithDrawers from "../../../globals/TableWithDrawers";
 import { customFetcher } from "../../../utils/customFetcher";
@@ -7,11 +8,21 @@ import DeleteAGMFaq from "../../Modals/AGMFaqModals/DeleteAGMFaq";
 import EditAGMFaq from "../../Modals/AGMFaqModals/EditAGMFaq";
 import sanitizeHtml from "sanitize-html";
 
-function AGMFaqTable() {
-  const { loadingState, isError, data } = customFetcher<AGMFaqType[]>(
-    "all-agm-faqs",
-    getAllAgmFaq
-  );
+function AGMFaqTable({ id }: { id?: string }) {
+  // const { loadingState, isError, data } = customFetcher<AGMFaqType[]>(
+  //   "all-agm-faqs",
+  //   getAllAgmFaq
+  // );
+
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery([`all-agm-faqs`, id || ""], () => getAllAgmFaq({ id }), {
+    select(data) {
+      return data?.data;
+    },
+  });
 
   if (loadingState) {
     return <EmptyState header="loading data" />;

@@ -8,6 +8,8 @@ export interface ServiceRequestType {
   name: string;
   email: string;
   company_name: string;
+  type: string;
+  service: string;
   message: string;
   created_at: string;
 }
@@ -33,6 +35,14 @@ const ServiceRequestItem: React.FC<{ data: ServiceRequestType }> = ({
       <p>
         <span className="darkend">Company Name: </span>
         {data.company_name}
+      </p>
+      <p>
+        <span className="darkend">Service Type: </span>
+        {data.type}
+      </p>
+      <p>
+        <span className="darkend">Service Name: </span>
+        {data.service}
       </p>
       <p>
         <span className="darkend">Message: </span>

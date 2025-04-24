@@ -84,6 +84,7 @@ function App() {
             />
 
             <Route path="/agm-section" element={<AGMSectionPage />} />
+            <Route path="/agm-section/:id" element={<AGMSectionPage />} />
             <Route path="/events-and-media" element={<EventsAndMediaPage />} />
 
             <Route

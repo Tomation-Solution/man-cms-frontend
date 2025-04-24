@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useForm } from "react-hook-form";
 
 import {
@@ -17,10 +17,24 @@ import InputWithLabel from "../InputWithLabel/InputWithLabel";
 import Button from "../Button/Button";
 import TextRichEditor from "../../globals/TextRichEditor/TextRichEditor";
 
-function AGMExhibitionpage() {
-  const { loadingState, isError, data } = customFetcher<AGMExhibitionType>(
-    "exhibition-details",
-    getExhibitionPageContent
+function AGMExhibitionpage({ id }: { id?: string }) {
+  // const { loadingState, isError, data } = customFetcher<AGMExhibitionType>(
+  //   "exhibition-details",
+  //   getExhibitionPageContent
+  // );
+
+  const {
+    isLoading: loadingState,
+    isError,
+    data,
+  } = useQuery(
+    [`exhibition-details`, id || ""],
+    () => getExhibitionPageContent({ id }),
+    {
+      select(data) {
+        return data?.data;
+      },
+    }
   );
 
   const {
@@ -37,15 +51,18 @@ function AGMExhibitionpage() {
 
   const queryClient = useQueryClient();
 
-  const { isLoading, mutate } = useMutation(updateExhibtionPageContent, {
-    onSuccess: () => {
-      queryClient.invalidateQueries("exhibition-details");
-      toast.success("update sucessful");
-    },
-    onError: () => {
-      toast.error("update failed");
-    },
-  });
+  const { isLoading, mutate } = useMutation(
+    (data: any) => updateExhibtionPageContent({ params: { id }, data }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("exhibition-details");
+        toast.success("update sucessful");
+      },
+      onError: () => {
+        toast.error("update failed");
+      },
+    }
+  );
 
   useEffect(() => {
     if (data) {
