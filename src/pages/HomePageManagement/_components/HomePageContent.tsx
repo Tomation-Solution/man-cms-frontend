@@ -88,12 +88,12 @@ const HomePageContent = () => {
   const onSubmitHandler = (data: HomePageContentType) => {
     console.log({ SUbmittedData: data });
     mutate(data);
-    setVisionIntro("");
-    setMissionIntro("");
-    setAdvocacyIntro("");
-    setHistoryIntro("");
-    setWhyJoinIntro("");
-    setMembersIntro("");
+    // setVisionIntro("");
+    // setMissionIntro("");
+    // setAdvocacyIntro("");
+    // setHistoryIntro("");
+    // setWhyJoinIntro("");
+    // setMembersIntro("");
   };
 
   useEffect(() => {
@@ -116,12 +116,12 @@ const HomePageContent = () => {
       setValue("why_join_intro", data.why_join_intro);
       setValue("members_intro", data.members_intro);
 
-      //   setVisionIntro(data.vision_intro);
-      //   setMissionIntro(data.mission_intro);
-      //   setAdvocacyIntro(data.advocacy_intro);
-      //   setHistoryIntro(data.history_intro);
-      //   setWhyJoinIntro(data.why_join_intro);
-      //   setMembersIntro(data.members_intro);
+      setVisionIntro(data.vision_intro);
+      setMissionIntro(data.mission_intro);
+      setAdvocacyIntro(data.advocacy_intro);
+      setHistoryIntro(data.history_intro);
+      setWhyJoinIntro(data.why_join_intro);
+      setMembersIntro(data.members_intro);
     }
   }, [data]);
 
