@@ -1,3 +1,4 @@
+// Modifications to Login component to add Forgot Password link
 import React from "react";
 import {
   Form,
@@ -8,14 +9,13 @@ import {
 } from "../../globals/styles/forms.styles";
 import { LoginContainer } from "./Login.styles";
 import { useForm } from "react-hook-form";
-
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "react-query";
 import { loginUser } from "../../axios/api-calls";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../../zustand/store";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, Link } from "react-router-dom";
 import { AxiosError } from "axios";
 import Loading from "../Loading/Loading";
 
@@ -61,9 +61,9 @@ const Login = () => {
           icon: false,
         });
         setUserFn(data);
-        if(data.user_type==='executive_secretary'){
-        navigate("/prospective-members-executive");
-        }else{
+        if (data.user_type === "executive_secretary") {
+          navigate("/prospective-members-executive");
+        } else {
           navigate("/publications");
         }
       },
@@ -110,9 +110,11 @@ const Login = () => {
                 type={"password"}
                 {...register("password", { required: true })}
               />
-              <br />
-              <FormButton>Submit</FormButton>
+              <div style={{ textAlign: "right", marginTop: "5px" }}>
+                <Link to="/forgot-password">Forgot password?</Link>
+              </div>
             </FormInput>
+            <FormButton>Submit</FormButton>
           </Form>
         </FormContainer>
       </LoginContainer>

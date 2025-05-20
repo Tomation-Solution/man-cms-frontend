@@ -160,6 +160,12 @@ const SideBar: FC<Props> = ({ show }) => {
             <MdRoundaboutLeft />
             NewsLetter Subscriptions
           </CustomSideBarNavLinks>
+
+          <CustomSideBarNavLinks where="/admin-control">
+            <MdEmojiEvents />
+            Admin User Control
+          </CustomSideBarNavLinks>
+
           <SideBtn onClick={deleteUserFn}>
             <BiLogOut />
             Logout

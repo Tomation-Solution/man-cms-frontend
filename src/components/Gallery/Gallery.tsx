@@ -21,12 +21,12 @@ const Gallery = () => {
   const [galleryId, setGalleryId] = useState(0);
   const [galleryName, setGalleryName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [showRenameModal, setShowRenameModal] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-  const [nextUrl, setNextUrl] = useState(null);
+
   const [url, setUrl] = useState("/gallery/");
-  const [updateNext, setUpdateNext] = useState<boolean>(true);
+  const [data, setData] = useState<any[]>([]);
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
   const {
     isLoading,
@@ -39,24 +39,15 @@ const Gallery = () => {
 
   useEffect(() => {
     if (results?.results) {
-      setData((prevData) => {
-        const existingIds = new Set(prevData.map((item) => item.id)); // Track existing IDs
-        const newData = results.results.filter(
-          (item: any) => !existingIds.has(item.id)
-        ); // Filter out duplicates
-
-        const mergedData = [...prevData, ...newData]; // Append only new unique items
-        return mergedData.sort(
-          (a, b) =>
+      setData(
+        results.results.sort(
+          (a: { updated_at: any }, b: { updated_at: any }) =>
             new Date(String(b.updated_at)).getTime() -
             new Date(String(a.updated_at)).getTime()
-        );
-      });
-
-      if (updateNext) {
-        setNextUrl(results.next || null);
-      }
-      setUpdateNext(true);
+        )
+      );
+      setNextUrl(results.next || null);
+      setPrevUrl(results.previous || null);
     }
   }, [results]);
 
@@ -69,21 +60,21 @@ const Gallery = () => {
           {showModal && (
             <GalleryModal
               galleryid={galleryId}
-              closefn={() => setShowModal(!showModal)}
+              closefn={() => setShowModal(false)}
             />
           )}
           {showDeleteModal && (
             <GalleryDelete
               galleryId={galleryId}
               galleryName={galleryName}
-              closefn={() => setShowDeleteModal(!showDeleteModal)}
+              closefn={() => setShowDeleteModal(false)}
             />
           )}
           {showRenameModal && (
             <GalleryRename
               galleryId={galleryId}
               galleryName={galleryName}
-              closefn={() => setShowRenameModal(!showRenameModal)}
+              closefn={() => setShowRenameModal(false)}
             />
           )}
 
@@ -93,8 +84,9 @@ const Gallery = () => {
             setIsOpen={setIsOpen}
             isOpen={isOpen}
           >
-            <GalleryCreateModal closefn={() => setIsOpen(!isOpen)} />
+            <GalleryCreateModal closefn={() => setIsOpen(false)} />
           </OffCanvas>
+
           <div
             style={{
               display: "flex",
@@ -107,7 +99,6 @@ const Gallery = () => {
               onClick={() => {
                 setIsOpen(true);
                 setUrl("/gallery/");
-                setUpdateNext(false);
               }}
             >
               Create New
@@ -123,14 +114,13 @@ const Gallery = () => {
                   <small>
                     Created on: {datefromatter(new Date(item.created_at))}
                   </small>
-
                   <div className="gallery-modal-btn">
                     <Button
                       isSmall
                       onClick={() => {
                         setGalleryId(item.id);
                         setGalleryName(item.name);
-                        setShowRenameModal(!showRenameModal);
+                        setShowRenameModal(true);
                       }}
                     >
                       Rename
@@ -139,7 +129,7 @@ const Gallery = () => {
                       isSmall
                       onClick={() => {
                         setGalleryId(item.id);
-                        setShowModal(!showModal);
+                        setShowModal(true);
                       }}
                     >
                       View
@@ -149,7 +139,7 @@ const Gallery = () => {
                       onClick={() => {
                         setGalleryId(item.id);
                         setGalleryName(item.name);
-                        setShowDeleteModal(!showDeleteModal);
+                        setShowDeleteModal(true);
                       }}
                     >
                       Delete
@@ -158,22 +148,28 @@ const Gallery = () => {
                 </div>
               ))}
             </div>
+
             <div
               style={{
                 display: "flex",
-                flexDirection: "row-reverse",
+                justifyContent: "space-between",
                 paddingTop: "2rem",
                 paddingBottom: "2rem",
               }}
             >
               <Button
-                style={{
-                  opacity: !nextUrl ? "0.5" : "1",
-                }}
+                disabled={!prevUrl}
+                style={{ opacity: prevUrl ? "1" : "0.5" }}
+                onClick={() => setUrl(prevUrl!)}
+              >
+                Previous
+              </Button>
+              <Button
                 disabled={!nextUrl}
+                style={{ opacity: nextUrl ? "1" : "0.5" }}
                 onClick={() => setUrl(nextUrl!)}
               >
-                Load More
+                Next
               </Button>
             </div>
           </GalleryContainer>
