@@ -208,6 +208,7 @@ const CreateEventModal: React.FC<{ closefn: () => void }> = ({ closefn }) => {
                 <label>
                   Image
                   <br />
+                  <small>Aspect Ratio: 16/7</small>
                   <input
                     type="file"
                     accept="image/*"

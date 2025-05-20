@@ -29,6 +29,9 @@ import Unauthorized from "./components/Unauthorized/Unauthorized";
 import ExecutiveMemberViewPage from "./components/ProspectiveMembers/ExecutiveMember";
 import AGMSectionPage from "./pages/AGMSectionPage";
 import EventsAndMediaPage from "./pages/events&media";
+import AdminsPage from "./pages/AdminPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
@@ -37,6 +40,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
           <Route element={<MainLayout />}>
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/publications" element={<PublicationsPage />} />
@@ -51,6 +59,7 @@ function App() {
             <Route path="/newsletter-sub" element={<NewsLetterPage />} />
             <Route path="/service" element={<ServicePage />} />
             <Route path="/structure" element={<StructurePage />} />
+            <Route path="/admin-control" element={<AdminsPage />} />
             <Route
               path="/payments-and-registrations"
               element={<PaymentsPage />}

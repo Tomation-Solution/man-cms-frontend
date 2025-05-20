@@ -14,9 +14,16 @@ import { MPDCLPageContentSchemaFormType } from "../pages/Structure/_components/M
 import { MrcPageContentTabschemaType } from "../pages/Structure/_components/MRCPageContent";
 import { EventAndMediaContentType } from "../pages/events&media";
 import { MrcContactPageSchemaType } from "../pages/Structure/_components/MRCContact";
+import {
+  CreateUserPayload,
+  CreateUserResponse,
+  LoginPayload,
+  LoginResponse,
+  LogoutPayload,
+} from "./auth.types";
 
 //LOGIN
-export const loginUser = async (user: { email: string; password: string }) => {
+export const loginUser = async (user: LoginPayload): Promise<LoginResponse> => {
   try {
     const loginURL = `${BASE_URL}/auth/login`;
     const res = await axios.post(loginURL, user);
@@ -24,9 +31,9 @@ export const loginUser = async (user: { email: string; password: string }) => {
   } catch (error: any) {
     if (!error?.response) {
       throw new Error("No Server Response");
-    } else if (error?.response.status === 400) {
+    } else if (error.response.status === 400) {
       throw new Error("Invalid Credentials");
-    } else if (error?.response.status === 401) {
+    } else if (error.response.status === 401) {
       throw new Error("Unauthorized");
     } else {
       throw new Error("Login Failed");
@@ -35,7 +42,7 @@ export const loginUser = async (user: { email: string; password: string }) => {
 };
 
 //LOG OUT
-export const logoutUser = async (payload: { refresh: string }) => {
+export const logoutUser = async (payload: LogoutPayload) => {
   try {
     const res = await privateRequest.post("/auth/token/blacklist/", payload);
     return res.data;
@@ -43,23 +50,127 @@ export const logoutUser = async (payload: { refresh: string }) => {
     throw new AxiosError(e);
   }
 };
-//userType ... u can add more users type options that is avalable in the backend
-type createUserProp = {
-  email: string;
-  password: string;
-  userType: "executive_secretary";
-};
+
 export const createUserApi = async ({
   email,
   password,
   userType,
-}: createUserProp): Promise<{ message: string }> => {
+}: CreateUserPayload): Promise<CreateUserResponse> => {
   const resp = await privateRequest.post(
     `/auth/create-account/?user_type=${userType}`,
     { email, password }
   );
   return resp.data;
 };
+
+export const refreshAccessToken = async (refreshToken: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/auth/token/refresh/`, {
+      refresh: refreshToken,
+    });
+    return res.data; // returns new access token
+  } catch (error) {
+    throw new Error("Unable to refresh token");
+  }
+};
+
+// Types for password reset
+export type RequestResetPayload = {
+  email: string;
+  frontend_url: string;
+};
+
+export type ConfirmResetPayload = {
+  token: string;
+  password: string;
+  confirm_password: string;
+};
+
+export type AdminResetPayload = {
+  user_id: string | number;
+};
+
+// Request password reset
+export const requestPasswordReset = async (
+  payload: RequestResetPayload
+): Promise<any> => {
+  try {
+    const resetURL = `${BASE_URL}/auth/password-reset/request/`;
+    const res = await axios.post(resetURL, payload);
+    return res.data;
+  } catch (error: any) {
+    if (!error?.response) {
+      throw new Error("No Server Response");
+    } else if (error.response.status === 400) {
+      throw new Error(error.response.data?.detail || "Invalid request");
+    } else {
+      throw new Error("Password reset request failed");
+    }
+  }
+};
+
+// Confirm password reset with token and new password
+export const confirmPasswordReset = async (
+  payload: ConfirmResetPayload
+): Promise<any> => {
+  try {
+    const resetURL = `${BASE_URL}/auth/password-reset/confirm/`;
+    const res = await axios.post(resetURL, payload);
+    return res.data;
+  } catch (error: any) {
+    if (!error?.response) {
+      throw new Error("No Server Response");
+    } else if (error.response.status === 400) {
+      // Get detailed error message if available
+      const errorMsg =
+        error.response.data?.token ||
+        error.response.data?.password ||
+        error.response.data?.detail ||
+        "Invalid reset request";
+      throw new Error(errorMsg);
+    } else {
+      throw new Error("Password reset failed");
+    }
+  }
+};
+
+// Admin initiated password reset (requires authentication)
+export const adminResetPassword = async (
+  payload: AdminResetPayload
+): Promise<any> => {
+  try {
+    const res = await privateRequest.post(
+      "/auth/admin/password-reset/",
+      payload
+    );
+    return res.data;
+  } catch (error: any) {
+    if (!error?.response) {
+      throw new Error("No Server Response");
+    } else if (error.response.status === 403) {
+      throw new Error("You don't have permission to perform this action");
+    } else if (error.response.status === 404) {
+      throw new Error("User not found");
+    } else {
+      throw new Error(error.response.data?.error || "Password reset failed");
+    }
+  }
+};
+
+export const getAdminUserById = async (id: number | string) => {
+  // Return early if no valid ID is provided
+  if (id === "") {
+    return null;
+  }
+
+  try {
+    const res = await privateRequest.get(`/admin/${id}`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 //PUBLICATIONS
 export const publicationCreate = async (payload: any) => {
   try {

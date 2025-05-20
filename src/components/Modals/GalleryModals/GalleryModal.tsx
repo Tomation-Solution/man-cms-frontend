@@ -23,9 +23,7 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const [data, setData] = useState<any>();
 
-  const [nextUrl, setNextUrl] = useState<string>();
   const [url, setUrl] = useState("");
-  const [updateNext, setUpdateNext] = useState(true);
 
   const {
     isLoading,
@@ -42,39 +40,20 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
 
   useEffect(() => {
     if (results?.results) {
-      setData((prevData: any) => {
-        const fetchedResults = results?.results;
-        if (!fetchedResults) return prevData;
+      const fetchedResults = results.results;
 
-        const existingIds = new Set(
-          (prevData?.gallery_items || []).map((item: any) => item.id)
-        ); // Track existing gallery item IDs
+      const sortedGalleryItems = [
+        ...(fetchedResults?.gallery_items || []),
+      ].sort(
+        (a, b) =>
+          new Date(String(b.updated_at)).getTime() -
+          new Date(String(a.updated_at)).getTime()
+      );
 
-        // Filter out duplicates and merge new gallery items
-        const newGalleryItems =
-          fetchedResults.gallery_items?.filter(
-            (item: any) => !existingIds.has(item.id)
-          ) || [];
-
-        const updatedGalleryItems = [
-          ...(prevData?.gallery_items || []),
-          ...newGalleryItems,
-        ].sort(
-          (a, b) =>
-            new Date(String(b.updated_at)).getTime() -
-            new Date(String(a.updated_at)).getTime() // Sort by latest updated
-        );
-
-        return {
-          ...fetchedResults,
-          gallery_items: updatedGalleryItems,
-        };
+      setData({
+        ...fetchedResults,
+        gallery_items: sortedGalleryItems,
       });
-
-      if (updateNext) {
-        setNextUrl(results.next || null);
-      }
-      setUpdateNext(true);
     }
   }, [results]);
 
@@ -157,19 +136,29 @@ const GalleryModal: React.FC<{ closefn: () => void; galleryid?: number }> = ({
             <div
               style={{
                 display: "flex",
-                flexDirection: "row-reverse",
+                justifyContent: "space-between",
                 paddingTop: "2rem",
                 paddingBottom: "2rem",
               }}
             >
               <Button
                 style={{
-                  opacity: !nextUrl ? "0.5" : "1",
+                  opacity: !results?.previous ? "0.5" : "1",
                 }}
-                disabled={!nextUrl}
-                onClick={() => setUrl(nextUrl!)}
+                disabled={!results?.previous}
+                onClick={() => setUrl(results?.previous || "")}
               >
-                Load More
+                Previous
+              </Button>
+
+              <Button
+                style={{
+                  opacity: !results?.next ? "0.5" : "1",
+                }}
+                disabled={!results?.next}
+                onClick={() => setUrl(results?.next || "")}
+              >
+                Next
               </Button>
             </div>
           </GalleryModalContainer>

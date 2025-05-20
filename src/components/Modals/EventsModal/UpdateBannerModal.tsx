@@ -9,18 +9,8 @@ import { useForm } from "react-hook-form";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import {
-  getEventBanner,
-  getOurMembersBanner,
-  getTrainingsBanner,
-  getWhyJoinBanner,
-  ourMembersCreate,
-  updateEventBanner,
-  updateOurMembersBanner,
-  updateTrainingsBanner,
-  updateWhyJoinBanner,
-} from "../../../axios/api-calls";
+import { useMutation, useQuery } from "react-query";
+import { getEventBanner, updateEventBanner } from "../../../axios/api-calls";
 import { CustomModalButton } from "../../../globals/styles/CustomFormComponents";
 import { toast } from "react-toastify";
 import InputWithLabel from "../../InputWithLabel/InputWithLabel";
@@ -33,7 +23,6 @@ interface InputData extends yup.InferType<typeof schema> {}
 
 const EventUpdateBanner: React.FC<{ closefn: () => void }> = ({ closefn }) => {
   const { data: fetchedData } = useQuery("event-banner", getEventBanner);
-  console.log(fetchedData);
 
   const {
     handleSubmit,
@@ -47,7 +36,7 @@ const EventUpdateBanner: React.FC<{ closefn: () => void }> = ({ closefn }) => {
     },
   });
 
-  const { isLoading, mutate, data } = useMutation(updateEventBanner, {
+  const { isLoading, mutate, data, error } = useMutation(updateEventBanner, {
     onMutate: () => {
       toast.info("Updating Banner", {
         icon: false,
