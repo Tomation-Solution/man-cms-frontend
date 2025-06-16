@@ -215,7 +215,7 @@ const EditPublicationsModal: React.FC<{ pubid: number; close: () => void }> = ({
               <FormInput>
                 <SelectImage image={`${previousImage}`} />
                 <label>
-                  Image*
+                  Image* (Aspect Ratio: 16:9)
                   <br />
                   <input
                     type={"file"}

@@ -235,7 +235,7 @@ const CreatePublicationsModal = () => {
               <FormError>{errors?.image?.message}</FormError>
               <FormInput>
                 <label>
-                  Image*
+                  Image* (Aspect Ratio: 16:9)
                   <br />
                   <input
                     type={"file"}

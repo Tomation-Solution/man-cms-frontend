@@ -57,6 +57,7 @@ const HomePageContent = () => {
           console.log({ data });
         }
       },
+      refetchOnWindowFocus: false,
     }
   );
 
