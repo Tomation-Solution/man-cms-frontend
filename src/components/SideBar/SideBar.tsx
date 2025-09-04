@@ -161,6 +161,11 @@ const SideBar: FC<Props> = ({ show }) => {
             NewsLetter Subscriptions
           </CustomSideBarNavLinks>
 
+          <CustomSideBarNavLinks where="/footer-management">
+            <MdRoundaboutLeft />
+            Footer Management
+          </CustomSideBarNavLinks>
+
           <CustomSideBarNavLinks where="/admin-control">
             <MdEmojiEvents />
             Admin User Control

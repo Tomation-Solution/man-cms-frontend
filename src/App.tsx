@@ -32,6 +32,7 @@ import EventsAndMediaPage from "./pages/events&media";
 import AdminsPage from "./pages/AdminPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import FooterManagementPage from "./pages/FooterManagementPage";
 
 function App() {
   return (
@@ -60,6 +61,10 @@ function App() {
             <Route path="/service" element={<ServicePage />} />
             <Route path="/structure" element={<StructurePage />} />
             <Route path="/admin-control" element={<AdminsPage />} />
+            <Route
+              path="/footer-management"
+              element={<FooterManagementPage />}
+            />
             <Route
               path="/payments-and-registrations"
               element={<PaymentsPage />}

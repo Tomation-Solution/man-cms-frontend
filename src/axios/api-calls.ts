@@ -1272,6 +1272,28 @@ export const newsletterUIGet = async () => {
   return res.data;
 };
 
+// FOOTER MANAGEMENT
+export const getFooterContent = async () => {
+  try {
+    const res = await privateRequest.get(`/homepage/footer/content/`);
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
+export const updateFooterContent = async (payload: any) => {
+  try {
+    const res = await privateRequest.patch(
+      `/homepage/footer/update_content/`,
+      payload
+    );
+    return res.data;
+  } catch (e: any) {
+    throw new AxiosError(e);
+  }
+};
+
 //PAYMENTS
 
 export const publicationPayments = async (
